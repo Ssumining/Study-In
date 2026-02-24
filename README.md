@@ -62,19 +62,20 @@ gantt
 
 ## 3. 프로젝트 샐행 방법
 
-  ###$. 저장소 클론
-    VITE_BASE_URL=https://api.studyin.com
-    VITE_CHAT_URL=wss://api.studyin.com/ws
-git clone <repository-url>
+  ### 1. 저장소 클론
+  
+    VITE_BASE_URL=https://api.studyin.com :
+    VITE_CHAT_URL=wss://api.studyin.com/ws :
+git clone <[repository-url](https://github.com/Study-In-03/Study-In.git)>
 
- ### $. 패키지 설치
+ ### 2. 패키지 설치
   npm install
 
-  ### $. 환경 변수 설정
+  ### 3. 환경 변수 설정
   .env 파일 생성 후 아래 내용 추가
 
 
-  ### $. 실행
+  ### 4. 실행
   npm run dev
 
 ## 4. 프로젝트 구조
