@@ -28,9 +28,6 @@ function validateForm(state: StudyFormState): StudyFormErrors {
   if (!state.thumbnail) errors.thumbnail = "썸네일 이미지를 업로드해주세요.";
   if (!state.title.trim()) errors.title = "스터디 제목을 입력해주세요.";
   if (!state.studyType) errors.studyType = "스터디 유형을 선택해주세요.";
-  if (state.studyType === "offline" && !state.location.trim()) {
-    errors.location = "오프라인 스터디는 지역을 입력해주세요.";
-  }
   if (state.maxMembers === "") {
     errors.maxMembers = "모집 인원을 입력해주세요.";
   } else if (Number(state.maxMembers) < 3 || Number(state.maxMembers) > 99) {
@@ -54,7 +51,6 @@ function isFormValid(state: StudyFormState): boolean {
   if (!state.thumbnail) return false;
   if (!state.title.trim()) return false;
   if (!state.studyType) return false;
-  if (state.studyType === "offline" && !state.location.trim()) return false;
   if (
     state.maxMembers === "" ||
     Number(state.maxMembers) < 3 ||
@@ -155,6 +151,7 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
     const trimmed = tagInput.trim();
     if (!trimmed) return;
     if (form.tags.includes(trimmed)) return;
+    if (form.tags.length >= 5) return;
     setForm((prev: StudyFormState) => ({
       ...prev,
       tags: [...prev.tags, trimmed],
