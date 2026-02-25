@@ -34,6 +34,7 @@ export interface StudyFormErrors {
   durationWeeks?: string;
   startTime?: string;
   endTime?: string;
+  timeRange?: string;
   subject?: string;
   difficulty?: string;
   tags?: string;

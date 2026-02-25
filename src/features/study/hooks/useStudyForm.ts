@@ -1,10 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import type { ChangeEvent, KeyboardEvent, FormEvent } from "react";
-import type {
-  StudyFormState,
-  StudyFormErrors,
-  StudyDay,
-} from "@/types/study";
+import type { StudyFormState, StudyFormErrors, StudyDay } from "@/types/study";
 
 const INITIAL_STATE: StudyFormState = {
   thumbnail: null,
@@ -44,6 +40,9 @@ function validateForm(state: StudyFormState): StudyFormErrors {
   if (state.durationWeeks === "") errors.durationWeeks = "기간을 입력해주세요.";
   if (!state.startTime) errors.startTime = "시작 시간을 선택해주세요.";
   if (!state.endTime) errors.endTime = "종료 시간을 선택해주세요.";
+  if (state.startTime && state.endTime && state.startTime >= state.endTime) {
+    errors.timeRange = "종료 시간은 시작 시간보다 늦어야 합니다.";
+  }
   if (!state.subject) errors.subject = "주제를 선택해주세요.";
   if (!state.difficulty) errors.difficulty = "난이도를 선택해주세요.";
   if (state.tags.length === 0) errors.tags = "태그를 1개 이상 입력해주세요.";
@@ -66,6 +65,7 @@ function isFormValid(state: StudyFormState): boolean {
   if (state.durationWeeks === "") return false;
   if (!state.startTime) return false;
   if (!state.endTime) return false;
+  if (state.startTime >= state.endTime) return false;
   if (!state.subject) return false;
   if (!state.difficulty) return false;
   if (state.tags.length === 0) return false;
@@ -155,7 +155,10 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
     const trimmed = tagInput.trim();
     if (!trimmed) return;
     if (form.tags.includes(trimmed)) return;
-    setForm((prev: StudyFormState) => ({ ...prev, tags: [...prev.tags, trimmed] }));
+    setForm((prev: StudyFormState) => ({
+      ...prev,
+      tags: [...prev.tags, trimmed],
+    }));
     setTagInput("");
     setErrors((prev: StudyFormErrors) => {
       const next = { ...prev };
@@ -166,7 +169,10 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
   }, [tagInput, form.tags]);
 
   const handleRemoveTag = useCallback((tag: string) => {
-    setForm((prev: StudyFormState) => ({ ...prev, tags: prev.tags.filter((t: string) => t !== tag) }));
+    setForm((prev: StudyFormState) => ({
+      ...prev,
+      tags: prev.tags.filter((t: string) => t !== tag),
+    }));
     setIsDirty(true);
   }, []);
 

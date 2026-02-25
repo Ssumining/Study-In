@@ -83,7 +83,9 @@ export default function StudyForm({
                 />
               </svg>
               <p className="text-xs text-gray-400">클릭하여 이미지 업로드</p>
-              <p className="text-xs text-gray-300 mt-1">JPG, PNG, GIF (최대 5MB)</p>
+              <p className="text-xs text-gray-300 mt-1">
+                JPG, PNG, GIF (최대 5MB)
+              </p>
             </>
           )}
         </div>
@@ -325,6 +327,9 @@ export default function StudyForm({
             )}
           </div>
         </div>
+        {errors.timeRange && (
+          <p className="text-xs text-red-500">{errors.timeRange}</p>
+        )}
       </section>
 
       {/* 주제 & 난이도 */}
