@@ -36,7 +36,7 @@ export default function StudyCreate() {
   return (
     <div className="min-h-screen bg-white">
       {/* ── 앱 헤더 ── */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
+      <header className="bg-background border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
           {/* 햄버거 */}
           <button type="button" className="p-1 -ml-1" aria-label="메뉴">
@@ -61,7 +61,7 @@ export default function StudyCreate() {
           type="submit"
           form="study-create-form"
           disabled={!isValid}
-          className={`min-w-[160px] min-h-[40px] py-[10px] px-6 rounded-xl text-sm font-bold text-white transition-colors ${
+          className={`min-w-[160px] min-h-[40px] py-[10px] px-6 rounded-xl text-sm font-bold text-background transition-colors ${
             isValid ? "bg-[#4F7BF7]" : "bg-[#c5d3fc]"
           }`}
         >

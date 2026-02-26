@@ -99,7 +99,7 @@ export default function Header({ variant = 'default' }: HeaderProps) {
               </button>
             </div>
           ) : (
-            <button className="shrink-0 px-4 py-2 bg-primary text-white text-base font-medium rounded-lg">
+            <button className="shrink-0 px-4 py-2 bg-primary text-background text-base font-medium rounded-lg">
               시작하기
             </button>
           )}
