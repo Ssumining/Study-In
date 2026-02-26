@@ -296,7 +296,7 @@ export default function StudyForm({
   return (
     <form id="study-create-form" onSubmit={handleSubmit} noValidate>
       {/* ── 카드: 대표이미지 ~ 모집인원 ── */}
-      <div className="mx-4 mt-2 rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="mx-4 mt-2 rounded-2xl border border-gray-200 overflow-hidden bg-white">
         {/* 대표 이미지 */}
         <div
           className="relative w-full bg-gray-100 cursor-pointer"
