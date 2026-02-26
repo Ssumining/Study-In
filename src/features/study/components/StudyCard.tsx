@@ -1,0 +1,31 @@
+import React from 'react';
+import type { Study } from '../../../types/study';
+
+interface StudyCardProps {
+  study: Study;
+}
+
+const StudyCard = ({ study }: StudyCardProps) => {
+  return (
+    <div className="bg-white rounded-[20px] border border-gray-100 overflow-hidden shadow-sm">
+      <div className="relative aspect-16/10">
+        <img 
+          src={study.thumbnail} 
+          alt={study.title} 
+          className="w-full h-full object-cover" 
+        />
+        <div className="absolute top-3 left-3">
+          <span className="bg-primary text-white text-xs font-bold px-2 py-1 rounded-lg">
+            {study.status}
+          </span>
+        </div>
+      </div>
+      <div className="p-4">
+        <h4 className="text-base font-bold text-gray-900 mb-2">{study.title}</h4>
+        <div className="text-sm text-gray-500">참여 {study.current_participants}명</div>
+      </div>
+    </div>
+  );
+};
+
+export default StudyCard;
