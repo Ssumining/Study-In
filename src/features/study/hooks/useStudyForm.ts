@@ -80,12 +80,20 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
       setForm((prev: StudyFormState) => ({ ...prev, [key]: value }));
       setIsDirty(true);
       setErrors((prev: StudyFormErrors) => {
-        if (prev[key as keyof StudyFormErrors]) {
-          const next = { ...prev };
+        const next = { ...prev };
+        if (key === "maxMembers") {
+          const num = Number(value);
+          if ((value as string) === "") {
+            next.maxMembers = "모집 인원을 입력해주세요.";
+          } else if (num < 3 || num > 99) {
+            next.maxMembers = "스터디원은 3명 이상 모집해야 합니다.";
+          } else {
+            delete next.maxMembers;
+          }
+        } else if (prev[key as keyof StudyFormErrors]) {
           delete next[key as keyof StudyFormErrors];
-          return next;
         }
-        return prev;
+        return next;
       });
     },
     [],
