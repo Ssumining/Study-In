@@ -31,7 +31,7 @@ function validateForm(state: StudyFormState): StudyFormErrors {
   if (state.maxMembers === "") {
     errors.maxMembers = "모집 인원을 입력해주세요.";
   } else if (Number(state.maxMembers) < 3 || Number(state.maxMembers) > 99) {
-    errors.maxMembers = "모집 인원은 3명 이상 99명 이하여야 합니다.";
+    errors.maxMembers = "스터디원은 3명 이상 모집해야 합니다.";
   }
   if (!state.startDate) errors.startDate = "시작일을 선택해주세요.";
   if (state.durationWeeks === "") errors.durationWeeks = "기간을 입력해주세요.";
@@ -165,6 +165,24 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
     setIsDirty(true);
   }, [tagInput, form.tags]);
 
+  const handleAddTagDirect = useCallback((tag: string) => {
+    const trimmed = tag.trim();
+    if (!trimmed) return;
+    if (form.tags.includes(trimmed)) return;
+    if (form.tags.length >= 5) return;
+    setForm((prev: StudyFormState) => ({
+      ...prev,
+      tags: [...prev.tags, trimmed],
+    }));
+    setTagInput("");
+    setErrors((prev: StudyFormErrors) => {
+      const next = { ...prev };
+      delete next.tags;
+      return next;
+    });
+    setIsDirty(true);
+  }, [form.tags]);
+
   const handleRemoveTag = useCallback((tag: string) => {
     setForm((prev: StudyFormState) => ({
       ...prev,
@@ -218,6 +236,7 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
     handleThumbnailChange,
     handleDayToggle,
     handleAddTag,
+    handleAddTagDirect,
     handleRemoveTag,
     handleTagInputKeyDown,
     handleSubmit,

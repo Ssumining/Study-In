@@ -2,6 +2,8 @@ import { useCallback } from "react";
 import StudyForm from "@/features/study/components/StudyForm";
 import { useStudyForm } from "@/features/study/hooks/useStudyForm";
 import type { StudyFormState } from "@/types/study";
+import iconLogo from "@/assets/base/icon-Logo.svg";
+import iconChatting from "@/assets/base/icon-chatting.svg";
 
 export default function StudyCreate() {
   const handleSubmit = useCallback((formState: StudyFormState) => {
@@ -21,11 +23,15 @@ export default function StudyCreate() {
     handleThumbnailChange,
     handleDayToggle,
     handleAddTag,
+    handleAddTagDirect,
     handleRemoveTag,
     handleTagInputKeyDown,
     handleSubmit: onSubmit,
     handleReset,
   } = useStudyForm(handleSubmit);
+
+  // TODO: 프로필 API 연결 시 로그인 사용자의 인증된 지역으로 교체
+  const userLocation: string | undefined = undefined;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -40,25 +46,22 @@ export default function StudyCreate() {
           </button>
 
           {/* 로고 */}
-          <span className="text-base font-extrabold text-gray-900 tracking-tight">Studyin</span>
+          <img src={iconLogo} alt="Studyin" className="h-6" />
 
           {/* 채팅 */}
           <button type="button" className="p-1 -mr-1" aria-label="채팅">
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+            <img src={iconChatting} alt="채팅" className="w-6 h-6" />
           </button>
         </div>
       </header>
 
       {/* ── 스터디 만들기 CTA 버튼 ── */}
-      <div className="bg-white max-w-lg mx-auto px-4 pt-4 pb-3">
+      <div className="max-w-lg mx-auto px-4 pt-3 pb-1 flex justify-end">
         <button
           type="submit"
           form="study-create-form"
           disabled={!isValid}
-          className={`w-full py-3 rounded-xl text-sm font-bold text-white transition-colors ${
+          className={`min-w-[160px] min-h-[40px] py-[10px] px-6 rounded-xl text-sm font-bold text-white transition-colors ${
             isValid ? "bg-[#4F7BF7]" : "bg-[#c5d3fc]"
           }`}
         >
@@ -79,10 +82,12 @@ export default function StudyCreate() {
           handleThumbnailChange={handleThumbnailChange}
           handleDayToggle={handleDayToggle}
           handleAddTag={handleAddTag}
+          handleAddTagDirect={handleAddTagDirect}
           handleRemoveTag={handleRemoveTag}
           handleTagInputKeyDown={handleTagInputKeyDown}
           handleSubmit={onSubmit}
           handleReset={handleReset}
+          userLocation={userLocation}
         />
       </main>
     </div>

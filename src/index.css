@@ -1,7 +1,5 @@
-@import "tailwindcss";
-
-/* 웹 폰트 불러오기*/
 @import url("https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css");
+@import "tailwindcss";
 
 @theme {
     /* 폰트 세팅 */

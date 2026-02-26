@@ -1,7 +1,14 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "../pages/Home";
+import StudyDetail from "../pages/StudyDetail";
+
 export default function Router() {
   return (
-    <div>
-      <h1>Router Component</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/study/:studyId" element={<StudyDetail />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
