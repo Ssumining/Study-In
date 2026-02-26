@@ -157,7 +157,7 @@ export default function StudyForm({
           {/* 스터디 유형 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              스터디 유형 <span className="text-[#4F7BF7]">*</span>
+              스터디 유형 <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-5">
               {STUDY_TYPES.map(({ value, label }) => (
@@ -197,21 +197,23 @@ export default function StudyForm({
 
           {/* 모집 인원 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              모집 인원 <span className="text-[#4F7BF7]">*</span>
-              <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-xs font-bold cursor-default">?</span>
-            </label>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min={3}
-                max={99}
-                value={form.maxMembers}
-                onChange={(e) => updateField("maxMembers", e.target.value)}
-                placeholder="3"
-                className="w-24 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors"
-              />
-              <span className="text-sm text-gray-600">명</span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                모집 인원 <span className="text-red-500">*</span>
+                <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-xs font-bold cursor-default">?</span>
+              </span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={3}
+                  max={99}
+                  value={form.maxMembers}
+                  onChange={(e) => updateField("maxMembers", e.target.value)}
+                  placeholder="3"
+                  className="w-16 border-0 border-b border-gray-400 px-1 py-1 text-sm text-center focus:outline-none focus:border-[#4F7BF7] transition-colors bg-transparent"
+                />
+                <span className="text-sm text-gray-600">명</span>
+              </div>
             </div>
             {errors.maxMembers && (
               <p className="mt-1 text-xs text-red-500">{errors.maxMembers}</p>
@@ -228,7 +230,7 @@ export default function StudyForm({
         {/* 스터디 소개 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            스터디 소개 <span className="text-[#4F7BF7]">*</span>
+            스터디 소개 <span className="text-red-500">*</span>
           </label>
           <textarea
             maxLength={MAX_INTRO}
@@ -292,7 +294,7 @@ export default function StudyForm({
         {/* 스터디 시작일 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            스터디 시작일 <span className="text-[#4F7BF7]">*</span>
+            스터디 시작일 <span className="text-red-500">*</span>
           </label>
           <input
             type="date"
@@ -308,7 +310,7 @@ export default function StudyForm({
         {/* 스터디 기간 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            스터디 기간 <span className="text-[#4F7BF7]">*</span>
+            스터디 기간 <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <select
@@ -336,7 +338,7 @@ export default function StudyForm({
         {/* 스터디 시간 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            스터디 시간 <span className="text-[#4F7BF7]">*</span>
+            스터디 시간 <span className="text-red-500">*</span>
           </label>
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -376,7 +378,7 @@ export default function StudyForm({
         {/* 스터디 주제 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            스터디 주제 <span className="text-[#4F7BF7]">*</span>
+            스터디 주제 <span className="text-red-500">*</span>
           </label>
           <div className="flex flex-wrap gap-2">
             {SUBJECTS.map((s) => (
@@ -402,7 +404,7 @@ export default function StudyForm({
         {/* 스터디 난이도 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            스터디 난이도 <span className="text-[#4F7BF7]">*</span>
+            스터디 난이도 <span className="text-red-500">*</span>
           </label>
           <div className="flex gap-2">
             {DIFFICULTIES.map(({ value, label }) => (

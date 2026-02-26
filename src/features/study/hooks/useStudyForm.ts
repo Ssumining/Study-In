@@ -31,7 +31,7 @@ function validateForm(state: StudyFormState): StudyFormErrors {
   if (state.maxMembers === "") {
     errors.maxMembers = "모집 인원을 입력해주세요.";
   } else if (Number(state.maxMembers) < 3 || Number(state.maxMembers) > 99) {
-    errors.maxMembers = "모집 인원은 3명 이상 99명 이하여야 합니다.";
+    errors.maxMembers = "스터디원은 3명 이상 모집해야 합니다.";
   }
   if (!state.startDate) errors.startDate = "시작일을 선택해주세요.";
   if (state.durationWeeks === "") errors.durationWeeks = "기간을 입력해주세요.";
