@@ -30,6 +30,9 @@ export default function StudyCreate() {
     handleReset,
   } = useStudyForm(handleSubmit);
 
+  // TODO: 프로필 API 연결 시 로그인 사용자의 인증된 지역으로 교체
+  const userLocation: string | undefined = undefined;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ── 앱 헤더 ── */}
@@ -84,6 +87,7 @@ export default function StudyCreate() {
           handleTagInputKeyDown={handleTagInputKeyDown}
           handleSubmit={onSubmit}
           handleReset={handleReset}
+          userLocation={userLocation}
         />
       </main>
     </div>

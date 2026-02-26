@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ChangeEvent, KeyboardEvent, FormEvent, RefObject } from "react";
 import iconImage from "@/assets/base/icon-Image.svg";
+import iconLocation from "@/assets/base/icon-location.svg";
 import type { StudyFormState, StudyFormErrors, StudyDay } from "@/types/study";
 
 const DAYS: StudyDay[] = ["월", "화", "수", "목", "금", "토", "일"];
@@ -10,11 +11,6 @@ const STUDY_TYPES = [
   { value: "online", label: "온라인" },
 ];
 
-const LOCATIONS = [
-  "서울", "경기", "인천", "부산", "대구", "대전",
-  "광주", "울산", "세종", "강원", "충북", "충남",
-  "전북", "전남", "경북", "경남", "제주",
-];
 
 const DURATIONS = [
   "1주", "2주", "4주", "6주", "8주", "10주", "12주", "16주",
@@ -64,6 +60,8 @@ interface StudyFormProps {
   handleTagInputKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
   handleSubmit: (e: FormEvent) => void;
   handleReset: () => void;
+  // 프로필에서 인증된 지역 — 추후 API 연결 시 실제 값으로 주입
+  userLocation?: string;
 }
 
 export default function StudyForm({
@@ -80,6 +78,7 @@ export default function StudyForm({
   handleRemoveTag,
   handleTagInputKeyDown,
   handleSubmit,
+  userLocation,
 }: StudyFormProps) {
   const [isTagFocused, setIsTagFocused] = useState(false);
 
@@ -152,6 +151,9 @@ export default function StudyForm({
             </div>
           </div>
 
+          {/* 구분선 */}
+          <div className="-mx-4 border-t border-gray-100" />
+
           {/* 스터디 유형 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -181,40 +183,17 @@ export default function StudyForm({
                 </label>
               ))}
             </div>
+            {form.studyType === "offline" && (
+              <p className="mt-2 text-xs text-[#4F7BF7] flex items-center gap-1">
+                <img src={iconLocation} alt="" className="w-3.5 h-3.5" />
+                {userLocation ?? "내 지역"} 에서 스터디원을 모집합니다.
+              </p>
+            )}
             {errors.studyType && (
               <p className="mt-1 text-xs text-red-500">{errors.studyType}</p>
             )}
           </div>
 
-          {/* 오프라인 지역 — studyType === "offline" 일 때만 노출 */}
-          {form.studyType === "offline" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                지역 <span className="text-[#4F7BF7]">*</span>
-              </label>
-              <div className="relative">
-                <select
-                  value={form.location}
-                  onChange={(e) => updateField("location", e.target.value)}
-                  className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors text-gray-700"
-                >
-                  <option value="">지역 선택</option>
-                  {LOCATIONS.map((loc) => (
-                    <option key={loc} value={loc}>{loc}</option>
-                  ))}
-                </select>
-                <svg
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-              {errors.location && (
-                <p className="mt-1 text-xs text-red-500">{errors.location}</p>
-              )}
-            </div>
-          )}
 
           {/* 모집 인원 */}
           <div>
