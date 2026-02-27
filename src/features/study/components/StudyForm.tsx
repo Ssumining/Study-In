@@ -87,6 +87,7 @@ interface StudyFormProps {
   handleAddTagDirect: (tag: string) => void;
   handleRemoveTag: (tag: string) => void;
   handleTagInputKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
+  handleBlurField: (key: keyof StudyFormState) => void;
   handleSubmit: (e: FormEvent) => void;
   handleReset: () => void;
   // 프로필에서 인증된 지역 — 추후 API 연결 시 실제 값으로 주입
@@ -264,6 +265,7 @@ export default function StudyForm({
   handleAddTagDirect,
   handleRemoveTag,
   handleTagInputKeyDown,
+  handleBlurField,
   handleSubmit,
   userLocation,
 }: StudyFormProps) {
@@ -346,6 +348,7 @@ export default function StudyForm({
               maxLength={MAX_TITLE}
               value={form.title}
               onChange={(e) => updateField("title", e.target.value)}
+              onBlur={() => handleBlurField("title")}
               placeholder="스터디 제목 입력"
               className="w-full min-h-[100px] border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors resize-none align-top"
             />
@@ -423,6 +426,7 @@ export default function StudyForm({
                   max={99}
                   value={form.maxMembers}
                   onChange={(e) => updateField("maxMembers", e.target.value)}
+                  onBlur={() => handleBlurField("maxMembers")}
                   placeholder="3"
                   className="w-16 border-0 border-b border-gray-400 px-1 py-1 text-sm text-center focus:outline-none focus:border-[#4F7BF7] transition-colors bg-transparent"
                 />

@@ -30,6 +30,7 @@ export default function StudyCreate() {
     handleAddTagDirect,
     handleRemoveTag,
     handleTagInputKeyDown,
+    handleBlurField,
     handleSubmit: onSubmit,
     handleReset,
   } = useStudyForm(handleSubmit);
@@ -98,6 +99,7 @@ export default function StudyCreate() {
           handleAddTagDirect={handleAddTagDirect}
           handleRemoveTag={handleRemoveTag}
           handleTagInputKeyDown={handleTagInputKeyDown}
+          handleBlurField={handleBlurField}
           handleSubmit={onSubmit}
           handleReset={handleReset}
           userLocation={userLocation}
