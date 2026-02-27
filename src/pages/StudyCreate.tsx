@@ -35,7 +35,7 @@ export default function StudyCreate() {
   const userLocation: string | undefined = undefined;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* ── 앱 헤더 (모바일/데스크탑 공통) ── */}
       <div className="sticky top-0 z-10">
         <Header />

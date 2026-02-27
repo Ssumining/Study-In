@@ -23,13 +23,13 @@ export default function StudyCreateTopBar({ isValid, onViewStudy, onDeleteStudy 
   }, []);
 
   return (
-    <div className="w-full bg-white border-b border-[#D9DBE0]">
+    <div className="w-full bg-background border-b border-[#D9DBE0]">
       <div className="max-w-[1200px] mx-auto h-[56px] lg:h-[60px] px-4 flex items-center justify-end gap-[8px]">
         {onViewStudy && (
           <button
             type="button"
             onClick={onViewStudy}
-            className="w-[110px] lg:w-[160px] h-[40px] border border-[#D9DBE0] rounded-lg text-sm font-medium text-[#121314] bg-white transition-colors hover:bg-gray-50"
+            className="w-[110px] lg:w-[160px] h-[40px] border border-[#D9DBE0] rounded-lg text-sm font-medium text-[#121314] bg-background transition-colors hover:bg-gray-50"
           >
             스터디 보기
           </button>
@@ -38,7 +38,7 @@ export default function StudyCreateTopBar({ isValid, onViewStudy, onDeleteStudy 
           type="submit"
           form="study-create-form"
           disabled={!isValid}
-          className={`w-[160px] h-[40px] rounded-lg text-sm font-medium text-white transition-colors ${
+          className={`w-[160px] h-[40px] rounded-lg text-sm font-medium text-background transition-colors ${
             isValid ? "bg-[#2E6FF2]" : "bg-[#c5d3fc]"
           }`}
         >
@@ -54,7 +54,7 @@ export default function StudyCreateTopBar({ isValid, onViewStudy, onDeleteStudy 
               <img src={iconDots} alt="더보기" className="w-[30px] h-[30px]" />
             </button>
             {isDropdownOpen && (
-              <div className="absolute right-0 top-[38px] w-[160px] bg-white border border-[#D9DBE0] rounded-[10px] shadow-[0px_5px_15px_rgba(71,73,77,0.1)] z-20 py-1">
+              <div className="absolute right-0 top-[38px] w-[160px] bg-background border border-[#D9DBE0] rounded-[10px] shadow-[0px_5px_15px_rgba(71,73,77,0.1)] z-20 py-1">
                 <button
                   type="button"
                   onClick={() => {
