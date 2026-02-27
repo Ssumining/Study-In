@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { validateEmail } from '@/features/auth/utils/authValidators';
 import IconX from '@/assets/base/icon-X.svg?react';
 import { usePasswordResetEmail } from '@/features/auth/hooks/usePasswordResetEmail';
-import { verifyPasswordResetCode } from '@/api/auth';
 
 export default function ForgotPassword() {
     const navigate = useNavigate();
@@ -41,21 +40,10 @@ export default function ForgotPassword() {
         
         // 성공하면 재설정 페이지로 이동 (이메일 정보와 고정 인증번호 전달)
         if (isSuccess) {
-            try {
-                // 자동 인증
-                await verifyPasswordResetCode(email, '123456');
-
-                // API 검증까지 완벽하게 통과하면 재설정 페이지로 이동
-                alert('이메일 인증이 자동 완료되었습니다. (테스트 환경)');
-                navigate('/reset-password', { 
-                    state: { email: email } // 이제 인증 코드는 안 넘겨줘도 됩니다.
-                }); 
-                
-            } catch (error: any) {
-                // 서버에서 123456 코드를 거절하면 에러 메시지 띄우기
-                const errorMessage = error.response?.data?.error || '자동 인증 처리에 실패했습니다.';
-                setApiError(errorMessage);
-            }
+            alert('비밀번호 재설정 링크가 이메일로 발송되었습니다.');
+            navigate('/reset-password', { 
+                state: { email: email } 
+            }); 
         }
     };
 

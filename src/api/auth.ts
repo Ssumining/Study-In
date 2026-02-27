@@ -28,15 +28,6 @@ export const sendPasswordResetEmail = async (email: string) => {
     return response.data;
 };
 
-// 비밀번호 찾기 인증코드 123456 확인 API
-export const verifyPasswordResetCode = async (email: string, verification_uuid: string) => {
-    const response = await axiosInstance.post('/accounts/password-reset/verify/', {
-        email,
-        verification_uuid
-    });
-    return response.data;
-};
-
 // 비밀번호 재설정 API (이메일, 새 비밀번호 전달)
 export const resetPasswordConfirm = async (email: string, new_password: string) => {
     // PUT 메서드로 요청
