@@ -161,7 +161,7 @@ export default function StudyDetail() {
 
           {/* 버튼 영역 (오늘은 UI만) */}
           <div className="mt-6 flex flex-wrap gap-2">
-            <button className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white">
+            <button className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-background">
               참가하기
             </button>
             <button className="rounded-xl border px-4 py-2 text-sm font-semibold">
