@@ -298,10 +298,10 @@ export default function StudyForm({
       {/* ── 카드: 대표이미지 ~ 모집인원 ── */}
       <div className="mx-4 mt-2 rounded-2xl border border-gray-200 overflow-hidden bg-background">
         {/* 대표 이미지 */}
-        <div
-          className="relative w-full bg-gray-100 cursor-pointer"
-          style={{ minWidth: "358px", minHeight: "358px" }}
-          onClick={() => fileInputRef.current?.click()}
+        <label
+          htmlFor="thumbnail-input"
+          className="relative w-full bg-gray-100 cursor-pointer block"
+          style={{ minHeight: "358px" }}
         >
           {form.thumbnailPreview ? (
             <img
@@ -323,13 +323,14 @@ export default function StudyForm({
             </div>
           )}
           <input
+            id="thumbnail-input"
             ref={fileInputRef}
             type="file"
             accept="image/*"
             className="hidden"
             onChange={handleThumbnailChange}
           />
-        </div>
+        </label>
         {errors.thumbnail && (
           <p className="px-4 pt-1.5 text-xs text-red-500">{errors.thumbnail}</p>
         )}
