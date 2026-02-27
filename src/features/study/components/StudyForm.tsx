@@ -65,7 +65,8 @@ const TAG_OPTIONS = [
   "코딩테스트",
 ];
 
-const MAX_TITLE = 80;
+const MAX_TITLE_MOBILE = 80;
+const MAX_TITLE_DESKTOP = 50;
 const MAX_INTRO = 1000;
 const MAX_SCHEDULE = 500;
 const MAX_TAGS = 5;
@@ -271,6 +272,16 @@ export default function StudyForm({
 }: StudyFormProps) {
   const [isTagFocused, setIsTagFocused] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 1024px)").matches);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const MAX_TITLE = isDesktop ? MAX_TITLE_DESKTOP : MAX_TITLE_MOBILE;
   const dateInputRef = useRef<HTMLInputElement>(null);
   const dateContainerRef = useRef<HTMLDivElement>(null);
 
@@ -340,7 +351,7 @@ export default function StudyForm({
         <div className="px-4 pt-5 pb-5 space-y-5 lg:flex-1 lg:px-[30px] lg:flex lg:flex-col">
           {/* 스터디 제목 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2 lg:text-base lg:font-bold">
+            <label className="block text-sm font-medium text-gray-700 mb-2 lg:text-[16px] lg:font-bold">
               스터디 제목 <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -348,13 +359,8 @@ export default function StudyForm({
               value={form.title}
               onChange={(e) => updateField("title", e.target.value)}
               onBlur={() => handleBlurField("title")}
-              onInput={(e) => {
-                const el = e.currentTarget;
-                el.style.height = "auto";
-                el.style.height = `${el.scrollHeight}px`;
-              }}
               placeholder="스터디 제목 입력"
-              className="w-full min-h-[100px] lg:min-h-[50px] border border-gray-200 rounded-lg px-3 py-2.5 text-sm lg:text-base focus:outline-none focus:border-[#4F7BF7] transition-colors resize-none align-top"
+              className="w-full h-[50px] overflow-hidden border border-gray-200 rounded-lg px-3 py-[13px] text-sm lg:text-[16px] focus:outline-none focus:border-[#4F7BF7] transition-colors resize-none"
             />
             <div className="flex justify-between mt-1">
               {errors.title ? (
@@ -362,64 +368,66 @@ export default function StudyForm({
               ) : (
                 <span />
               )}
-              <span className="text-xs text-gray-400 ml-auto">
+              <span className="text-xs lg:text-sm text-gray-400 ml-auto">
                 {form.title.length}/{MAX_TITLE}
               </span>
             </div>
           </div>
 
           {/* 구분선 */}
-          <div className="-mx-4 lg:-mx-[30px] border-t border-gray-100" />
+          <div className="-mx-4 lg:-mx-[30px] border-t border-gray-200 lg:mt-[30px]" />
 
           {/* 스터디 유형 */}
           <div>
-            <div className="flex items-center gap-4">
-              <span className="shrink-0 text-sm font-medium text-gray-700 lg:text-base lg:font-bold">
+            <div className="flex items-start gap-4">
+              <span className="shrink-0 text-sm font-medium text-gray-700 lg:text-[16px] lg:font-bold pt-0.5">
                 스터디 유형 <span className="text-red-500">*</span>
               </span>
-              <div className="flex gap-5">
-              {STUDY_TYPES.map(({ value, label }) => (
-                <label
-                  key={value}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <div
-                    onClick={() => updateField("studyType", value)}
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                      form.studyType === value
-                        ? "border-[#4F7BF7]"
-                        : "border-gray-300"
-                    }`}
-                  >
-                    {form.studyType === value && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#4F7BF7]" />
-                    )}
-                  </div>
-                  <span
-                    onClick={() => updateField("studyType", value)}
-                    className="text-sm text-gray-700"
-                  >
-                    {label}
-                  </span>
-                </label>
-              ))}
+              <div>
+                <div className="flex gap-5">
+                  {STUDY_TYPES.map(({ value, label }) => (
+                    <label
+                      key={value}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <div
+                        onClick={() => updateField("studyType", value)}
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                          form.studyType === value
+                            ? "border-[#4F7BF7]"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {form.studyType === value && (
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#4F7BF7]" />
+                        )}
+                      </div>
+                      <span
+                        onClick={() => updateField("studyType", value)}
+                        className="text-sm lg:text-[16px] text-gray-700"
+                      >
+                        {label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {form.studyType === "offline" && (
+                  <p className="mt-2 text-xs lg:text-[14px] text-[#4F7BF7] flex items-center gap-1">
+                    <img src={iconLocation} alt="" className="w-3.5 h-3.5" />
+                    {userLocation ?? "내 지역"} 에서 스터디원을 모집합니다.
+                  </p>
+                )}
+                {errors.studyType && (
+                  <p className="mt-1 text-xs text-red-500">{errors.studyType}</p>
+                )}
               </div>
             </div>
-            {form.studyType === "offline" && (
-              <p className="mt-2 text-xs text-[#4F7BF7] flex items-center gap-1">
-                <img src={iconLocation} alt="" className="w-3.5 h-3.5" />
-                {userLocation ?? "내 지역"} 에서 스터디원을 모집합니다.
-              </p>
-            )}
-            {errors.studyType && (
-              <p className="mt-1 text-xs text-red-500">{errors.studyType}</p>
-            )}
           </div>
 
           {/* 모집 인원 */}
-          <div>
+          <div className="mt-4 lg:mt-[70px]">
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-gray-700 whitespace-nowrap lg:text-base lg:font-bold">
+              <span className="text-sm font-medium text-gray-700 whitespace-nowrap lg:text-[16px] lg:font-bold">
                 모집 인원 <span className="text-red-500">*</span>
                 <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-xs font-bold cursor-default">
                   ?
@@ -434,9 +442,9 @@ export default function StudyForm({
                   onChange={(e) => updateField("maxMembers", e.target.value)}
                   onBlur={() => handleBlurField("maxMembers")}
                   placeholder="3"
-                  className="w-16 border-0 border-b border-gray-400 px-1 py-1 text-sm text-center focus:outline-none focus:border-[#4F7BF7] transition-colors bg-transparent"
+                  className="w-16 border-0 border-b border-gray-400 px-1 py-1 text-sm lg:text-[16px] text-center focus:outline-none focus:border-[#4F7BF7] transition-colors bg-transparent"
                 />
-                <span className="text-sm text-gray-600">명</span>
+                <span className="text-sm lg:text-[16px] text-gray-600">명</span>
               </div>
             </div>
             {errors.maxMembers && (
@@ -605,7 +613,7 @@ export default function StudyForm({
 
         {/* 스터디 주제 */}
         <div className="lg:flex lg:items-start lg:gap-12">
-          <label className="block text-sm font-medium text-gray-700 mb-2 lg:shrink-0 lg:text-base lg:font-bold lg:mb-0 lg:pt-[10px] lg:w-20">
+          <label className="block text-sm font-medium text-gray-700 mb-2 lg:shrink-0 lg:text-[16px] lg:font-bold lg:mb-0 lg:pt-[10px] lg:w-20">
             스터디 주제 <span className="text-red-500">*</span>
           </label>
           <div>
@@ -615,7 +623,7 @@ export default function StudyForm({
                   key={s}
                   type="button"
                   onClick={() => updateField("subject", s)}
-                  className={`px-3 py-1.5 lg:px-4 lg:py-[10px] rounded-full text-xs lg:text-base font-medium border transition-colors ${
+                  className={`px-3 py-1.5 lg:px-4 lg:py-[10px] rounded-full text-xs lg:text-[16px] font-medium border transition-colors ${
                     form.subject === s
                       ? "bg-[#4F7BF7] border-[#4F7BF7] text-background"
                       : "bg-gray-100 border-gray-100 text-gray-700"
@@ -633,7 +641,7 @@ export default function StudyForm({
 
         {/* 스터디 난이도 */}
         <div className="lg:flex lg:items-start lg:gap-12">
-          <label className="block text-sm font-medium text-gray-700 mb-2 lg:shrink-0 lg:text-base lg:font-bold lg:mb-0 lg:pt-[10px] lg:w-20">
+          <label className="block text-sm font-medium text-gray-700 mb-2 lg:shrink-0 lg:text-[16px] lg:font-bold lg:mb-0 lg:pt-[10px] lg:w-20">
             스터디 난이도 <span className="text-red-500">*</span>
           </label>
           <div>
@@ -643,7 +651,7 @@ export default function StudyForm({
                   key={value}
                   type="button"
                   onClick={() => updateField("difficulty", value)}
-                  className={`px-3 py-1.5 lg:px-4 lg:py-[10px] rounded-full text-xs lg:text-base font-medium border transition-colors ${
+                  className={`px-3 py-1.5 lg:px-4 lg:py-[10px] rounded-full text-xs lg:text-[16px] font-medium border transition-colors ${
                     form.difficulty === value
                       ? "bg-[#4F7BF7] border-[#4F7BF7] text-background"
                       : "bg-gray-100 border-gray-100 text-gray-700"
