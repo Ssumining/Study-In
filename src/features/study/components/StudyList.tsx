@@ -1,30 +1,23 @@
 import React from 'react';
-import type { Study } from '../../../types/study';
+import { useStudyList } from '../hooks/useStudyList'; // 커스텀 훅 가져오기
 import StudyCard from './StudyCard';
 
-const MOCK_STUDIES: Study[] = [
-  {
-    id: 1,
-    thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',
-    title: '파이썬 기초부터 실전 프로젝트까지 함께해요',
-    is_offline: true,
-    location: '서울 강남',
-    difficulty: '초급',
-    topic: '개념학습',
-    status: '모집 중',
-    current_participants: 5,
-    is_liked: true
-  }
-];
+export default function StudyList({ selectedCategory }: { selectedCategory: string }) {
+  // 훅을 통해 진짜 데이터를 받아옵니다.
+  const { studies, isLoading, error } = useStudyList(selectedCategory); 
 
-const StudyList = () => {
+  // 로딩 중이거나 에러가 났을 때의 화면 처리
+  if (isLoading) return <div className="p-10 text-center text-gray-500 font-medium">스터디를 불러오는 중입니다...</div>;
+  if (error) return <div className="p-10 text-center text-red-500 font-medium">{error}</div>;
+
+  // 데이터가 없을 때의 예외 처리
+  if (studies.length === 0) return <div className="p-10 text-center text-gray-400">해당 카테고리에 등록된 스터디가 없습니다.</div>;
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {MOCK_STUDIES.map((study) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+      {studies.map((study) => (
         <StudyCard key={study.id} study={study} />
       ))}
     </div>
   );
-};
-
-export default StudyList;
+}
