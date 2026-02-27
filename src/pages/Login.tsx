@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import loginIllustration from '@/assets/login-illustration.png';
+import LoginForm from '@/features/auth/components/LoginForm'
 
 export default function Login() {
     return (
@@ -16,27 +17,7 @@ export default function Login() {
                 className="w-full max-w-[322px] h-auto rounded-3 object-contain mb-6"
             />
 
-            <form className="w-full max-w-[322px] flex flex-col gap-3">
-                
-                <input 
-                    type="email" 
-                    placeholder="이메일" 
-                    className="w-full max-w-[322px] border-b-2 border-gray-300 py-3 text-base placeholder:text-gray-500 focus:outline-none focus:border-primary transition-colors"
-                />
-                
-                <input 
-                    type="password" 
-                    placeholder="비밀번호" 
-                    className="w-full max-w-[322px] border-b-2 border-gray-300 py-3 text-base placeholder:text-gray-500 focus:outline-none focus:border-primary transition-colors mb-2"
-                />
-
-                <button 
-                    type="button" 
-                    className="w-full max-w-[322px] bg-primary text-background font-bold text-lg py-4 rounded-lg hover:bg-primary-light transition-colors"
-                >
-                    로그인
-                </button>
-            </form>
+            <LoginForm />
 
             <div className="flex items-center gap-2 mt-6 text-sm text-gray-700">
                 <Link to="/register" className="hover:text-primary-light transition-colors">회원가입</Link>
