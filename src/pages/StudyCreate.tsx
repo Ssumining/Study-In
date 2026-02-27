@@ -34,7 +34,7 @@ export default function StudyCreate() {
   const userLocation: string | undefined = undefined;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* ── 앱 헤더 ── */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">

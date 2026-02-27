@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { ChangeEvent, KeyboardEvent, FormEvent, RefObject } from "react";
 import iconImage from "@/assets/base/icon-Image.svg";
 import iconLocation from "@/assets/base/icon-location.svg";
+import iconClock from "@/assets/base/icon-clock.svg";
+import iconCalendar from "@/assets/base/icon-Calendar.svg";
 import type { StudyFormState, StudyFormErrors, StudyDay } from "@/types/study";
 
 const DAYS: StudyDay[] = ["월", "화", "수", "목", "금", "토", "일"];
@@ -11,14 +13,17 @@ const STUDY_TYPES = [
   { value: "online", label: "온라인" },
 ];
 
-
-const DURATIONS = [
-  "1주", "2주", "4주", "6주", "8주", "10주", "12주", "16주",
-];
+const DURATIONS = ["1주", "2주", "4주", "6주", "8주", "10주", "12주", "16주"];
 
 const SUBJECTS = [
-  "개념/학습", "응용/활용", "프로젝트", "챌린지",
-  "자격증/시험", "취업/코테", "특강", "기타",
+  "개념/학습",
+  "응용/활용",
+  "프로젝트",
+  "챌린지",
+  "자격증/시험",
+  "취업/코테",
+  "특강",
+  "기타",
 ];
 
 const DIFFICULTIES = [
@@ -28,12 +33,36 @@ const DIFFICULTIES = [
 ];
 
 const TAG_OPTIONS = [
-  "JavaScript", "TypeScript", "React", "Vue", "Angular",
-  "Python", "Java", "Spring", "Node.js", "Express",
-  "Flutter", "Swift", "Kotlin", "Go", "Rust",
-  "알고리즘", "자료구조", "CS", "데이터베이스", "네트워크",
-  "AWS", "Docker", "Git", "머신러닝", "딥러닝",
-  "데이터분석", "SQL", "포트폴리오", "취업", "코딩테스트",
+  "JavaScript",
+  "TypeScript",
+  "React",
+  "Vue",
+  "Angular",
+  "Python",
+  "Java",
+  "Spring",
+  "Node.js",
+  "Express",
+  "Flutter",
+  "Swift",
+  "Kotlin",
+  "Go",
+  "Rust",
+  "알고리즘",
+  "자료구조",
+  "CS",
+  "데이터베이스",
+  "네트워크",
+  "AWS",
+  "Docker",
+  "Git",
+  "머신러닝",
+  "딥러닝",
+  "데이터분석",
+  "SQL",
+  "포트폴리오",
+  "취업",
+  "코딩테스트",
 ];
 
 const MAX_TITLE = 80;
@@ -64,6 +93,165 @@ interface StudyFormProps {
   userLocation?: string;
 }
 
+function SelectPicker({
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={`w-full flex items-center justify-between h-10 bg-white border rounded-lg pl-[14px] pr-[10px] transition-colors ${
+          open ? "border-[#4F7BF7]" : "border-gray-300"
+        }`}
+      >
+        <span className={`text-[14px] font-normal ${value ? "text-gray-900" : "text-gray-500"}`}>
+          {value || placeholder}
+        </span>
+        <svg
+          className={`w-4 h-4 shrink-0 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden">
+          <div className="max-h-48 overflow-y-auto">
+            {options.map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onChange(opt);
+                  setOpen(false);
+                }}
+                className={`w-full px-[14px] py-2.5 text-[14px] text-left transition-colors ${
+                  opt === value
+                    ? "bg-[#4F7BF7] text-white"
+                    : "text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TimePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hh, mm] = (value || "00:00").split(":");
+  const hour = (hh ?? "00").padStart(2, "0");
+  const minute = (mm ?? "00").padStart(2, "0");
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative flex-1 min-w-0">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={`w-full flex items-center justify-between h-10 bg-white border rounded-lg pl-[14px] pr-[10px] transition-colors ${
+          open ? "border-[#4F7BF7]" : "border-gray-300"
+        }`}
+      >
+        <span className="text-[14px] font-normal text-gray-900">{hour} : {minute}</span>
+        <img src={iconClock} alt="" className="w-5 h-5 shrink-0" />
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-md flex overflow-hidden w-full">
+          {/* 시 */}
+          <div className="flex-1 h-44 overflow-y-auto">
+            {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")).map((hv) => (
+              <button
+                key={hv}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onChange(`${hv}:${minute}`);
+                }}
+                className={`w-full py-2 text-sm text-center transition-colors ${
+                  hv === hour
+                    ? "bg-[#4F7BF7] text-white"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {hv}
+              </button>
+            ))}
+          </div>
+          <div className="w-px bg-gray-100 shrink-0" />
+          {/* 분 */}
+          <div className="flex-1 h-44 overflow-y-auto">
+            {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0")).map((mv) => (
+              <button
+                key={mv}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onChange(`${hour}:${mv}`);
+                }}
+                className={`w-full py-2 text-sm text-center transition-colors ${
+                  mv === minute
+                    ? "bg-[#4F7BF7] text-white"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {mv}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function StudyForm({
   form,
   errors,
@@ -73,7 +261,6 @@ export default function StudyForm({
   updateField,
   handleThumbnailChange,
   handleDayToggle,
-  handleAddTag,
   handleAddTagDirect,
   handleRemoveTag,
   handleTagInputKeyDown,
@@ -81,6 +268,19 @@ export default function StudyForm({
   userLocation,
 }: StudyFormProps) {
   const [isTagFocused, setIsTagFocused] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(false);
+  const dateInputRef = useRef<HTMLInputElement>(null);
+  const dateContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dateContainerRef.current && !dateContainerRef.current.contains(e.target as Node)) {
+        setIsDateOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const filteredTagOptions = TAG_OPTIONS.filter(
     (t) =>
@@ -89,14 +289,14 @@ export default function StudyForm({
   ).slice(0, 8);
 
   const showTagDropdown =
-    isTagFocused && form.tags.length < MAX_TAGS && filteredTagOptions.length > 0;
+    isTagFocused &&
+    form.tags.length < MAX_TAGS &&
+    filteredTagOptions.length > 0;
 
   return (
     <form id="study-create-form" onSubmit={handleSubmit} noValidate>
-
       {/* ── 카드: 대표이미지 ~ 모집인원 ── */}
-      <div className="mx-4 mt-2 bg-white rounded-2xl overflow-hidden border border-gray-200">
-
+      <div className="mx-4 mt-2 rounded-2xl border border-gray-200 overflow-hidden bg-white">
         {/* 대표 이미지 */}
         <div
           className="relative w-full bg-gray-100 cursor-pointer"
@@ -111,7 +311,9 @@ export default function StudyForm({
             />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-              <p className="text-sm font-medium text-gray-400">대표 이미지 삽입</p>
+              <p className="text-sm font-medium text-gray-400">
+                대표 이미지 삽입
+              </p>
               <p className="text-xs text-gray-400">(권장 사이즈 1200*1200px)</p>
             </div>
           )}
@@ -120,7 +322,13 @@ export default function StudyForm({
               <img src={iconImage} alt="" className="w-5 h-5" />
             </div>
           )}
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbnailChange} />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleThumbnailChange}
+          />
         </div>
         {errors.thumbnail && (
           <p className="px-4 pt-1.5 text-xs text-red-500">{errors.thumbnail}</p>
@@ -128,7 +336,6 @@ export default function StudyForm({
 
         {/* 스터디 제목 / 유형 / 지역 / 모집인원 */}
         <div className="px-4 pt-5 pb-5 space-y-5">
-
           {/* 스터디 제목 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -142,9 +349,11 @@ export default function StudyForm({
               className="w-full min-h-[100px] border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors resize-none align-top"
             />
             <div className="flex justify-between mt-1">
-              {errors.title
-                ? <p className="text-xs text-red-500">{errors.title}</p>
-                : <span />}
+              {errors.title ? (
+                <p className="text-xs text-red-500">{errors.title}</p>
+              ) : (
+                <span />
+              )}
               <span className="text-xs text-gray-400 ml-auto">
                 {form.title.length}/{MAX_TITLE}
               </span>
@@ -161,7 +370,10 @@ export default function StudyForm({
             </label>
             <div className="flex gap-5">
               {STUDY_TYPES.map(({ value, label }) => (
-                <label key={value} className="flex items-center gap-2 cursor-pointer">
+                <label
+                  key={value}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <div
                     onClick={() => updateField("studyType", value)}
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
@@ -194,13 +406,14 @@ export default function StudyForm({
             )}
           </div>
 
-
           {/* 모집 인원 */}
           <div>
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
                 모집 인원 <span className="text-red-500">*</span>
-                <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-xs font-bold cursor-default">?</span>
+                <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-xs font-bold cursor-default">
+                  ?
+                </span>
               </span>
               <div className="flex items-center gap-2">
                 <input
@@ -219,26 +432,23 @@ export default function StudyForm({
               <p className="mt-1 text-xs text-red-500">{errors.maxMembers}</p>
             )}
           </div>
-
         </div>
       </div>
       {/* ── 카드 끝 ── */}
 
-      {/* ── 소개 / 일정 ── */}
-      <div className="bg-white px-4 pt-6 pb-4 mt-4 space-y-5">
-
+      {/* ── 소개 / 일정 / 상세 일정 / 태그 설정 ── */}
+      <div className="bg-white px-4 pt-5 pb-8 mt-2 space-y-5">
         {/* 스터디 소개 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            스터디 소개 <span className="text-red-500">*</span>
+          <label className="block text-lg font-medium text-gray-700 mb-2">
+            스터디 소개
           </label>
           <textarea
             maxLength={MAX_INTRO}
             value={form.introduction}
             onChange={(e) => updateField("introduction", e.target.value)}
             placeholder="스터디 소개를 입력해 주세요."
-            rows={5}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors resize-none"
+            className="w-full min-h-[288px] border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors resize-none"
           />
           <p className="text-xs text-gray-400 text-right mt-1">
             {form.introduction.length}/{MAX_INTRO}
@@ -247,7 +457,7 @@ export default function StudyForm({
 
         {/* 스터디 일정 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-lg font-medium text-gray-700 mb-2">
             스터디 일정
           </label>
           <textarea
@@ -255,24 +465,25 @@ export default function StudyForm({
             value={form.schedule}
             onChange={(e) => updateField("schedule", e.target.value)}
             placeholder="스터디 일정을 입력해 주세요."
-            rows={4}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors resize-none"
+            className="w-full min-h-[288px] border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors resize-none"
           />
           <p className="text-xs text-gray-400 text-right mt-1">
             {form.schedule.length}/{MAX_SCHEDULE}
           </p>
         </div>
-      </div>
 
-      {/* ── 상세 일정 ── */}
-      <div className="bg-gray-50 px-4 pt-6 pb-6 mt-2 space-y-5">
-        <h2 className="text-base font-bold text-gray-900">상세 일정</h2>
+        {/* ── 구분선 ── */}
+        <div className="border-t border-gray-200" />
+
+        {/* ── 상세 일정 ── */}
+        <div className="space-y-5">
+        <h2 className="text-base font-bold text-gray-900 text-center">상세 일정</h2>
 
         {/* 스터디 요일 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="flex items-start gap-4">
+          <span className="w-24 shrink-0 text-sm font-medium text-gray-700 pt-1">
             스터디 요일
-          </label>
+          </span>
           <div className="flex flex-wrap gap-2">
             {DAYS.map((day) => (
               <button
@@ -292,88 +503,93 @@ export default function StudyForm({
         </div>
 
         {/* 스터디 시작일 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="flex items-center gap-4">
+          <span className="w-24 shrink-0 text-sm font-medium text-gray-700">
             스터디 시작일 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="date"
-            value={form.startDate}
-            onChange={(e) => updateField("startDate", e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors"
-          />
-          {errors.startDate && (
-            <p className="mt-1 text-xs text-red-500">{errors.startDate}</p>
-          )}
+          </span>
+          <div className="flex-1">
+            <div ref={dateContainerRef} className="relative w-full">
+              {/* 보이는 표시 — 클릭 시 showPicker() 호출 */}
+              <div
+                className={`w-full h-10 bg-white border rounded-lg pl-[14px] pr-[10px] text-[14px] flex items-center justify-between cursor-pointer transition-colors ${isDateOpen ? "border-[#4F7BF7]" : "border-gray-200"}`}
+                onClick={() => {
+                  setIsDateOpen(true);
+                  (dateInputRef.current as HTMLInputElement & { showPicker?: () => void })?.showPicker?.();
+                }}
+              >
+                <span className={form.startDate ? "text-gray-900" : "text-gray-500"}>
+                  {form.startDate || "YYYY-MM-DD"}
+                </span>
+                <img src={iconCalendar} alt="" className="w-5 h-5 shrink-0" />
+              </div>
+              {/* 숨겨진 네이티브 피커 */}
+              <input
+                ref={dateInputRef}
+                type="date"
+                value={form.startDate}
+                onChange={(e) => { updateField("startDate", e.target.value); setIsDateOpen(false); }}
+                className="absolute opacity-0 pointer-events-none w-0 h-0"
+              />
+            </div>
+            {errors.startDate && (
+              <p className="mt-1 text-xs text-red-500">{errors.startDate}</p>
+            )}
+          </div>
         </div>
 
         {/* 스터디 기간 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="flex items-center gap-4">
+          <span className="w-24 shrink-0 text-sm font-medium text-gray-700">
             스터디 기간 <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
+          </span>
+          <div className="flex-1">
+            <SelectPicker
               value={form.durationWeeks}
-              onChange={(e) => updateField("durationWeeks", e.target.value)}
-              className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors text-gray-700"
-            >
-              <option value="">스터디 기간 선택</option>
-              {DURATIONS.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-            <svg
-              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-              fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+              onChange={(v) => updateField("durationWeeks", v)}
+              options={DURATIONS}
+              placeholder="스터디 기간 선택"
+            />
+            {errors.durationWeeks && (
+              <p className="mt-1 text-xs text-red-500">{errors.durationWeeks}</p>
+            )}
           </div>
-          {errors.durationWeeks && (
-            <p className="mt-1 text-xs text-red-500">{errors.durationWeeks}</p>
-          )}
         </div>
 
         {/* 스터디 시간 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="flex items-start gap-4">
+          <span className="w-24 shrink-0 text-sm font-medium text-gray-700 pt-2.5">
             스터디 시간 <span className="text-red-500">*</span>
-          </label>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <input
-                type="time"
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <TimePicker
                 value={form.startTime}
-                onChange={(e) => updateField("startTime", e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors"
+                onChange={(v) => updateField("startTime", v)}
               />
-            </div>
-            <span className="text-gray-400 text-sm shrink-0">~</span>
-            <div className="relative flex-1">
-              <input
-                type="time"
+              <span className="text-gray-400 text-sm shrink-0">~</span>
+              <TimePicker
                 value={form.endTime}
-                onChange={(e) => updateField("endTime", e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors"
+                onChange={(v) => updateField("endTime", v)}
               />
             </div>
+            {errors.startTime && (
+              <p className="mt-1 text-xs text-red-500">{errors.startTime}</p>
+            )}
+            {errors.endTime && (
+              <p className="mt-1 text-xs text-red-500">{errors.endTime}</p>
+            )}
+            {errors.timeRange && (
+              <p className="mt-1 text-xs text-red-500">{errors.timeRange}</p>
+            )}
           </div>
-          {errors.startTime && (
-            <p className="mt-1 text-xs text-red-500">{errors.startTime}</p>
-          )}
-          {errors.endTime && (
-            <p className="mt-1 text-xs text-red-500">{errors.endTime}</p>
-          )}
-          {errors.timeRange && (
-            <p className="mt-1 text-xs text-red-500">{errors.timeRange}</p>
-          )}
         </div>
-      </div>
+        </div>
 
-      {/* ── 스터디 태그 설정 ── */}
-      <div className="bg-white px-4 pt-6 pb-8 mt-2 space-y-5">
-        <h2 className="text-base font-bold text-gray-900">스터디 태그 설정</h2>
+        {/* ── 구분선 ── */}
+        <div className="border-t border-gray-200" />
+
+        {/* ── 스터디 태그 설정 ── */}
+        <h2 className="text-base font-bold text-gray-900 text-center">스터디 태그 설정</h2>
 
         {/* 스터디 주제 */}
         <div>
@@ -389,7 +605,7 @@ export default function StudyForm({
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   form.subject === s
                     ? "bg-[#4F7BF7] border-[#4F7BF7] text-white"
-                    : "bg-white border-gray-300 text-gray-600"
+                    : "bg-gray-100 border-gray-100 text-gray-700"
                 }`}
               >
                 {s}
@@ -412,10 +628,10 @@ export default function StudyForm({
                 key={value}
                 type="button"
                 onClick={() => updateField("difficulty", value)}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   form.difficulty === value
                     ? "bg-[#4F7BF7] border-[#4F7BF7] text-white"
-                    : "bg-white border-gray-300 text-gray-600"
+                    : "bg-gray-100 border-gray-100 text-gray-700"
                 }`}
               >
                 {label}
@@ -430,13 +646,13 @@ export default function StudyForm({
         {/* 검색 태그 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            검색 태그
+            검색 태그 <span className="text-red-500">*</span>
             <span className="ml-1.5 text-xs text-gray-400 font-normal">
               ({form.tags.length}/{MAX_TAGS})
             </span>
           </label>
           <div className="relative">
-            <div className="flex gap-2">
+            <div>
               <input
                 type="text"
                 value={tagInput}
@@ -444,21 +660,13 @@ export default function StudyForm({
                 onKeyDown={handleTagInputKeyDown}
                 onFocus={() => setIsTagFocused(true)}
                 onBlur={() => setIsTagFocused(false)}
-                placeholder="태그 검색 또는 직접 입력"
+                placeholder="태그 입력 (최대5개)"
                 disabled={form.tags.length >= MAX_TAGS}
-                className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors disabled:bg-gray-50 disabled:text-gray-400"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#4F7BF7] transition-colors disabled:bg-gray-50 disabled:text-gray-400"
               />
-              <button
-                type="button"
-                onClick={handleAddTag}
-                disabled={form.tags.length >= MAX_TAGS}
-                className="px-4 py-2.5 rounded-lg bg-[#4F7BF7] text-white text-sm font-medium hover:bg-[#3d68e0] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                추가
-              </button>
             </div>
             {showTagDropdown && (
-              <ul className="absolute z-10 left-0 right-[4.5rem] mt-1 bg-white border border-gray-200 rounded-lg shadow-md max-h-48 overflow-y-auto">
+              <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-md max-h-48 overflow-y-auto">
                 {filteredTagOptions.map((option) => (
                   <li
                     key={option}
