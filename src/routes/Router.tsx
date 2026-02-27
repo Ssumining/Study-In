@@ -3,9 +3,10 @@ import Home from "../pages/Home";
 import StudyDetail from "../pages/StudyDetail";
 import Profile from "../pages/Profile"; // 프로필 페이지 추가
 import ProfileEdit from "../pages/ProfileEdit";
+import StudyCreate from "@/pages/StudyCreate";
 import Layout from '@/components/layout/Layout';
 import AuthLayout from '@/components/layout/AuthLayout';
-import Login from '@/pages/Login'; 
+import Login from '@/pages/Login';
 
 export default function Router() {
   return (
@@ -21,6 +22,9 @@ export default function Router() {
           <Route path="/profile/edit" element={<ProfileEdit />} /> 
         </Route>
         
+        {/* 스터디 만들기 — 자체 헤더를 포함하므로 Layout 밖에 배치 */}
+        <Route path="/study/create" element={<StudyCreate />} />
+
         {/* 인증 레이아웃 (심플한 헤더) */}
         <Route element={<AuthLayout />}>
           {/* 로그인 */}

@@ -1,15 +1,18 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import StudyForm from "@/features/study/components/StudyForm";
 import { useStudyForm } from "@/features/study/hooks/useStudyForm";
+import MobileDrawer from "@/components/layout/MobileDrawer";
 import type { StudyFormState } from "@/types/study";
 import iconLogo from "@/assets/base/icon-Logo.svg";
 import iconChatting from "@/assets/base/icon-chatting.svg";
+import iconHamburger from "@/assets/base/icon-hamburger.svg";
 
 export default function StudyCreate() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const handleSubmit = useCallback((formState: StudyFormState) => {
-    // API 붙일 때 여기만 교체
-    console.log("[StudyCreate] submit →", formState);
-    alert("스터디가 생성되었습니다! (API 연동 전 임시 메시지)");
+    // TODO: API 붙일 때 여기만 교체
+    console.log("[StudyCreate] submit payload →", formState);
   }, []);
 
   const {
@@ -34,22 +37,31 @@ export default function StudyCreate() {
   const userLocation: string | undefined = undefined;
 
   return (
+    <>
     <div className="min-h-screen bg-white">
       {/* ── 앱 헤더 ── */}
       <header className="bg-background border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
           {/* 햄버거 */}
-          <button type="button" className="p-1 -ml-1" aria-label="메뉴">
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+          <button
+            type="button"
+            className="p-1 -ml-1"
+            aria-label="메뉴"
+            onClick={() => setDrawerOpen(true)}
+          >
+            <img src={iconHamburger} alt="메뉴" className="w-6 h-6" />
           </button>
 
           {/* 로고 */}
           <img src={iconLogo} alt="Studyin" className="h-6" />
 
           {/* 채팅 */}
-          <button type="button" className="p-1 -mr-1" aria-label="채팅">
+          <button
+            type="button"
+            className="p-1 -mr-1"
+            aria-label="채팅"
+            onClick={() => console.log("[추후] 채팅")}
+          >
             <img src={iconChatting} alt="채팅" className="w-6 h-6" />
           </button>
         </div>
@@ -91,5 +103,8 @@ export default function StudyCreate() {
         />
       </main>
     </div>
+
+    <MobileDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
+    </>
   );
 }
