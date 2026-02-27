@@ -8,6 +8,8 @@ import StudyCreate from "@/pages/StudyCreate";
 import Layout from '@/components/layout/Layout';
 import AuthLayout from '@/components/layout/AuthLayout';
 import Login from '@/pages/Login';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword'
 
 export default function Router() {
   return (
@@ -31,7 +33,8 @@ export default function Router() {
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<div>회원가입 화면 준비 중...</div>} />
-          <Route path="/forgot-password" element={<div>비밀번호 찾기 화면 준비 중...</div>} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
 
       </Routes>
