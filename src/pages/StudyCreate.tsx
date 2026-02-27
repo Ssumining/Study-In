@@ -3,6 +3,7 @@ import StudyForm from "@/features/study/components/StudyForm";
 import StudyCreateTopBar from "@/features/study/components/StudyCreateTopBar";
 import { useStudyForm } from "@/features/study/hooks/useStudyForm";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import type { StudyFormState } from "@/types/study";
 
 export default function StudyCreate() {
@@ -65,6 +66,8 @@ export default function StudyCreate() {
           userLocation={userLocation}
         />
       </main>
+
+      <Footer />
     </div>
   );
 }
