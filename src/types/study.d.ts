@@ -40,16 +40,15 @@ export interface StudyFormErrors {
   tags?: string;
 }
 
-// 반드시 앞에 'export'가 붙어있어야 합니다!
 export interface Study {
   id: number;
   thumbnail: string;
   title: string;
   is_offline: boolean;
   location: string | null;
-  difficulty: "초급" | "중급" | "고급";
+  difficulty: '초급' | '중급' | '고급';
   topic: string;
-  status: "모집 중" | "모집 완료" | "진행 중" | "종료";
+  status: '모집 중' | '모집 완료' | '진행 중' | '종료';
   current_participants: number;
   is_liked: boolean;
 }

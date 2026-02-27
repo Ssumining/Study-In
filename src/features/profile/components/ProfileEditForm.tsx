@@ -64,8 +64,8 @@ const ProfileEditForm = () => {
             className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary"
           />
           <button
-            onClick={() => setIsNicknameChecked(true)}
-            className="px-3 py-2 bg-primary text-white text-base rounded-lg"
+            onClick={() => setIsNicknameChecked(true)} // 실제 중복확인 API 연결 필요
+            className="px-3 py-2 bg-primary text-background text-base rounded-lg"
           >
             중복확인
           </button>
@@ -135,8 +135,8 @@ const ProfileEditForm = () => {
         disabled={!isSaveEnabled}
         className={`mt-4 w-full py-2 rounded-lg text-base ${
           isSaveEnabled
-            ? 'bg-primary text-white cursor-pointer hover:bg-primary-light'
-            : 'bg-gray-300 text-white cursor-not-allowed'
+            ? 'bg-primary text-background cursor-pointer hover:bg-primary-light'
+            : 'bg-gray-300 text-background cursor-not-allowed'
         }`}
       >
         저장하기

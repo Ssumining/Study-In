@@ -122,7 +122,7 @@ function SelectPicker({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`w-full flex items-center justify-between h-10 bg-white border rounded-lg pl-[14px] pr-[10px] transition-colors ${
+        className={`w-full flex items-center justify-between h-10 bg-background border rounded-lg pl-[14px] pr-[10px] transition-colors ${
           open ? "border-[#4F7BF7]" : "border-gray-300"
         }`}
       >
@@ -140,7 +140,7 @@ function SelectPicker({
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden">
+        <div className="absolute top-full left-0 mt-1 z-20 w-full bg-background border border-gray-200 rounded-lg shadow-md overflow-hidden">
           <div className="max-h-48 overflow-y-auto">
             {options.map((opt) => (
               <button
@@ -153,7 +153,7 @@ function SelectPicker({
                 }}
                 className={`w-full px-[14px] py-2.5 text-[14px] text-left transition-colors ${
                   opt === value
-                    ? "bg-[#4F7BF7] text-white"
+                    ? "bg-[#4F7BF7] text-background"
                     : "text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -195,7 +195,7 @@ function TimePicker({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`w-full flex items-center justify-between h-10 bg-white border rounded-lg pl-[14px] pr-[10px] transition-colors ${
+        className={`w-full flex items-center justify-between h-10 bg-background border rounded-lg pl-[14px] pr-[10px] transition-colors ${
           open ? "border-[#4F7BF7]" : "border-gray-300"
         }`}
       >
@@ -204,7 +204,7 @@ function TimePicker({
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-md flex overflow-hidden w-full">
+        <div className="absolute top-full left-0 mt-1 z-20 bg-background border border-gray-200 rounded-lg shadow-md flex overflow-hidden w-full">
           {/* 시 */}
           <div className="flex-1 h-44 overflow-y-auto">
             {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")).map((hv) => (
@@ -217,7 +217,7 @@ function TimePicker({
                 }}
                 className={`w-full py-2 text-sm text-center transition-colors ${
                   hv === hour
-                    ? "bg-[#4F7BF7] text-white"
+                    ? "bg-[#4F7BF7] text-background"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -238,7 +238,7 @@ function TimePicker({
                 }}
                 className={`w-full py-2 text-sm text-center transition-colors ${
                   mv === minute
-                    ? "bg-[#4F7BF7] text-white"
+                    ? "bg-[#4F7BF7] text-background"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -296,7 +296,7 @@ export default function StudyForm({
   return (
     <form id="study-create-form" onSubmit={handleSubmit} noValidate>
       {/* ── 카드: 대표이미지 ~ 모집인원 ── */}
-      <div className="mx-4 mt-2 rounded-2xl border border-gray-200 overflow-hidden bg-white">
+      <div className="mx-4 mt-2 rounded-2xl border border-gray-200 overflow-hidden bg-background">
         {/* 대표 이미지 */}
         <div
           className="relative w-full bg-gray-100 cursor-pointer"
@@ -318,7 +318,7 @@ export default function StudyForm({
             </div>
           )}
           {!form.thumbnailPreview && (
-            <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center">
+            <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-background shadow flex items-center justify-center">
               <img src={iconImage} alt="" className="w-5 h-5" />
             </div>
           )}
@@ -436,8 +436,9 @@ export default function StudyForm({
       </div>
       {/* ── 카드 끝 ── */}
 
-      {/* ── 소개 / 일정 / 상세 일정 / 태그 설정 ── */}
-      <div className="bg-white px-4 pt-5 pb-8 mt-2 space-y-5">
+      {/* ── 소개 / 일정 ── */}
+      <div className="bg-background px-4 pt-6 pb-4 mt-4 space-y-5">
+
         {/* 스터디 소개 */}
         <div>
           <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -492,8 +493,8 @@ export default function StudyForm({
                 onClick={() => handleDayToggle(day)}
                 className={`w-9 h-9 rounded-full text-sm font-medium border transition-colors ${
                   form.days.includes(day)
-                    ? "bg-[#4F7BF7] border-[#4F7BF7] text-white"
-                    : "bg-white border-gray-300 text-gray-600"
+                    ? "bg-[#4F7BF7] border-[#4F7BF7] text-background"
+                    : "bg-background border-gray-300 text-gray-600"
                 }`}
               >
                 {day}
@@ -511,7 +512,7 @@ export default function StudyForm({
             <div ref={dateContainerRef} className="relative w-full">
               {/* 보이는 표시 — 클릭 시 showPicker() 호출 */}
               <div
-                className={`w-full h-10 bg-white border rounded-lg pl-[14px] pr-[10px] text-[14px] flex items-center justify-between cursor-pointer transition-colors ${isDateOpen ? "border-[#4F7BF7]" : "border-gray-200"}`}
+                className={`w-full h-10 bg-background border rounded-lg pl-[14px] pr-[10px] text-[14px] flex items-center justify-between cursor-pointer transition-colors ${isDateOpen ? "border-[#4F7BF7]" : "border-gray-200"}`}
                 onClick={() => {
                   setIsDateOpen(true);
                   (dateInputRef.current as HTMLInputElement & { showPicker?: () => void })?.showPicker?.();
@@ -604,7 +605,7 @@ export default function StudyForm({
                 onClick={() => updateField("subject", s)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   form.subject === s
-                    ? "bg-[#4F7BF7] border-[#4F7BF7] text-white"
+                    ? "bg-[#4F7BF7] border-[#4F7BF7] text-background"
                     : "bg-gray-100 border-gray-100 text-gray-700"
                 }`}
               >
@@ -630,7 +631,7 @@ export default function StudyForm({
                 onClick={() => updateField("difficulty", value)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   form.difficulty === value
-                    ? "bg-[#4F7BF7] border-[#4F7BF7] text-white"
+                    ? "bg-[#4F7BF7] border-[#4F7BF7] text-background"
                     : "bg-gray-100 border-gray-100 text-gray-700"
                 }`}
               >
@@ -666,7 +667,7 @@ export default function StudyForm({
               />
             </div>
             {showTagDropdown && (
-              <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-md max-h-48 overflow-y-auto">
+              <ul className="absolute z-10 left-0 right-0 mt-1 bg-background border border-gray-200 rounded-lg shadow-md max-h-48 overflow-y-auto">
                 {filteredTagOptions.map((option) => (
                   <li
                     key={option}

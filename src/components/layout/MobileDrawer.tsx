@@ -45,7 +45,7 @@ export default function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               <Link
                 to="/study/create"
                 onClick={onClose}
-                className="w-full py-3 bg-primary text-white text-base font-medium rounded-lg text-center"
+                className="w-full py-3 bg-primary text-background text-base font-medium rounded-lg text-center"
               >
                 스터디 만들기
               </Link>
@@ -76,7 +76,7 @@ export default function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               <Link
                 to="/login"
                 onClick={onClose}
-                className="w-full py-3 bg-primary text-white text-base font-medium rounded-lg text-center"
+                className="w-full py-3 bg-primary text-background text-base font-medium rounded-lg text-center"
               >
                 시작하기
               </Link>
