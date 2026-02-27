@@ -1,11 +1,14 @@
 import { GitHubCalendar } from 'react-github-calendar'
+import { useNavigate } from 'react-router-dom' 
 
-// 내 프로필인지 다른 사람 프로필인지 구분하는 타입
 interface ProfileCardProps {
-  isMyProfile?: boolean // true: 내 프로필, false: 다른 사람 프로필
+  isMyProfile?: boolean
 }
 
 const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
+  // 페이지 이동을 위한 훅
+  const navigate = useNavigate()
+
   return (
     <div className="flex flex-col items-center px-4 py-6 gap-4 bg-background">
 
@@ -101,7 +104,10 @@ const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
 
       {/* 내 프로필일 때만 수정하기 버튼 표시 */}
       {isMyProfile && (
-        <button className="w-40 py-2 border border-gray-300 rounded-lg text-base text-gray-700 hover:bg-gray-100">
+        <button
+          onClick={() => navigate('/profile/edit')} 
+          className="w-40 py-2 border border-gray-300 rounded-lg text-base text-gray-700 hover:bg-gray-100"
+        >
           수정하기
         </button>
       )}
