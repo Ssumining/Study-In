@@ -1,8 +1,10 @@
 import { GitHubCalendar } from 'react-github-calendar'
-import { useNavigate } from 'react-router-dom' 
+import { useNavigate } from 'react-router-dom'
+import personIcon from '@/assets/base/icon-person.svg'
 
+// 내 프로필인지 다른 사람 프로필인지 구분하는 타입
 interface ProfileCardProps {
-  isMyProfile?: boolean
+  isMyProfile?: boolean // true: 내 프로필, false: 다른 사람 프로필
 }
 
 const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
@@ -13,11 +15,11 @@ const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
     <div className="flex flex-col items-center px-4 py-6 gap-4 bg-background">
 
       {/* 프로필 이미지 - 실제 데이터 연결 시 src 교체 필요 */}
-      <div className="w-24 h-24 rounded-full bg-gray-300 overflow-hidden">
+      <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
         <img
-          src="https://via.placeholder.com/96"
+          src={personIcon}
           alt="프로필 이미지"
-          className="w-full h-full object-cover"
+          className="w-14 h-14"
         />
       </div>
 
@@ -105,7 +107,7 @@ const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
       {/* 내 프로필일 때만 수정하기 버튼 표시 */}
       {isMyProfile && (
         <button
-          onClick={() => navigate('/profile/edit')} 
+          onClick={() => navigate('/profile/edit')}
           className="w-40 py-2 border border-gray-300 rounded-lg text-base text-gray-700 hover:bg-gray-100"
         >
           수정하기
