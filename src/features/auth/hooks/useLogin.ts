@@ -17,8 +17,8 @@ export const useLogin = () => {
         const data = await loginApi({ email, password });
 
         // 스토리지에 토큰 저장
-        storage.setAccessToken(data.accessToken);
-        storage.setRefreshToken(data.refreshToken);
+        storage.setAccessToken(data.access_token);
+        storage.setRefreshToken(data.refresh_token);
 
         // 성공 시 메인 페이지로 이동
         navigate('/');

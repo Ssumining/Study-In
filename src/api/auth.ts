@@ -8,9 +8,13 @@ export interface LoginRequest {
 
 // 백엔드에서 받을 데이터 타입 (토큰)
 export interface LoginResponse {
-    accessToken: string;
-    refreshToken: string;
-    // user 정보 등 추가
+    access_token: string;
+    refresh_token: string;
+    user: {
+        pk: number;
+        email: string;
+        uid: string;
+    };
 }
 
 export const loginApi = async (data: LoginRequest): Promise<LoginResponse> => {
@@ -21,6 +25,15 @@ export const loginApi = async (data: LoginRequest): Promise<LoginResponse> => {
 // 비밀번호 찾기 이메일 발송 API
 export const sendPasswordResetEmail = async (email: string) => {
     const response = await axiosInstance.post('/accounts/password-reset/', { email });
+    return response.data;
+};
+
+// 비밀번호 찾기 인증코드 123456 확인 API
+export const verifyPasswordResetCode = async (email: string, verification_uuid: string) => {
+    const response = await axiosInstance.post('/accounts/password-reset/verify/', {
+        email,
+        verification_uuid
+    });
     return response.data;
 };
 
