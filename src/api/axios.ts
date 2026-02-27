@@ -16,13 +16,25 @@ export const axiosInstance = axios.create({
 // Request Interceptor (요청 보내기 전)
 axiosInstance.interceptors.request.use(
     (config) => {
-        // 스토리지에서 access_token 꺼냄
-        const token = storage.getAccessToken();
-        
-        // 토큰이 있다면, 모든 요청의 Authorization 헤더에 Bearer 토큰을 꽂아줌
-        if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        // 토큰을 헤더에 넣지 말아야 할 API 엔드포인트 목록
+        // (로그인, 회원가입, 토큰 갱신 등은 Access Token이 필요 없음)
+        const noAuthUrls = [
+            '/accounts/login/',
+            '/accounts/token/refresh/',
+            // 나중에 '/accounts/register/', '/accounts/password-reset/' 등 추가 예정
+        ];
+
+        // 현재 요청하려는 URL이 위 목록에 포함되어 있는지 확인
+        const isNoAuthUrl = noAuthUrls.some((url) => config.url?.includes(url));
+
+        // 예외 목록에 없는 일반 API 요청일 때만 토큰 꽂아줌
+        if (!isNoAuthUrl) {
+            const token = storage.getAccessToken();
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
         }
+        
         return config;
     },
     (error) => Promise.reject(error)

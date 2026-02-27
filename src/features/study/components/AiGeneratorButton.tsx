@@ -78,7 +78,7 @@ export default function AiGeneratorButton({
           role="dialog"
           aria-modal="true"
           aria-label="AI 생성 확인"
-          className="absolute bottom-full mb-2 left-0 z-20 w-60 bg-white rounded-xl shadow-lg border border-gray-100 p-4"
+          className="absolute bottom-full mb-2 left-0 z-20 w-60 bg-background rounded-xl shadow-lg border border-gray-100 p-4"
         >
           <p className="text-xs text-gray-700 mb-3 leading-relaxed">
             기존 내용을 AI가 생성한 내용으로
@@ -96,7 +96,7 @@ export default function AiGeneratorButton({
             <button
               type="button"
               onClick={handleConfirm}
-              className="flex-1 py-1.5 rounded-lg bg-[#4F7BF7] text-xs text-white font-medium hover:bg-[#3d68e0] transition-colors"
+              className="flex-1 py-1.5 rounded-lg bg-[#4F7BF7] text-xs text-background font-medium hover:bg-[#3d68e0] transition-colors"
             >
               덮어쓰기
             </button>

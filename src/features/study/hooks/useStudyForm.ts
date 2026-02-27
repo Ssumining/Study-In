@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type { ChangeEvent, KeyboardEvent, FormEvent } from "react";
 import type { StudyFormState, StudyFormErrors, StudyDay } from "@/types/study";
 
@@ -30,8 +30,10 @@ function validateForm(state: StudyFormState): StudyFormErrors {
   if (!state.studyType) errors.studyType = "스터디 유형을 선택해주세요.";
   if (state.maxMembers === "") {
     errors.maxMembers = "모집 인원을 입력해주세요.";
-  } else if (Number(state.maxMembers) < 3 || Number(state.maxMembers) > 99) {
+  } else if (Number(state.maxMembers) < 3) {
     errors.maxMembers = "스터디원은 3명 이상 모집해야 합니다.";
+  } else if (Number(state.maxMembers) >= 100) {
+    errors.maxMembers = "100명 이상 모집할 수 없습니다.";
   }
   if (!state.startDate) errors.startDate = "시작일을 선택해주세요.";
   if (state.durationWeeks === "") errors.durationWeeks = "기간을 입력해주세요.";
@@ -74,6 +76,9 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
   const [tagInput, setTagInput] = useState("");
   const [isDirty, setIsDirty] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // 항상 최신 form 값을 참조하기 위한 ref (useCallback 클로저 문제 방지)
+  const formRef = useRef(form);
+  useEffect(() => { formRef.current = form; }, [form]);
 
   const updateField = useCallback(
     <K extends keyof StudyFormState>(key: K, value: StudyFormState[K]) => {
@@ -85,10 +90,21 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
           const num = Number(value);
           if ((value as string) === "") {
             next.maxMembers = "모집 인원을 입력해주세요.";
-          } else if (num < 3 || num > 99) {
+          } else if (num < 3) {
             next.maxMembers = "스터디원은 3명 이상 모집해야 합니다.";
+          } else if (num >= 100) {
+            next.maxMembers = "100명 이상 모집할 수 없습니다.";
           } else {
             delete next.maxMembers;
+          }
+        } else if (key === "startTime" || key === "endTime") {
+          delete next.startTime;
+          delete next.endTime;
+          delete next.timeRange;
+          const newStart = key === "startTime" ? (value as string) : formRef.current.startTime;
+          const newEnd   = key === "endTime"   ? (value as string) : formRef.current.endTime;
+          if (newStart && newEnd && newStart >= newEnd) {
+            next.timeRange = "종료 시간은 시작 시간보다 늦어야 합니다.";
           }
         } else if (prev[key as keyof StudyFormErrors]) {
           delete next[key as keyof StudyFormErrors];
@@ -98,6 +114,27 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
     },
     [],
   );
+
+  // blur 시 필수 필드 검증
+  const handleBlurField = useCallback((key: keyof StudyFormState) => {
+    const current = formRef.current;
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (key === "title" && !current.title.trim()) {
+        next.title = "스터디 제목을 입력해주세요.";
+      } else if (key === "maxMembers") {
+        const num = Number(current.maxMembers);
+        if (current.maxMembers === "") {
+          next.maxMembers = "모집 인원을 입력해주세요.";
+        } else if (num < 3) {
+          next.maxMembers = "스터디원은 3명 이상 모집해야 합니다.";
+        } else if (num >= 100) {
+          next.maxMembers = "100명 이상 모집할 수 없습니다.";
+        }
+      }
+      return next;
+    });
+  }, []);
 
   const handleThumbnailChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -141,6 +178,7 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
         return next;
       });
       setIsDirty(true);
+      e.target.value = "";
     },
     [],
   );
@@ -247,6 +285,7 @@ export function useStudyForm(onSubmit?: (state: StudyFormState) => void) {
     handleAddTagDirect,
     handleRemoveTag,
     handleTagInputKeyDown,
+    handleBlurField,
     handleSubmit,
     handleReset,
   };
