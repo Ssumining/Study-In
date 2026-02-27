@@ -229,7 +229,7 @@ function TimePicker({
           <div className="w-px bg-gray-100 shrink-0" />
           {/* 분 */}
           <div className="flex-1 h-44 overflow-y-auto">
-            {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0")).map((mv) => (
+            {Array.from({ length: 6 }, (_, i) => String(i * 10).padStart(2, "0")).map((mv) => (
               <button
                 key={mv}
                 type="button"
