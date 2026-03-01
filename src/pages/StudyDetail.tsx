@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 type StudyDetailData = {
@@ -12,8 +12,8 @@ type StudyDetailData = {
   participants: number;
   description: string;
   days: string[];
-  startDate: string; // YYYY-MM-DD
-  time: string; // e.g. "19:00 ~ 21:00"
+  startDate: string;
+  time: string;
   durationWeeks: number;
   difficulty: "초급" | "중급" | "고급";
   subject: string;
@@ -23,7 +23,19 @@ type StudyDetailData = {
 export default function StudyDetail() {
   const { studyId } = useParams<{ studyId: string }>();
 
-  // ✅ 오늘은 더미 데이터 기반. 나중에 API 연동으로 교체할 자리
+  // ✅ 좋아요(필수: UI 토글만)
+  const [liked, setLiked] = useState(false);
+
+  // ✅ 참가 상태(오늘은 UI 상태로 시뮬레이션)
+  const [isJoined, setIsJoined] = useState(false);
+
+  // ✅ 오늘 요구사항: 참가/탈퇴 버튼 조건 UI 설계용 플래그들 (API 연결 전, 더미)
+  // 필요하면 true/false만 바꿔서 조건 화면 확인 가능
+  const isMember = true; // 정회원 여부
+  const isLeader = false; // 스터디장 여부(스터디장 탈퇴 불가)
+  // 모집 인원 초과 여부(참가 불가)
+  const isFull = false;
+
   const data: StudyDetailData | null = useMemo(() => {
     if (!studyId) return null;
 
@@ -54,42 +66,39 @@ export default function StudyDetail() {
     };
   }, [studyId]);
 
-  // ✅ 로딩/에러 상태는 기본 뼈대만 (오늘 이슈 범위)
-  const isLoading = false;
-  const isError = false;
+  if (!data) return <div className="p-6">잘못된 접근입니다.</div>;
 
-  if (isLoading) {
-    return (
-      <div className="p-6">
-        <p className="text-sm text-gray-500">로딩 중...</p>
-      </div>
-    );
-  }
+  // ✅ 버튼 상태/문구/비활성 사유 계산
+  const joinButtonText = isJoined ? "탈퇴하기" : "참가하기";
 
-  if (isError) {
-    return (
-      <div className="p-6">
-        <p className="text-sm text-red-600">
-          데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
-        </p>
-      </div>
-    );
-  }
+  // 참가하기(=isJoined=false)일 때의 비활성 조건
+  const joinDisabledReason = !isMember
+    ? "정회원만 참가할 수 있어요."
+    : isFull
+      ? "모집 인원이 마감되었어요."
+      : null;
 
-  if (!data) {
-    return (
-      <div className="p-6">
-        <p className="text-sm text-gray-500">잘못된 접근입니다.</p>
-      </div>
-    );
-  }
+  // 탈퇴하기(=isJoined=true)일 때의 비활성 조건(스터디장은 탈퇴 불가)
+  const leaveDisabledReason = isLeader ? "스터디장은 탈퇴할 수 없어요." : null;
+
+  const actionDisabled = isJoined
+    ? Boolean(leaveDisabledReason)
+    : Boolean(joinDisabledReason);
+
+  const helperText = isJoined ? leaveDisabledReason : joinDisabledReason;
+
+  const handleJoinToggle = () => {
+    if (actionDisabled) return;
+    setIsJoined((prev) => !prev);
+  };
 
   return (
     <div className="mx-auto w-full max-w-5xl p-4 md:p-6">
-      {/* 상단: 타이틀/요약 */}
+      {/* 상단 */}
       <section className="mb-6">
         <p className="mb-2 text-xs text-gray-400">studyId: {studyId}</p>
         <h1 className="text-2xl font-bold">{data.title}</h1>
+
         <div className="mt-3 flex flex-wrap gap-2 text-sm text-gray-600">
           <span className="rounded-full bg-gray-100 px-3 py-1">
             {data.subject}
@@ -103,12 +112,12 @@ export default function StudyDetail() {
         </div>
       </section>
 
-      {/* 썸네일 + 기본 정보 */}
+      {/* 썸네일 + 기본정보 */}
       <section className="grid gap-6 md:grid-cols-[360px_1fr]">
         <div className="overflow-hidden rounded-2xl bg-gray-100">
           <img
             src={data.thumbnailUrl}
-            alt="study thumbnail"
+            alt="thumbnail"
             className="h-56 w-full object-cover md:h-72"
           />
         </div>
@@ -117,20 +126,17 @@ export default function StudyDetail() {
           <div className="flex items-center gap-3">
             <img
               src={data.leader.profileImageUrl}
-              alt="leader profile"
+              alt="profile"
               className="h-10 w-10 rounded-full object-cover"
             />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold">
-                {data.leader.nickname}{" "}
-                {data.leader.grade ? (
-                  <span className="ml-2 text-xs text-gray-500">
-                    ({data.leader.grade})
-                  </span>
-                ) : null}
-              </p>
-              <p className="text-xs text-gray-500">스터디장</p>
-            </div>
+            <p className="text-sm font-semibold">
+              {data.leader.nickname}{" "}
+              {data.leader.grade ? (
+                <span className="text-xs text-gray-500">
+                  ({data.leader.grade})
+                </span>
+              ) : null}
+            </p>
           </div>
 
           <div className="mt-5 grid gap-2 text-sm">
@@ -159,24 +165,50 @@ export default function StudyDetail() {
             )}
           </div>
 
-          {/* 버튼 영역 (오늘은 UI만) */}
+          {/* 버튼 */}
           <div className="mt-6 flex flex-wrap gap-2">
-            <button className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-background">
-              참가하기
+            {/* 참가/탈퇴 버튼: 조건 UI 적용 */}
+            <button
+              type="button"
+              onClick={handleJoinToggle}
+              disabled={actionDisabled}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                actionDisabled
+                  ? "cursor-not-allowed bg-gray-200 text-gray-500"
+                  : isJoined
+                    ? "bg-gray-300 text-black"
+                    : "bg-black text-white"
+              }`}
+            >
+              {joinButtonText}
             </button>
-            <button className="rounded-xl border px-4 py-2 text-sm font-semibold">
-              ♡ 좋아요
+
+            {/* 좋아요(필수: UI 토글만) */}
+            <button
+              type="button"
+              onClick={() => setLiked((prev) => !prev)}
+              aria-pressed={liked}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                liked
+                  ? "bg-red-500 text-white"
+                  : "border border-gray-300 bg-white text-black"
+              }`}
+            >
+              {liked ? "♥ 좋아요" : "♡ 좋아요"}
             </button>
           </div>
+
+          {/* 조건 안내 텍스트 */}
+          {helperText ? (
+            <p className="mt-2 text-xs text-gray-500">{helperText}</p>
+          ) : null}
         </div>
       </section>
 
       {/* 소개 */}
       <section className="mt-8 rounded-2xl border p-4 md:p-6">
         <h2 className="text-lg font-bold">스터디 소개</h2>
-        <p className="mt-3 whitespace-pre-line text-sm text-gray-700">
-          {data.description}
-        </p>
+        <p className="mt-3 text-sm text-gray-700">{data.description}</p>
       </section>
 
       {/* 태그 */}
@@ -194,12 +226,12 @@ export default function StudyDetail() {
         </div>
       </section>
 
-      {/* 댓글 자리(나중에 서원 컴포넌트 붙일 곳) */}
+      {/* 댓글 자리(구조 정리 완료: 나중에 컴포넌트 꽂기) */}
       <section className="mt-6 rounded-2xl border p-4 md:p-6">
         <h2 className="text-lg font-bold">댓글</h2>
-        <p className="mt-2 text-sm text-gray-500">
+        <div className="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-500">
           (댓글 컴포넌트가 이 위치에 추가될 예정입니다.)
-        </p>
+        </div>
       </section>
     </div>
   );

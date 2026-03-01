@@ -1,19 +1,44 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import useUpload from '@/hooks/useUpload'
+import { getFullUrl } from '@/api/upload'
+import personIcon from '@/assets/base/icon-person.svg'
 
 // 선택 가능한 전체 태그 목록
 const allTags = ['Python', 'JS', 'Java', 'React', 'Django', '크롬확장프로그램', '사이드프로젝트', '알고리즘', '취업준비']
 
-const ProfileEditForm = () => {
-  const [nickname, setNickname] = useState('')
-  const [isNicknameChecked, setIsNicknameChecked] = useState(false)
-  const [bio, setBio] = useState('')
-  const [region, setRegion] = useState('')
-  const [github, setGithub] = useState('')
-  const [selectedTags, setSelectedTags] = useState<string[]>(['Python', 'JS'])
-  const navigate = useNavigate()
+// 소개 최대 글자수
+const MAX_BIO_LENGTH = 200
 
-  const isSaveEnabled = nickname !== '' && isNicknameChecked
+const ProfileEditForm = () => {
+  const navigate = useNavigate()
+  const { uploading, handleImageUpload } = useUpload()
+
+  // 프로필 이미지 상태
+  const [profileImg, setProfileImg] = useState<string | null>(null)
+  // 파일 input 참조
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 닉네임 입력값 상태 관리
+  const [nickname, setNickname] = useState('')
+  // 닉네임 중복확인 여부 상태
+  const [isNicknameChecked, setIsNicknameChecked] = useState(false)
+  // 소개 입력값 상태 관리
+  const [bio, setBio] = useState('')
+  // 지역 입력값 상태 관리
+  const [region, setRegion] = useState('')
+  // GitHub 입력값 상태 관리
+  const [github, setGithub] = useState('')
+  // 선택된 태그 상태 관리
+  const [selectedTags, setSelectedTags] = useState<string[]>(['Python', 'JS'])
+
+  // 닉네임 유효성 검사 - 2자 이상
+  const isNicknameValid = nickname.length >= 2
+  // GitHub 유효성 검사 - 영문/숫자/하이픈만 허용
+  const isGithubValid = github === '' || /^[a-zA-Z0-9-]+$/.test(github)
+
+  // 저장하기 버튼 활성화 조건
+  const isSaveEnabled = isNicknameValid && isNicknameChecked && isGithubValid
 
   // 태그 클릭시 선택/해제
   const toggleTag = (tag: string) => {
@@ -22,6 +47,14 @@ const ProfileEditForm = () => {
     } else {
       setSelectedTags([...selectedTags, tag])
     }
+  }
+
+  // 이미지 파일 선택 시 업로드
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = await handleImageUpload(file)
+    if (url) setProfileImg(getFullUrl(url))
   }
 
   return (
@@ -35,17 +68,28 @@ const ProfileEditForm = () => {
         ← 뒤로가기
       </button>
 
-      {/* 프로필 이미지 수정 - 실제 데이터 연결 시 이미지 업로드 기능 추가 필요 */}
+      {/* 프로필 이미지 수정 */}
       <div className="flex flex-col items-center gap-2">
-        <div className="w-24 h-24 rounded-full bg-gray-300 overflow-hidden">
-          <img
-            src="https://via.placeholder.com/96"
-            alt="프로필 이미지"
-            className="w-full h-full object-cover"
-          />
+        <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
+          {profileImg ? (
+            <img src={profileImg} alt="프로필 이미지" className="w-full h-full object-cover" />
+          ) : (
+            <img src={personIcon} alt="프로필 이미지" className="w-14 h-14" />
+          )}
         </div>
-        <button className="text-base text-primary font-medium">
-          이미지 변경
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+          className="hidden"
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="text-base text-primary font-medium"
+        >
+          {uploading ? '업로드 중...' : '이미지 변경'}
         </button>
       </div>
 
@@ -55,35 +99,50 @@ const ProfileEditForm = () => {
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="닉네임 입력"
+            placeholder="닉네임 입력 (2자 이상)"
             value={nickname}
             onChange={(e) => {
               setNickname(e.target.value)
-              setIsNicknameChecked(false)
+              setIsNicknameChecked(false) // 닉네임 변경시 중복확인 초기화
             }}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary"
+            className={`flex-1 border rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none ${
+              nickname && !isNicknameValid
+                ? 'border-red-400 focus:border-red-400'
+                : 'border-gray-300 focus:border-primary'
+            }`}
           />
           <button
-            onClick={() => setIsNicknameChecked(true)} // 실제 중복확인 API 연결 필요
-            className="px-3 py-2 bg-primary text-background text-base rounded-lg"
+            onClick={() => setIsNicknameChecked(true)}
+            disabled={!isNicknameValid}
+            className={`px-3 py-2 text-white text-base rounded-lg ${
+              isNicknameValid ? 'bg-primary' : 'bg-gray-300 cursor-not-allowed'
+            }`}
           >
             중복확인
           </button>
         </div>
+        {/* 닉네임 오류 메시지 */}
+        {nickname && !isNicknameValid && (
+          <p className="text-sm text-red-400">닉네임은 2자 이상 입력해주세요!</p>
+        )}
+        {/* 중복확인 완료 메시지 */}
         {isNicknameChecked && (
           <p className="text-sm text-primary">사용 가능한 닉네임입니다!</p>
         )}
       </div>
 
-      {/* 소개 */}
+      {/* 소개 - 글자수 제한 표시 */}
       <div className="flex flex-col gap-1">
         <label className="text-base font-medium text-gray-900">소개</label>
         <textarea
           placeholder="소개를 입력해주세요"
           value={bio}
+          maxLength={MAX_BIO_LENGTH}
           onChange={(e) => setBio(e.target.value)}
           className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 resize-none h-24 focus:outline-none focus:border-primary"
         />
+        {/* 글자수 표시 */}
+        <p className="text-xs text-gray-500 text-right">{bio.length}/{MAX_BIO_LENGTH}자</p>
       </div>
 
       {/* 선호 지역 */}
@@ -98,19 +157,27 @@ const ProfileEditForm = () => {
         />
       </div>
 
-      {/* GitHub */}
+      {/* GitHub - 영문/숫자/하이픈만 허용 */}
       <div className="flex flex-col gap-1">
         <label className="text-base font-medium text-gray-900">GitHub</label>
         <input
           type="text"
-          placeholder="GitHub 아이디 입력"
+          placeholder="GitHub 아이디 입력 (영문/숫자/하이픈)"
           value={github}
           onChange={(e) => setGithub(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary"
+          className={`border rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none ${
+            github && !isGithubValid
+              ? 'border-red-400 focus:border-red-400'
+              : 'border-gray-300 focus:border-primary'
+          }`}
         />
+        {/* GitHub 오류 메시지 */}
+        {github && !isGithubValid && (
+          <p className="text-sm text-red-400">영문, 숫자, 하이픈(-)만 입력 가능해요!</p>
+        )}
       </div>
 
-      {/* 관심 분야 태그 - 클릭으로 선택/해제 */}
+      {/* 관심 분야 태그 */}
       <div className="flex flex-col gap-1">
         <label className="text-base font-medium text-gray-900">관심 분야</label>
         <div className="flex flex-wrap gap-2">
@@ -130,13 +197,13 @@ const ProfileEditForm = () => {
         </div>
       </div>
 
-      {/* 저장하기 버튼 - 변경사항 있고 유효성 검사 통과시 활성화 */}
+      {/* 저장하기 버튼 */}
       <button
         disabled={!isSaveEnabled}
         className={`mt-4 w-full py-2 rounded-lg text-base ${
           isSaveEnabled
-            ? 'bg-primary text-background cursor-pointer hover:bg-primary-light'
-            : 'bg-gray-300 text-background cursor-not-allowed'
+            ? 'bg-primary text-white cursor-pointer'
+            : 'bg-gray-300 text-white cursor-not-allowed'
         }`}
       >
         저장하기

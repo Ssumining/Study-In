@@ -543,6 +543,7 @@ export default function StudyForm({
               <input
                 ref={dateInputRef}
                 type="date"
+                aria-label="시작 날짜 선택"
                 value={form.startDate}
                 onChange={(e) => { updateField("startDate", e.target.value); setIsDateOpen(false); }}
                 className="absolute opacity-0 pointer-events-none w-0 h-0"

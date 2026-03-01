@@ -3,11 +3,12 @@ import iconDots from "@/assets/base/icon-dots.svg";
 
 interface StudyCreateTopBarProps {
   isValid: boolean;
+  isSubmitting?: boolean;
   onViewStudy?: () => void;
   onDeleteStudy?: () => void;
 }
 
-export default function StudyCreateTopBar({ isValid, onViewStudy, onDeleteStudy }: StudyCreateTopBarProps) {
+export default function StudyCreateTopBar({ isValid, isSubmitting = false, onViewStudy, onDeleteStudy }: StudyCreateTopBarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -37,12 +38,12 @@ export default function StudyCreateTopBar({ isValid, onViewStudy, onDeleteStudy 
         <button
           type="submit"
           form="study-create-form"
-          disabled={!isValid}
+          disabled={!isValid || isSubmitting}
           className={`w-[160px] h-[40px] rounded-lg text-sm font-medium text-background transition-colors ${
-            isValid ? "bg-[#2E6FF2]" : "bg-[#c5d3fc]"
+            isValid && !isSubmitting ? "bg-[#2E6FF2]" : "bg-[#c5d3fc]"
           }`}
         >
-          스터디 만들기
+          {isSubmitting ? "생성 중..." : "스터디 만들기"}
         </button>
         {onViewStudy && (
           <div ref={dropdownRef} className="relative">
