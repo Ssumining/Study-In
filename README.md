@@ -1,16 +1,26 @@
 # Study-In-03
 
-> **Study-In Service**
->
-> StudyIn은 스터디를 생성하고, 참가하고, 소통할 수 있는 스터디 매칭 서비스입니다.
-> 사용자는 스터디 생성 / 수정 / 삭제, 스터디 참가 / 탈퇴, 댓글 작성, 실시간 채팅 (WebSocket), AI 기반 커리큘럼 & 소개글 자동 생성, 프로필 관리, JWT 기반 로그인 인증을 할 수 있습니다.
+> **Study-In Service** <br>
+> StudyIn은 스터디를 생성하고, 참가하고, 소통할 수 있는 스터디 매칭 서비스입니다. </br>
+
+> **Study-In Function**
+> 1. 스터디 생성 / 수정 / 삭제
+> 2. 스터디 참가 / 탈퇴
+> 3. 댓글 작성
+> 4. 실시간 채팅 (WebSocket)
+> 5. AI 기반 커리큘럼 & 소개글 자동 생성
+> 6. 프로필 관리
+> 7. JWT 기반 로그인 인증
+
+---
+# 프로젝트 관리
 
 ## 1. 프로젝트 개요
 
-- **프로젝트명**: Study-In-03
-- **개발 기간**: 2026.02.24 ~ 2026.03.13
-- **개발 인원**: Front-End 6기 6명 (Team Project)
-- **배포주소**:
+- **프로젝트명** : Study-In-03
+- **개발 기간** : 2026.02.24 ~ 2026.03.13
+- **개발 인원** : Front-End 6기 6명 (Team Project)
+- **배포주소** : https://study-in.netlify.app/
 - **Test Account**
 
   
@@ -43,96 +53,312 @@ gantt
         2차배포 확인 및 수정              :2026-03-07, 2d
 ```
 
+## 사전 기획 및 요구사항 분해
+
+### WBS 기반의 체계적인 업무 분배 및 난이도 조절
+> 프로젝트 초기 단계에서 **WBS(Work Breakdown Structure)** 를 꼼꼼하게 작성하여 전체 개발 범위를 세분화했습니다. <br>
+> 저희 팀은 전공자(경험자)와 비전공자(초심자)가 함께하는 구성이이므로 **각 팀원의 코드 작성 역량과 기술적 이해도를 객관적으로 파악하여 업무를 분배**하는 것에 가장 큰 중점을 두었습니다.
+
+### 전공자 / 경험자 주도 (Core & Infrastructure)
+> 초기 아키텍처 세팅, Axios 인터셉터(JWT 토큰 자동 갱신), 웹소켓(실시간 채팅), TypeScript 공통 타입 정의 등 난이도가 높은 코드 <br>
+> 다른 도메인에 의존성을 많이 주는 '공통 인프라' 및 '심화 기능'을 주로 담당 <br>
+
+### 프로젝트의 뼈대를 견고하게 잡았습니다.
+
+### 비전공자 / 초심자 주도 (UI/UX & Feature CRUD)
+> 공통 레이아웃 마크업, 마이페이지, 스터디 피드 렌더링 등 직관적으로 화면 변화를 확인하며 React 컴포넌트 생태계에 적응할 수 있는 도메인을 우선 할당 <br> 
+> 이후 개발에 익숙해지는 속도에 맞춰 점진적으로 API 연동 및 상태 관리 로직까지 역할을 확대해 나갔습니다.
+
+### 맞춤형 업무 분배를 통해 초반 개발 병목 현상을 방지
+### 팀원 모두가 끝까지 프로젝트에 기여하며 동반 성장할 수 있는 환경 형성
+
+### WBS (Work Breakdown Structure)를 통한 구조적 설계
+
+| 대분류 (Depth 1) | 중분류 (Depth 2) | 세부 작업 내용 (Depth 3) | 담당자 | 의존성 / 연관 파트 | 구분 |
+| :--- | :--- | :--- | :---: | :--- | :---: |
+| **0. 공통 인프라** | 네트워크/통신 | JWT 관리 및 Axios 인터셉터 (토큰 자동 주입/갱신) | 수민 | 전 파트 API 통신에 필수 | 필수 |
+| | UI/UX 기반 | 글로벌 레이아웃(Header, Footer) 및 공통 모달 시스템 구축 | 서원 | 전 파트 화면 뼈대 | 필수 |
+| | 유틸리티 | 파일/이미지 업로드 API 유틸리티화 (5MB 제한, 이미지 900px 리사이징) | 서원 | 주현(썸네일), 하리(프로필), 수민(채팅) 사용 | 필수 |
+| **1. 회원/인증** | 로그인 | SNS 로그인(마크업만) 및 이메일 로그인 UI/로직 (유효성 검사) | 수민 | - | 필수 |
+| | 회원가입 | 이메일 인증 (코드 123456 고정), 비밀번호 유효성 검사 폼 | 수민 | - | 필수 |
+| | 초기 프로필 | 최초 가입 시 프로필 설정 화면 (이름, 폰번호, 사진, 닉네임, 지역 등) | 수민 | 서원(이미지 업로드) 함수 필요 | 필수 |
+| **2. 마이페이지** | 프로필 조회 | 본인(이름, 폰번호 포함) / 타인 프로필 구분 렌더링 | 하리 | 수민(로그인 상태) 필요 | 필수 |
+| | 프로필 수정 | 프로필 수정 폼 및 닉네임 중복 확인 API 연동 | 하리 | 서원(이미지 업로드) 함수 필요 | 필수 |
+| **3. 메인 피드** | 스터디 목록 | 스터디 카드 UI 및 메인 목록 조회 (Limit, Skip 페이지네이션) | 외숙 | - | 필수 |
+| | 배너/필터 UI | 상단 배너 컴포넌트 및 검색/필터 영역 UI (기능 없이 마크업만) | 외숙 | - | 필수 |
+| **4. 스터디 관리** | 스터디 생성 | 생성 폼 UI 및 필수 입력값(모집인원, 온/오프라인 등) 유효성 검사 | 주현 | 서원(이미지 업로드) 함수 필요 | 필수 |
+| | AI 연동 | ChatGPT API 활용 커리큘럼/소개글 자동 생성 (스트리밍/로딩 UI) | 주현 | 스터디 생성 폼 내부에 부착 | 필수 |
+| | 수정 및 삭제 | 스터디 수정(인원 축소 방지 로직) 및 삭제 기능 (모달 연동) | 주현 | 서원(공통 모달) 필요 | 필수 |
+| **5. 스터디 상세** | 상세 렌더링 | 스터디 정보 렌더링 및 그룹장 프로필 이동 링크 연결 | 수정 | 주현이 생성한 데이터 기반 | 필수 |
+| | 참가/탈퇴 | 참가/탈퇴 로직 (정회원 체크, 인원 제한 체크) | 수정 | 수민(채팅방 시스템 메세지) 트리거 | 필수 |
+| | 좋아요(기본) | 시각적 좋아요(하트 토글) UI 상태 변경 (API 연동 X) | 수정 | - | 필수 |
+| **6. 스터디 소통** | 댓글 (기본) | 스터디 상세 페이지 하단 단일 댓글 CRUD (정회원 전용) | 서원 | 수정(상세 페이지) 하단에 부착 | 필수 |
+| **7. 공통 모달** | 더보기 버튼 | 헤더(로그아웃 등), 상세페이지/댓글(수정, 삭제, 신고) 모달 분기 처리 | 서원 | 전 파트 모달 트리거에 적용 | 필수 |
+| **8. 심화 (선택)** | 채팅 (Websocket) | 채팅방 웹소켓 연결, 텍스트/이미지/파일 전송, 시스템 메세지 처리 | 수민 | 수정(참가/탈퇴 시 시스템 메세지 연동) | 선택 |
+| | 채팅 UI | 채팅방 레이아웃 마크업 및 메시지 말풍선 UI 지원 | 외숙 | 수민(웹소켓 로직)과 연결 | 선택 |
+| | 검색/필터 심화 | 다중 쿼리 파라미터 조합 API 연동 및 상태 관리 | 주현 | 외숙(검색 UI)과 연결 | 선택 |
+| | UI 고도화 | 검색어 일치 부분 강조 표시 (Highlighting) 적용 | 외숙 | 주현(검색 API 데이터) 활용 | 선택 |
+| | 댓글 고도화 | 대댓글(트리 구조), 유저 태그, 비밀 댓글 로직 처리 | 서원 | 수정(상세 페이지) 댓글 기능 대체 | 선택 |
+| | 알림 시스템 | 참가, 댓글, 대댓글 발생 시 알림 생성 및 헤더 읽음/삭제 처리 | 서원 | 헤더(공통 UI)에 알림 드롭다운 추가 | 선택 |
+| | 좋아요 고도화 | 실제 좋아요 API 연동 및 마이페이지 내 '관심 스터디 목록' 구현 | 수정 | 하리(마이페이지) 내 탭 추가 | 선택 |
+| | 신고 시스템 | 스터디, 사용자, 댓글에 대한 공통 신고하기 API 및 폼 구현 | 하리 | 서원(공통 모달)에 부착 | 선택 |
+
+### 팀 협업 가이드 및 프로젝트 컨벤션 설계
+> 다수의 인원이 하나의 레포지토리에서 작업하는 만큼, 코드의 일관성을 유지하고 불필요한 충돌 및 커뮤니케이션 비용을 줄이기 위해 **명확한 협업 가이드와 컨벤션**을 초기에 설계했습니다.
+
+* **커밋 및 브랜치 규칙 :** `feat:`, `fix:`, `design:` 등 직관적인 커밋 메시지 프리픽스(Prefix)를 도입하여 히스토리 파악을 용이하게 했습니다.
+* **코드 포맷팅 자동화 :** ESLint와 Prettier 설정을 공유하여 6명의 코드 스타일을 하나로 통일했습니다.
+* **PR(Pull Request) 템플릿 도입 :** 리뷰어가 작업 맥락을 빠르게 파악할 수 있도록, PR 생성 시 '작업 내용', 'UI 변경 사항(스크린샷)', '리뷰어에게 남길 말'을 필수적으로 작성하도록 템플릿을 문서화했습니다.
+
+### 일일 스크럼(Daily Scrum)을 통한 실시간 진행 상황 및 블로커(Blocker) 관리
+프로젝트 기간 동안 각 파트의 개발 속도를 맞추고 일정 지연을 방지하기 위해 **일일 스크럼(Daily Scrum)** 체제를 도입했습니다.
+* 매일 정해진 시간에 **'어제 완료한 작업, 오늘 진행할 작업, 현재 마주한 문제점(Blocker)'** 을 짧고 명확하게 공유했습니다.
+* 기술적인 에러나 로직 구현에 어려움을 겪는 팀원이 발생하면, 스크럼 시간에 이를 즉각적으로 파악하여 경험자가 페어 프로그래밍이나 트러블 슈팅을 지원하는 등 유기적으로 대처했습니다.
+* 스크럼에서 논의된 진행 유무는 즉각적으로 WBS 및 GitHub 프로젝트 보드에 반영되어, 전 팀원이 전체 프로젝트의 실시간 진행도를 투명하게 확인할 수 있었습니다.
+
+### GitHub 협업 프로세스로의 고도화
+#### GitHub Issues & Git-flow를 통한 태스크 트래킹
+> 작성된 WBS의 세부 작업 내용(Depth 3)은 모두 **GitHub Issue**로 티켓팅하여 관리했습니다. <br>
+> 작업을 시작하기 전 이슈를 생성해 담당자를 할당하고, **Git-flow 브랜치 전략**을 엄격하게 적용하여 `feature/이슈번호-작업명` 형태로 브랜치를 분기했습니다. <br>
+> 작업 완료 후에는 반드시 Pull Request를 생성하여 코드 리뷰를 거친 뒤 `develop` 브랜치에 병합(Merge) <br>
+
+### 전 팀원이 동시에 병렬로 개발을 진행해도 코드가 충돌하거나 꼬이지 않도록 안전하게 협업
+
 ## 2. 기술 스택 (Tech Stack)
 
-| 구분                    | 기술                                                                                                                                                                                                      | 설명                                 |
-| :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------- |
-| **Core**              | <img src="https://img.shields.io/badge/React_18-20232A?style=flat&logo=react&logoColor=61DAFB"/> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white"/> | 컴포넌트 기반 SPA 개발 및 정적 타입 안정성 확보      |
-| **Routing**           | <img src="https://img.shields.io/badge/React_Router_DOM-CA4245?style=flat&logo=reactrouter&logoColor=white"/>                                                                                           | SPA 환경에서 Public / Private Route 분리 |
-| **Styling**           | <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/>                                                                                               | 유틸리티 퍼스트 기반 디자인 시스템 구축             |
-| **State Management**  | <img src="https://img.shields.io/badge/Zustand-000000?style=flat&logo=react&logoColor=white"/>                                                                                                          | 인증 상태, 알림, 모달 등 전역 상태 관리           |
-| **API Communication** | <img src="https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=axios&logoColor=white"/>                                                                                                            | 인터셉터 기반 JWT 자동 주입 및 토큰 갱신 처리       |
-| **Real-time**         | <img src="https://img.shields.io/badge/WebSocket-010101?style=flat&logo=socketdotio&logoColor=white"/>                                                                                                  | 실시간 채팅 기능 구현                       |
-| **AI Integration**    | <img src="https://img.shields.io/badge/ChatGPT_API-10A37F?style=flat&logo=openai&logoColor=white"/>                                                                                                     | AI 기반 커리큘럼 및 소개글 자동 생성 (스트리밍 처리)   |
-| **Build Tool** | <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white"/>                 | 빠른 HMR 및 번들링 최적화                       |
-| **Deploy**     | <img src="https://img.shields.io/badge/Firebase_Hosting-FFCA28?style=flat&logo=firebase&logoColor=black"/> | Firebase CLI 기반 정적 배포 및 SPA rewrite 설정 |
-
-
+| 구분 | 기술 | 설명 |
+| :--- | :--- | :--- |
+| **Core** | <img src="https://img.shields.io/badge/React_18-20232A?style=flat&logo=react&logoColor=61DAFB"/> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white"/> | 컴포넌트 기반 SPA 개발 및 정적 타입 안정성 확보 |
+| **Routing** | <img src="https://img.shields.io/badge/React_Router_DOM-CA4245?style=flat&logo=reactrouter&logoColor=white"/> | SPA 환경에서 Public / Private Route 분리 |
+| **Styling** | <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/> | 유틸리티 퍼스트 기반 디자인 시스템 구축 |
+| **State Management** | <img src="https://img.shields.io/badge/Zustand-000000?style=flat&logo=react&logoColor=white"/> | 인증 상태, 알림, 모달 등 전역 상태 관리 |
+| **API Communication** | <img src="https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=axios&logoColor=white"/> | 인터셉터 기반 JWT 자동 주입 및 토큰 갱신 처리 |
+| **Real-time** | <img src="https://img.shields.io/badge/WebSocket-010101?style=flat&logo=socketdotio&logoColor=white"/> | 실시간 채팅 기능 구현 |
+| **AI Integration** | <img src="https://img.shields.io/badge/ChatGPT_API-10A37F?style=flat&logo=openai&logoColor=white"/> | AI 기반 커리큘럼 및 소개글 자동 생성 (스트리밍 처리) |
+| **Build Tool** | <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white"/> | 빠른 HMR 및 번들링 최적화 |
+| **Deploy** | <img src="https://img.shields.io/badge/Netlify-00C7B7?style=flat&logo=netlify&logoColor=white"/> | 지속적 배포(CI/CD) 및 SPA 정적 웹 호스팅 |
 ---
 
 ## 3. 프로젝트 실행 방법
 
-  ### 1. 저장소 클론
-  
-git clone https://github.com/Study-In-03/Study-In.git
+### 1. 원격 저장소 folk 후 로컬 저장소 클론
 
- ### 2. 패키지 설치
-  npm install
+```bash
+git folk https://github.com/Study-In-03/Study-In.git
+```
+```bash
+git clone https://github.com/my-repository/Study-In.git
+```
 
-  ### 3. 환경 변수 설정
-  .env 파일 생성 후 아래 내용 추가
+### 2. 패키지 설치
+```bash
+npm install
+```
 
-    VITE_BASE_URL=https://api.studyin.com :
-    VITE_CHAT_URL=wss://api.studyin.com/ws :
-    
-  ### 4. 실행
-  npm run dev
+### 3. 환경 변수 설정
+- .env 파일 생성 후 아래 내용 추가
+```bash
+VITE_API_BASE_URL=https://api.wenivops.co.kr/services/studyin/
+```
 
-## 4. 프로젝트 구조
-```mermade
- studyin-frontend
-├── public/
-├── src/
-│   ├── api/          # 서버 통신 로직 (Axios 인스턴스, API 함수)
-│   ├── components/   # 전역 공통 UI 컴포넌트
-│   ├── features/     # 도메인별 기능 모듈 (auth, study, profile 등)
-│   ├── hooks/        # 전역 커스텀 훅
-│   ├── pages/        # 라우팅과 연결되는 실제 페이지
-│   ├── routes/       # Public/Private 라우트 설정
-│   ├── store/        # Zustand 전역 상태 관리
-│   ├── types/        # TypeScript 타입 정의
-│   ├── utils/        # 유틸 함수 모음
-│   ├── lib/          # 외부 라이브러리 초기화
-│   ├── App.tsx
-│   └── main.tsx
-end
+### 4. 실행
+```bash
+npm run dev
 ```
 
 ---
-## 5. 아키텍쳐 설계 전략
 
-1. Feature 기반 구조 : 기능(도메인) 단위로 폴더를 분리했습니다.
+## 4. 프로젝트 구조
 ```mermade
-features/
- ├── auth/
- ├── study/
- ├── profile/
- ├── comments/
- └── chat/
-end
+📦 studyin-frontend
+├── 📁 public/
+├── 📁 src/
+│   ├── 📁 api/
+│   │   ├── axios.ts
+│   │   ├── auth.ts
+│   │   ├── study.ts
+│   │   ├── profile.ts
+│   │   ├── upload.ts
+│   │   └── chat.ts
+│   │
+│   ├── 📁 assets/
+│   │   ├── 📁 base/
+│   │   └── 📁 category/
+│   │   
+│   ├── 📁 components/
+│   │   ├── 📁 common/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Input.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   └── Spinner.tsx
+│   │   │
+│   │   └── 📁 layout/
+│   │       ├── Header.tsx
+│   │       ├── Footer.tsx
+│   │       ├── Layout.tsx
+│   │       ├── AuthLayout.tsx
+│   │       └── MobileDrawer.tsx
+│   │
+│   ├── 📁 constants/
+│   │   └── auth.ts
+│   │   
+│   ├── 📁 features/
+│   │   ├── 📁 auth/
+│   │   │   ├── 📁 components/
+│   │   │   │   ├── LoginForm.tsx
+│   │   │   │   ├── RegisterForm.tsx
+│   │   │   │   ├── EmailVerification.tsx
+│   │   │   │   └── PasswordResetForm.tsx
+│   │   │   ├── 📁 hooks/
+│   │   │   │   ├── useLogin.ts
+│   │   │   │   ├── usePasswordResetConfirm.ts
+│   │   │   │   ├── usePasswordResetEmail.ts
+│   │   │   │   └── useRegister.ts
+│   │   │   ├── 📁 utils/
+│   │   │   │   └── authValidators.ts
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── 📁 study/
+│   │   │   ├── 📁 components/
+│   │   │   │   ├── StudyBanner.tsx
+│   │   │   │   ├── StudyCreateTopBar.tsx
+│   │   │   │   ├── StudyCard.tsx
+│   │   │   │   ├── StudyList.tsx
+│   │   │   │   ├── StudyFilter.tsx
+│   │   │   │   ├── StudyDetailInfo.tsx
+│   │   │   │   ├── LikeButton.tsx
+│   │   │   │   ├── StudyForm.tsx
+│   │   │   │   └── AiGeneratorButton.tsx
+│   │   │   ├── 📁 hooks/
+│   │   │   │   ├── useStudyList.ts
+│   │   │   │   ├── useStudyForm.ts
+│   │   │   │   ├── useLikeToggle.ts
+│   │   │   │   └── useAiStream.ts
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── 📁 profile/
+│   │   │   ├── 📁 components/
+│   │   │   │   ├── ProfileCard.tsx
+│   │   │   │   ├── ProfileEditForm.tsx
+│   │   │   │   └── ActivityTabs.tsx
+│   │   │   ├── 📁 hooks/
+│   │   │   │   ├── useMyStudies.ts
+│   │   │   │   └── useProfileEdit.ts
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── 📁 comments/
+│   │   │   ├── 📁 components/
+│   │   │   │   ├── CommentSection.tsx
+│   │   │   │   ├── CommentInput.tsx
+│   │   │   │   ├── CommentItem.tsx
+│   │   │   │   └── RecommentList.tsx
+│   │   │   ├── 📁 hooks/
+│   │   │   │   └── useComments.ts
+│   │   │   └── index.ts
+│   │   │
+│   │   └── 📁 chat/
+│   │       ├── 📁 components/
+│   │       │   ├── ChatRoom.tsx
+│   │       │   ├── ChatMessageList.tsx
+│   │       │   ├── ChatBubble.tsx
+│   │       │   ├── SystemMessage.tsx
+│   │       │   └── ChatInput.tsx
+│   │       ├── 📁 hooks/
+│   │       │   └── useWebSocket.ts
+│   │       └── index.ts
+│   │
+│   ├── 📁 hooks/
+│   │   ├── useAuth.ts
+│   │   ├── useWebsocket.ts
+│   │   └── useUpload.ts
+│   │  
+│   ├── 📁 pages/
+│   │   ├── Home.tsx
+│   │   ├── Login.tsx
+│   │   ├── Register.tsx
+│   │   ├── StudyDetail.tsx
+│   │   ├── StudyCreate.tsx
+│   │   ├── ForgotPassword.tsx
+│   │   ├── Mystudy.tsx
+│   │   ├── Notification.tsx
+│   │   ├── ProfileEdit.tsx
+│   │   ├── ResetPassword.tsx
+│   │   └── Profile.tsx
+│   │
+│   ├── 📁 routes/
+│   │   └── Router.tsx
+│   │
+│   ├── 📁 store/
+│   │   ├── authStore.ts
+│   │   └── alertStore.ts
+│   │
+│   ├── 📁 types/
+│   │   ├── api.d.ts
+│   │   ├── user.d.ts
+│   │   ├── study.d.ts
+│   │   └── chat.d.ts
+│   │
+│   ├── 📁 utils/
+│   │   ├── date.ts
+│   │   ├── storage.ts
+│   │   └── validation.ts
+│   │
+│   ├── 📁 lib/
+│   │   └── firebase.ts
+│   │
+│   ├── App.css
+│   ├── App.tsx
+│   ├── index.css
+│   ├── main.tsx
+│   └── vite-env.d.ts
+│
+├── .env
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json
 ```
 
- 장점: 기능별 응집도 ↑, 유지보수 용이, 팀원 분업이 명확
+---
+## 5. 아키텍처 설계 전략
 
- 2. API 레이어 분리 : Axios 인스턴스 분리, 인터셉터에서 JWT 자동 주입, 401 발생 시 refresh_token 자동 갱신
+### 1. Feature(도메인) 기반 폴더 구조
+> - 도메인(기능) 단위로 폴더를 분리하여 관련된 UI 컴포넌트, 커스텀 훅(비즈니스 로직), 유틸리티 함수를 한 곳에 모았습니다. <br>
+> - 이를 통해 기능별 응집도를 높이고 유지보수를 용이하게 했으며, 팀원 간의 명확한 분업을 통해 병렬 개발 시 충돌을 최소화했습니다.
+
+```text
+📁 src/features/
+ ├── 📁 auth/       # 로그인, 회원가입, 비밀번호 찾기 등 인증 도메인
+ ├── 📁 study/      # 스터디 목록, 상세, 생성 등 스터디 도메인
+ ├── 📁 profile/    # 마이페이지, 프로필 수정 도메인
+ ├── 📁 comments/   # 스터디 댓글 및 대댓글 도메인
+ └── 📁 chat/       # 실시간 웹소켓 채팅 도메인
+ ```
+
+### 2. API 레이어 분리 및 중앙 집중화
+> - UI 컴포넌트 내부에서 API를 직접 호출하지 않고 서버와의 통신 로직을 별도 레이어로 분리했습니다. 
+> - axios 인스턴스를 분리하여 헤더 설정, 에러 핸들링을 일원화했습니다.
+> - 인터셉터(Interceptor) 활용
+    : 요청 시 JWT(Access Token)를 자동으로 주입하고, 401(Unauthorized) 에러 발생 시 Refresh Token을 이용해 자동으로 토큰을 갱신하도록 구성했습니다.
     
-```mermade
-api/
- ├── axios.ts 
- ├── auth.ts
- ├── study.ts
- └── chat.ts
-end
+```text
+📁 src/api/
+ ├── axios.ts       # 공통 Axios 인스턴스 (인터셉터 설정 및 토큰 갱신 로직)
+ ├── auth.ts        # 인증 관련 API
+ ├── study.ts       # 스터디 CRUD API
+ ├── profile.ts     # 프로필 관련 API
+ ├── upload.ts      # 파일/이미지 업로드 API
+ └── chat.ts        # 채팅 내역 조회 등 관련 API
 ```
- 3. 상태 관리 전략 : 
-    상태 유형	관리 방식
-    로그인 상태	Zustand
-    모달/알림	Zustand
-    폼 상태	커스텀 훅
-    서버 데이터	API 호출 기반
+### 3. 상태 관리 전략 : 
+| 상태 유형 | 관리 방식 | 설명 및 적용 예시 |
+| :--- | :--- | :--- |
+| **전역 상태 (Global)** | Zustand | 로그인 유저 정보 및 토큰(`authStore`) 등 앱 전반에서 필요한 상태 |
+| **UI 상태 (UI/UX)** | Zustand | 전역 토스트, 모달 알림(`alertStore`) 등 공통 UI 제어 상태 |
+| **폼 상태 (Form)** | Custom Hook | `useStudyForm`, `useRegister` 등 도메인별 커스텀 훅에서 입력 상태 및 검증 로직 캡슐화 |
+| **서버 상태 (Server)** | Custom Hook | `useStudyList`, `useComments` 등 비즈니스 로직 훅에서 API 응답 데이터 파싱 및 관리 |
 
 
-## 6. 주요 기능 (Key Features)
+## 6. 주요 기능 (Key Features) 및 기능 시연 (Preview)
 
 ### 6-1. 회원가입 및 로그인 (Authentication)
 
@@ -209,30 +435,6 @@ end
 
 ---
 
-## 7. 기능 시연 (Preview) 및 역할 분담
-
-서비스의 핵심 기능을 **GIF**로 확인하실 수 있습니다.(발표용 PPR자료에서는 움짤+설명, 추가기능에대해서는 다른색으로 설명추가예정)
-
-(예)### 7-1-1. 메인 페이지 (Main Page)
-각 페이지에 대한 설명
-</>
-<br/>
-
----
-
-
-### 7-1. 역할 분담
-| 이름 | 담당 영역           |
-| -- | --------------- |
-| 수민 | Auth, WebSocket |
-| 외숙 | 메인 피드, 채팅 UI    |
-| 수정 | 스터디 상세, 좋아요     |
-| 주현 | 스터디 생성, AI      |
-| 하리 | 프로필             |
-| 서원 | 댓글, 업로드         |
-
----
-
 ## 8. 트러블 슈팅
 
 ### 8-1. JWT 자동 갱신 문제
@@ -264,66 +466,16 @@ end
 ### 성능 최적화(Reactmemo, Suspense)
 ### 접근성(A11y) 개선
 
+
+---
 ## 10. 팀원 정보 및 회고
 
-- **이름**: 강수민 (팀장)
-- **역할**: 
-- **GitHub**: 
-- **Email**:
-- **회고**:
-
-> 
-
-<br/>
-
-- **이름**: 강수정 (팀원)
-- **역할**:  
-- **GitHub**:  
-- **Email**: 
-- **회고**:
-
->
-> <br/>
-
-- **이름**:  강지현 (팀원)
-- **역할**:  
-- **GitHub**:  
-- **Email**: 
-- **회고**:
-
->  
-
-<br/>
-
-- **이름**: 권하리 (팀원)
-- **역할**:  
-- **GitHub**:  
-- **Email**: 
-- **회고**:
-
->  
-
-<br/>
-
-- **이름**: 박외숙 (팀원)
-- **역할**:  
-- **GitHub**:  
-- **Email**: 
-- **회고**:
-
->  
-
-<br/>
-
-- **이름**: 최서원 (팀원)
-- **역할**:  
-- **GitHub**:  
-- **Email**: 
-- **회고**:
-
->  
-
-
-
-
+| 사진 | 이름 | 역할 | GitHub | Email | 회고 |
+| :---: | :---: | :--- | :--- | :--- | :--- |
+| <img src="이미지URL" width="100" height="100"/> | **강수민**<br>(팀장) | 역할 추후 수정 | https://github.com/Ssumining | sumin6872@naver.com | 회고 추후 수정 |
+| <img src="이미지URL" width="100" height="100"/> | **강수정**<br>(팀원) | 역할 추후 수정 | | | 회고 추후 수정 |
+| <img src="이미지URL" width="100" height="100"/> | **강주현**<br>(팀원) | 역할 추후 수정 | | | 회고 추후 수정 |
+| <img src="이미지URL" width="100" height="100"/> | **권하리**<br>(팀원) | 역할 추후 수정 | | | 회고 추후 수정 |
+| <img src="이미지URL" width="100" height="100"/> | **박외숙**<br>(팀원) | 역할 추후 수정 | | | 회고 추후 수정 |
+| <img src="이미지URL" width="100" height="100"/> | **최서원**<br>(팀원) | 역할 추후 수정 | | | 회고 추후 수정 |
 ---
