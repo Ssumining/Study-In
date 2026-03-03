@@ -1,139 +1,160 @@
 import { useState } from 'react';
-import type { Comment } from '../../../api/comment';
-import { getFullUrl } from '../../../api/upload';
+import type { Comment } from '@/api/comment';
+import { getFullUrl } from '@/api/upload';
+import { useModalStore } from '@/store/modalStore';
+import RecommentList from './RecommentList';
 
 interface CommentItemProps {
   comment: Comment;
-  onUpdate: (commentPk: number, content: string) => void;
+  onUpdate: (commentPk: number, content: string, isSecret: boolean) => void;
   onDelete: (commentPk: number) => void;
+  onCreateRecomment: (commentPk: number, content: string, isSecret: boolean) => void;
+  onUpdateRecomment: (commentPk: number, recommentPk: number, content: string, isSecret: boolean) => void;
+  onDeleteRecomment: (commentPk: number, recommentPk: number) => void;
 }
 
-// 날짜 포맷 함수
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 };
 
-const CommentItem = ({ comment, onUpdate, onDelete }: CommentItemProps) => {
+const CommentItem = ({
+  comment, onUpdate, onDelete,
+  onCreateRecomment, onUpdateRecomment, onDeleteRecomment,
+}: CommentItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
-  const [showMenu, setShowMenu] = useState(false);
+  const [editIsSecret, setEditIsSecret] = useState(comment.is_secret ?? false);
+  const [showRecommentInput, setShowRecommentInput] = useState(false);
+  const { openModal, openConfirm } = useModalStore();
+
+  const isDeleted = !!comment.is_delete;
+  const isSecretOther = !!comment.is_secret && !comment.user?.is_author;
 
   const handleUpdate = () => {
     if (!editContent.trim()) return;
-    onUpdate(comment.id, editContent);
+    onUpdate(comment.id, editContent, editIsSecret ?? false);
     setIsEditing(false);
   };
 
+console.log("comment:", comment);
+console.log("is_author:", comment.user?.is_author);
   return (
-    <div className="flex gap-3 py-4 border-b border-gray-100 last:border-0">
-      {/* 프로필 이미지 */}
-      <img
-        src={getFullUrl(comment.user.profile_img) || '/default-profile.png'}
-        alt={comment.user.nickname}
-        className="w-9 h-9 rounded-full object-cover flex-shrink-0"
-      />
+    <div className="py-4 border-b border-gray-100 last:border-0">
+      <div className="flex gap-3">
+        {/* 프로필 이미지 */}
+        <img
+          src={getFullUrl(comment.user?.profile_img ?? null) || '/default-profile.png'}
+          alt={comment.user?.nickname ?? '익명'}
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+        />
 
-      <div className="flex-1">
-        {/* 닉네임 + 시간 + 더보기 */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-900">
-              {comment.user.nickname}
-            </span>
-            <span className="text-xs text-gray-400">
-              {formatDate(comment.created)}
-            </span>
+        <div className="flex-1 min-w-0">
+
+          {/* 모바일: 닉네임 + 답글달기 / 날짜 */}
+          <div className="md:hidden">
+            <div className="flex items-center gap-2">
+              <span className={`text-sm font-bold ${isDeleted ? 'text-gray-400' : 'text-gray-900'}`}>
+                {isSecretOther ? '익명' : (comment.user?.nickname ?? '미지의 사용자')}
+              </span>
+              {comment.user?.is_author && (
+                <span className="text-xs text-primary border border-primary rounded px-1.5 py-0.5 leading-none">
+                  내댓글
+                </span>
+              )}
+              {!isDeleted && (
+                <button
+                  onClick={() => setShowRecommentInput((prev) => !prev)}
+                  className="text-xs text-gray-400 underline"
+                >
+                  답글달기
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {comment.created ? formatDate(comment.created) : ''}
+            </p>
           </div>
 
-          {/* 더보기 버튼 */}
-          <div className="relative">
-            <button
-              onClick={() => setShowMenu((prev) => !prev)}
-              className="text-gray-400 hover:text-gray-600 px-1"
-            >
-              ⋯
-            </button>
-
-            {/* 드롭다운 메뉴 */}
-            {showMenu && (
-              <div className="absolute right-0 top-6 z-10 bg-white border border-gray-200 rounded-lg shadow-md min-w-[100px]">
-                {comment.user.is_author ? (
-                  // 내 댓글: 수정 / 삭제
+          {/* 웹: 닉네임 + 내댓글뱃지 + 답글달기 + 수정/삭제/신고 한 줄 */}
+          <div className="hidden md:flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`text-sm font-bold ${isDeleted ? 'text-gray-400' : 'text-gray-900'}`}>
+                {isSecretOther ? '익명' : (comment.user?.nickname ?? '미지의 사용자')}
+              </span>
+              {comment.user?.is_author && (
+                <span className="text-xs text-primary border border-primary rounded px-1.5 py-0.5 leading-none">
+                  내댓글
+                </span>
+              )}
+              {!isDeleted && (
+                <button
+                  onClick={() => setShowRecommentInput((prev) => !prev)}
+                  className="text-xs text-gray-400 underline"
+                >
+                  답글달기
+                </button>
+              )}
+            </div>
+            {!isDeleted && (
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {comment.user?.is_author ? (
                   <>
-                    <button
-                      onClick={() => {
-                        setIsEditing(true);
-                        setShowMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => {
-                        onDelete(comment.id);
-                        setShowMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-50"
-                    >
-                      삭제
-                    </button>
+                    <button onClick={() => setIsEditing(true)} className="text-sm text-gray-500 underline">수정</button>
+                    <button onClick={() => openConfirm('delete', () => onDelete(comment.id))} className="text-sm text-gray-500 underline">삭제</button>
                   </>
                 ) : (
-                  // 타인 댓글: 신고
-                  <button
-                    onClick={() => {
-                      // TODO: 신고 모달 연결
-                      setShowMenu(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-50"
-                  >
-                    신고
-                  </button>
+                  <button onClick={() => openConfirm('report', () => console.log('신고'))} className="text-sm text-gray-500 underline">신고</button>
                 )}
               </div>
             )}
           </div>
-        </div>
 
-        {/* 댓글 내용 또는 수정 입력창 */}
-        {isEditing ? (
-          <div className="flex gap-2 mt-2">
-            <input
-              type="text"
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
-              className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary"
-            />
-            <button
-              onClick={handleUpdate}
-              className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm"
-            >
-              저장
-            </button>
-            <button
-              onClick={() => {
-                setIsEditing(false);
-                setEditContent(comment.content);
-              }}
-              className="px-3 py-1.5 bg-gray-200 text-gray-600 rounded-lg text-sm"
-            >
-              취소
-            </button>
-          </div>
-        ) : (
-          <p className="mt-1 text-sm text-gray-700">{comment.content}</p>
-        )}
+          {/* 웹 날짜 */}
+          <p className="hidden md:block text-xs text-gray-400 mt-0.5">
+            {comment.created ? formatDate(comment.created) : ''}
+          </p>
+
+          {/* 내용 or 수정 입력창 */}
+          {isEditing ? (
+            <div className="mt-2 flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2">
+              <input
+                type="text"
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                className="flex-1 text-sm focus:outline-none"
+              />
+              <div className="flex gap-2 flex-shrink-0">
+                <button onClick={() => setIsEditing(false)} className="text-xs text-gray-400 underline">취소</button>
+                <button onClick={handleUpdate} className="text-xs text-primary underline">저장</button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 mt-1">
+              {comment.is_secret && !isSecretOther && <span className="text-primary text-sm">🔒</span>}
+              <p className={`text-sm break-all ${isSecretOther ? 'text-gray-400' : 'text-gray-700'}`}>
+                {isDeleted ? '삭제된 댓글입니다.' : isSecretOther ? '비밀 댓글입니다.' : comment.content}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* 대댓글 */}
+      {((comment.recomments && comment.recomments.length > 0) || showRecommentInput) && (
+        <RecommentList
+          recomments={comment.recomments ?? []}
+          commentPk={comment.id}
+          onCreateRecomment={onCreateRecomment}
+          onUpdateRecomment={onUpdateRecomment}
+          onDeleteRecomment={onDeleteRecomment}
+          showInput={showRecommentInput}
+          onCloseInput={() => setShowRecommentInput(false)}
+        />
+      )}
     </div>
+    
   );
 };
 
