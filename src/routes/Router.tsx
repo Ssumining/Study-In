@@ -9,6 +9,8 @@ import Layout from '@/components/layout/Layout';
 import AuthLayout from '@/components/layout/AuthLayout';
 import Login from '@/pages/Login';
 import Notification from "../pages/Notification";
+import CommentWritePage from '@/pages/CommentWritePage';
+
 
 export default function Router() {
   return (
@@ -29,6 +31,7 @@ export default function Router() {
         
         {/* 2. 스터디 만들기 (독립 페이지) */}
         <Route path="/study/create" element={<StudyCreate />} />
+        <Route path="/study/:studyId/comment/write" element={<CommentWritePage />} />
 
         {/* 3. 인증 관련 레이아웃 */}
         <Route element={<AuthLayout />}>
