@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState } from "react";
+import IconSquareCheck from "@/assets/base/icon-square-Check.svg?react";
+import IconSquareCheckFill from "@/assets/base/icon-square-Check-fill.svg?react";
 
 interface CommentInputProps {
   onSubmit: (content: string, isSecret: boolean) => void;
@@ -8,59 +10,64 @@ interface CommentInputProps {
 
 const CommentInput = ({
   onSubmit,
-  placeholder = '다른 사람의 권리를 침해하거나 명예를 훼손하는 댓글은 관련 법률에 의해 제재를 받을 수 있습니다.',
+  placeholder = "다른 사람의 권리를 침해하거나 명예를 훼손하는 댓글은 관련 법률에 의해 제재를 받을 수 있습니다.",
   isRecomment = false,
 }: CommentInputProps) => {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [isSecret, setIsSecret] = useState(false);
-  // 모바일은 1000자, 웹은 300자
   const MAX_LENGTH = 1000;
 
   const handleSubmit = () => {
     if (!content.trim()) return;
     onSubmit(content, isSecret);
-    setContent('');
+    setContent("");
     setIsSecret(false);
   };
 
   return (
     <div className="flex flex-col">
       {/* textarea */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <div className="border border-gray-300 rounded-lg overflow-hidden">
         <textarea
           value={content}
           onChange={(e) => {
             if (e.target.value.length <= MAX_LENGTH) setContent(e.target.value);
           }}
           placeholder={placeholder}
-          className="w-full px-4 pt-4 pb-2 text-sm text-gray-700 placeholder:text-gray-400 resize-none focus:outline-none
-            min-h-[80px] md:min-h-[80px]
-            /* 모바일에서 더 크게 */
-            max-md:min-h-[200px]"
+          className="w-full px-4 pt-4 pb-2 text-base text-gray-900 placeholder:text-gray-500 resize-none focus:outline-none min-h-20 max-md:min-h-48"
         />
-        {/* 웹: 글자수 + 비밀댓글 + 등록 버튼을 textarea 하단에 */}
-        <div className="hidden md:flex items-center justify-between border-t border-gray-200 px-4 py-2">
+        {/* 웹: 글자수 + 비밀댓글 + 등록 버튼 */}
+        <div className="hidden md:flex items-center justify-between border-t border-gray-300 px-4 py-2">
           <div className="flex items-center gap-2">
             {!isRecomment && (
               <>
-                <input
-                  type="checkbox"
-                  id="is_secret_web"
-                  checked={isSecret}
-                  onChange={(e) => setIsSecret(e.target.checked)}
-                  className="w-4 h-4 accent-primary cursor-pointer"
-                />
-                <label htmlFor="is_secret_web" className="text-sm text-gray-500 cursor-pointer">비밀댓글</label>
+                <button onClick={() => setIsSecret((prev) => !prev)}>
+                  {isSecret ? (
+                    <IconSquareCheckFill className="w-5 h-5 text-primary flex-shrink-0" />
+                  ) : (
+                    <IconSquareCheck className="w-5 h-5 text-gray-300 flex-shrink-0" />
+                  )}
+                </button>
+                <label
+                  htmlFor="is_secret_web"
+                  className="text-base text-gray-500 cursor-pointer"
+                >
+                  비밀댓글
+                </label>
               </>
             )}
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400">{content.length}/{MAX_LENGTH}</span>
+            <span className="text-sm text-gray-500">
+              {content.length}/{MAX_LENGTH}
+            </span>
             <button
               onClick={handleSubmit}
               disabled={!content.trim()}
-              className={`px-5 py-1.5 rounded text-sm font-medium transition ${
-                content.trim() ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              className={`px-5 py-2 rounded text-base font-medium transition ${
+                content.trim()
+                  ? "bg-primary text-background"
+                  : "bg-gray-100 text-gray-500 cursor-not-allowed"
               }`}
             >
               등록
@@ -69,13 +76,13 @@ const CommentInput = ({
         </div>
       </div>
 
-      {/* 글자수 - 모바일 전용 (textarea 바깥 우측 하단) */}
-      <div className="md:hidden text-right text-xs text-gray-400 mt-1 pr-1">
+      {/* 글자수 - 모바일 */}
+      <div className="md:hidden text-right text-sm text-gray-500 mt-1 pr-1">
         {content.length}/{MAX_LENGTH}
       </div>
 
       {/* 모바일: 비밀댓글 + 등록 고정 하단 바 */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 flex items-center border-t border-gray-200 bg-white z-10">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 flex items-center border-t border-gray-300 bg-background z-10">
         {!isRecomment && (
           <label className="flex items-center gap-2 flex-1 px-4 py-3 cursor-pointer">
             <input
@@ -84,14 +91,18 @@ const CommentInput = ({
               onChange={(e) => setIsSecret(e.target.checked)}
               className="w-4 h-4 accent-primary"
             />
-            <span className={`text-sm font-medium ${isSecret ? 'text-primary' : 'text-gray-400'}`}>비밀댓글</span>
+            <span
+              className={`text-base font-medium ${isSecret ? "text-primary" : "text-gray-500"}`}
+            >
+              비밀댓글
+            </span>
           </label>
         )}
         <button
           onClick={handleSubmit}
           disabled={!content.trim()}
-          className={`px-8 py-3 text-sm font-medium border-l border-gray-200 ${
-            content.trim() ? 'text-gray-700' : 'text-gray-300'
+          className={`px-8 py-3 text-base font-medium border-l border-gray-300 ${
+            content.trim() ? "text-gray-700" : "text-gray-300"
           }`}
         >
           등록
