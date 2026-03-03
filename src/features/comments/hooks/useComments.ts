@@ -1,18 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   getComments,
   createComment,
   updateComment,
   deleteComment,
+  createRecomment,
+  updateRecomment,
+  deleteRecomment,
   type Comment,
-} from '@/api/comment';
+} from "@/api/comment";
 
 const useComments = (studyPk: number) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 댓글 목록 조회
   const fetchComments = async () => {
     setLoading(true);
     setError(null);
@@ -20,46 +22,143 @@ const useComments = (studyPk: number) => {
       const data = await getComments(studyPk);
       setComments(data);
     } catch (err) {
-      setError('댓글을 불러오는 데 실패했습니다.');
+      setError("댓글을 불러오는 데 실패했습니다.");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // 댓글 작성
-  const handleCreate = async (content: string) => {
+  const handleCreate = async (content: string, isSecret: boolean = false) => {
     if (!content.trim()) return;
     try {
-      const newComment = await createComment(studyPk, { content });
+      const newComment = await createComment(studyPk, {
+        content,
+        is_secret: isSecret,
+      });
       setComments((prev) => [...prev, newComment]);
     } catch (err) {
-      setError('댓글 작성에 실패했습니다.');
+      setError("댓글 작성에 실패했습니다.");
       console.error(err);
     }
   };
 
-  // 댓글 수정
-  const handleUpdate = async (commentPk: number, content: string) => {
+  const handleUpdate = async (
+    commentPk: number,
+    content: string,
+    isSecret: boolean = false,
+  ) => {
     if (!content.trim()) return;
     try {
-      const updated = await updateComment(studyPk, commentPk, { content });
+      const updated = await updateComment(studyPk, commentPk, {
+        content,
+        is_secret: isSecret,
+      });
       setComments((prev) =>
-        prev.map((c) => (c.id === commentPk ? updated : c))
+        prev.map((c) =>
+          c.id === commentPk ? { ...updated, recomments: c.recomments } : c,
+        ),
       );
     } catch (err) {
-      setError('댓글 수정에 실패했습니다.');
+      setError("댓글 수정에 실패했습니다.");
       console.error(err);
     }
   };
 
-  // 댓글 삭제
   const handleDelete = async (commentPk: number) => {
     try {
       await deleteComment(studyPk, commentPk);
       setComments((prev) => prev.filter((c) => c.id !== commentPk));
     } catch (err) {
-      setError('댓글 삭제에 실패했습니다.');
+      setError("댓글 삭제에 실패했습니다.");
+      console.error(err);
+    }
+  };
+
+  const handleCreateRecomment = async (
+    commentPk: number,
+    content: string,
+    isSecret: boolean = false,
+    taggedUserId?: number,
+  ) => {
+    if (!content.trim()) return;
+
+    try {
+      const payload: any = {
+        content,
+        is_secret: isSecret,
+      };
+
+      // taggedUserId 있을 때만 추가
+      if (taggedUserId !== undefined) {
+        payload.tagged_user = taggedUserId;
+      }
+
+      const newRecomment = await createRecomment(studyPk, commentPk, payload);
+
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === commentPk
+            ? { ...c, recomments: [...(c.recomments || []), newRecomment] }
+            : c,
+        ),
+      );
+    } catch (err) {
+      setError("대댓글 작성에 실패했습니다.");
+      console.error(err);
+    }
+  };
+
+  const handleUpdateRecomment = async (
+    commentPk: number,
+    recommentPk: number,
+    content: string,
+    isSecret: boolean = false,
+  ) => {
+    if (!content.trim()) return;
+    try {
+      const updated = await updateRecomment(studyPk, commentPk, recommentPk, {
+        content,
+        is_secret: isSecret,
+      });
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === commentPk
+            ? {
+                ...c,
+                recomments: (c.recomments || []).map((r) =>
+                  r.recomment_id === recommentPk ? updated : r,
+                ),
+              }
+            : c,
+        ),
+      );
+    } catch (err) {
+      setError("대댓글 수정에 실패했습니다.");
+      console.error(err);
+    }
+  };
+
+  const handleDeleteRecomment = async (
+    commentPk: number,
+    recommentPk: number,
+  ) => {
+    try {
+      await deleteRecomment(studyPk, commentPk, recommentPk);
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === commentPk
+            ? {
+                ...c,
+                recomments: (c.recomments || []).filter(
+                  (r) => r.recomment_id !== recommentPk,
+                ),
+              }
+            : c,
+        ),
+      );
+    } catch (err) {
+      setError("대댓글 삭제에 실패했습니다.");
       console.error(err);
     }
   };
@@ -75,6 +174,9 @@ const useComments = (studyPk: number) => {
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleCreateRecomment,
+    handleUpdateRecomment,
+    handleDeleteRecomment,
   };
 };
 
