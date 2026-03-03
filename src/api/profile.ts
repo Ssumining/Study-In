@@ -28,6 +28,7 @@ export interface UpdateProfileRequest {
   profile_img?: string;
   introduction?: string;
   phone?: string;
+  preferred_region?: { id: number };
   github_username?: string;
   tag?: Array<{ id: number; name: string }>;
 }

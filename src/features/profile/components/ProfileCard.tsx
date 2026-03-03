@@ -6,15 +6,12 @@ import { getProfile, UserProfile } from '@/api/profile'
 import { storage } from '@/utils/storage'
 import { getFullUrl } from '@/api/upload'
 
-interface ProfileCardProps {
-  isMyProfile?: boolean
-}
-
-const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
+const ProfileCard = () => {
   const navigate = useNavigate()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isMyProfile, setIsMyProfile] = useState(false)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -23,6 +20,8 @@ const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
       try {
         const data = await getProfile(userId)
         setProfile(data)
+        // 내 userId랑 프로필 userId 비교해서 내 프로필인지 판단
+        setIsMyProfile(data.user === userId)
       } catch {
         setError('프로필을 불러오는 데 실패했어요.')
       } finally {
@@ -51,7 +50,6 @@ const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
   return (
     <div className="flex flex-col items-center px-4 py-6 gap-4 bg-background">
 
-      {/* 프로필 이미지 */}
       <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
         {profile.profile_img ? (
           <img
@@ -64,27 +62,19 @@ const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
         )}
       </div>
 
-      {/* 닉네임 */}
       <h2 className="text-lg font-bold text-gray-900">{profile.nickname}</h2>
 
-      {/* 등급 */}
       <span className="text-sm text-primary font-medium">Lv. {profile.grade}</span>
 
-      {/* 소개글 */}
       <p className="text-base text-gray-500 text-center bg-gray-100 rounded-lg px-4 py-3 w-full">
         {profile.introduction || '소개글이 없어요.'}
       </p>
 
       <div className="w-full border-t border-gray-300" />
 
-      {/* 정보 목록 */}
       <div className="w-full flex flex-col gap-4">
 
-        <div className="flex justify-between items-center">
-          <span className="text-base font-medium text-gray-900 w-28">이메일(ID)</span>
-          <span className="text-base text-gray-700 flex-1 text-right">{profile.user}</span>
-        </div>
-
+        {/* 내 프로필일 때만 이름 표시 (API에서 다른 사람 프로필엔 name 필드 없음) */}
         {isMyProfile && profile.name && (
           <div className="flex justify-between items-center">
             <span className="text-base font-medium text-gray-900 w-28">이름</span>
@@ -92,6 +82,7 @@ const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
           </div>
         )}
 
+        {/* 내 프로필일 때만 전화번호 표시 (API에서 다른 사람 프로필엔 phone 필드 없음) */}
         {isMyProfile && profile.phone && (
           <div className="flex justify-between items-center">
             <span className="text-base font-medium text-gray-900 w-28">전화번호</span>
@@ -132,7 +123,6 @@ const ProfileCard = ({ isMyProfile = true }: ProfileCardProps) => {
 
       <div className="w-full border-t border-gray-300" />
 
-      {/* 관심 분야 태그 */}
       {profile.tag.length > 0 && (
         <div className="w-full">
           <p className="text-base font-medium text-gray-900 mb-2">관심 분야</p>
