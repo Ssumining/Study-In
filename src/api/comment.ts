@@ -1,15 +1,19 @@
 import { axiosInstance } from "./axios";
 
+export interface CommentUser {
+  id: number;
+  profile: {
+    nickname: string;
+    profile_img: string | null;
+  };
+  is_author: boolean;
+}
+
 export interface Comment {
   id: number;
   is_secret?: boolean;
   is_delete?: boolean;
-  user?: {
-    user_id: number;
-    nickname: string;
-    profile_img: string | null;
-    is_author: boolean;
-  };
+  user?: CommentUser;
   study: number;
   content: string;
   created?: string;
@@ -22,12 +26,7 @@ export interface Recomment {
   is_secret: boolean;
   study_id: number;
   comment_id: number;
-  user?: {
-    user_id: number;
-    nickname: string;
-    profile_img: string | null;
-    is_author: boolean;
-  };
+  user?: CommentUser;
   content: string;
   tagged_user?: { user_id: number; nickname: string } | null;
   created: string;
@@ -82,12 +81,11 @@ export const createRecomment = async (
   commentPk: number,
   data: CreateRecommentRequest,
 ): Promise<Recomment> => {
-  const payload: any = {
+  const payload: Record<string, unknown> = {
     content: data.content,
     is_secret: data.is_secret ?? false,
   };
 
-  // tagged_user가 있을 때만 추가
   if (data.tagged_user !== undefined && data.tagged_user !== null) {
     payload.tagged_user = data.tagged_user;
   }
