@@ -114,6 +114,7 @@ const ProfileEditForm = () => {
         phone,
         introduction: bio,
         github_username: github,
+        profile_img: profileImgPath ?? undefined,
         tag: selectedTags,
       })
       navigate('/profile')
