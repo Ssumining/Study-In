@@ -197,7 +197,7 @@ export default function StudyDetail() {
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(true)}
-                className="rounded-xl border border-red-300 px-4 py-2 text-sm font-medium text-error transition hover:bg-red-50"
+                className="rounded-xl border border-error-border px-4 py-2 text-sm font-medium text-error transition hover:bg-error-light"
               >
                 삭제하기
               </button>
