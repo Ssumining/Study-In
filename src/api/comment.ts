@@ -1,6 +1,7 @@
 import { axiosInstance } from "./axios";
 
-export interface CommentUser {
+// 일반 유저 (is_author 있음)
+export interface CommentUserNormal {
   id: number;
   profile: {
     nickname: string;
@@ -9,28 +10,44 @@ export interface CommentUser {
   is_author: boolean;
 }
 
-export interface Comment {
-  id: number;
-  is_secret?: boolean;
-  is_delete?: boolean;
-  user?: CommentUser;
-  study: number;
-  content: string;
-  created?: string;
-  updated?: string;
-  recomments?: Recomment[];
+// 비밀/삭제 댓글 유저 (익명)
+export interface CommentUserAnon {
+  profile: {
+    nickname: string;
+  };
 }
 
+export type CommentUser = CommentUserNormal | CommentUserAnon;
+
+// CommentUser 타입 가드
+export const isNormalUser = (user: CommentUser): user is CommentUserNormal => {
+  return "id" in user;
+};
+
 export interface Recomment {
+  id: number;
   recomment_id: number;
   is_secret: boolean;
   study_id: number;
   comment_id: number;
-  user?: CommentUser;
+  user: CommentUser;
   content: string;
-  tagged_user?: { user_id: number; nickname: string } | null;
+  tagged_user: { user_id: number; nickname: string } | null;
+  tagged_comment?: null; // 비밀 대댓글일 때
   created: string;
   updated: string;
+}
+
+export interface Comment {
+  id: number;
+  is_secret?: boolean; // 삭제된 댓글엔 없음
+  is_delete?: boolean; // 삭제된 댓글일 경우 true
+  user?: CommentUser; // 삭제된 댓글엔 없음
+  study: number;
+  content: string;
+  created?: string; // 삭제된 댓글엔 없음
+  updated?: string; // 삭제된 댓글엔 없음
+  recomments: Recomment[];
 }
 
 export interface CreateCommentRequest {
@@ -41,7 +58,7 @@ export interface CreateCommentRequest {
 export interface CreateRecommentRequest {
   content: string;
   is_secret?: boolean;
-  tagged_user?: number;
+  tagged_user?: number; // 태그한 유저의 id (대댓글에서 답글 달기 시에만 사용)
 }
 
 export const getComments = async (studyPk: number): Promise<Comment[]> => {
@@ -72,8 +89,11 @@ export const updateComment = async (
 export const deleteComment = async (
   studyPk: number,
   commentPk: number,
-): Promise<void> => {
-  await axiosInstance.delete(`/study/${studyPk}/comment/${commentPk}/`);
+): Promise<{ detail: string }> => {
+  const response = await axiosInstance.delete(
+    `/study/${studyPk}/comment/${commentPk}/`,
+  );
+  return response.data;
 };
 
 export const createRecomment = async (
@@ -102,7 +122,7 @@ export const updateRecomment = async (
   studyPk: number,
   commentPk: number,
   recommentPk: number,
-  data: CreateCommentRequest,
+  data: Pick<CreateRecommentRequest, "content" | "is_secret">, // tagged_user는 수정 불가
 ): Promise<Recomment> => {
   const response = await axiosInstance.put(
     `/study/${studyPk}/comment/${commentPk}/recomment/${recommentPk}/`,
@@ -115,8 +135,9 @@ export const deleteRecomment = async (
   studyPk: number,
   commentPk: number,
   recommentPk: number,
-): Promise<void> => {
-  await axiosInstance.delete(
+): Promise<{ detail: string }> => {
+  const response = await axiosInstance.delete(
     `/study/${studyPk}/comment/${commentPk}/recomment/${recommentPk}/`,
   );
+  return response.data;
 };

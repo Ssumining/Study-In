@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Comment } from "@/api/comment";
+import { isNormalUser } from "@/api/comment";
 import { getFullUrl } from "@/api/upload";
 import { useModalStore } from "@/store/modalStore";
 import IconLock from "@/assets/base/icon-Lock.svg?react";
@@ -44,10 +45,28 @@ const CommentItem = ({
   const [editContent, setEditContent] = useState(comment.content);
   const [editIsSecret, setEditIsSecret] = useState(comment.is_secret ?? false);
   const [showRecommentInput, setShowRecommentInput] = useState(false);
+  const [taggedUser, setTaggedUser] = useState<
+    { id: number; nickname: string } | undefined
+  >(undefined);
   const { openConfirm } = useModalStore();
 
   const isDeleted = !!comment.is_delete;
-  const isSecretOther = !!comment.is_secret && !comment.user?.is_author;
+  const isAuthor =
+    !!comment.user && isNormalUser(comment.user) && comment.user.is_author;
+  const isSecretOther = !!comment.is_secret && !isAuthor;
+
+  // 닉네임 추출
+  const nickname = comment.user
+    ? isNormalUser(comment.user)
+      ? comment.user.profile.nickname
+      : comment.user.profile.nickname
+    : "익명";
+
+  // 프로필 이미지 추출
+  const profileImg =
+    comment.user && isNormalUser(comment.user)
+      ? getFullUrl(comment.user.profile.profile_img) || "/default-profile.png"
+      : "/default-profile.png";
 
   const handleUpdate = () => {
     if (!editContent.trim()) return;
@@ -59,11 +78,8 @@ const CommentItem = ({
     <div className="py-4 border-b border-gray-300 last:border-0">
       <div className="flex gap-3">
         <img
-          src={
-            getFullUrl(comment.user?.profile.profile_img ?? null) ||
-            "/default-profile.png"
-          }
-          alt={comment.user?.profile.nickname ?? "익명"}
+          src={profileImg}
+          alt={nickname}
           className="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-gray-300"
         />
 
@@ -74,18 +90,19 @@ const CommentItem = ({
               <span
                 className={`text-base font-bold ${isDeleted ? "text-gray-500" : "text-surface"}`}
               >
-                {isSecretOther
-                  ? "익명"
-                  : (comment.user?.profile.nickname ?? "익명")}
+                {isSecretOther ? "익명" : nickname}
               </span>
-              {comment.user?.is_author && (
+              {isAuthor && (
                 <span className="text-xs text-primary border border-primary rounded px-2 py-1 leading-none">
                   내댓글
                 </span>
               )}
               {!isDeleted && (
                 <button
-                  onClick={() => setShowRecommentInput((prev) => !prev)}
+                  onClick={() => {
+                    setTaggedUser(undefined);
+                    setShowRecommentInput((prev) => !prev);
+                  }}
                   className="text-base font-regular text-gray-500 underline"
                 >
                   답글달기
@@ -103,18 +120,19 @@ const CommentItem = ({
               <span
                 className={`text-base font-bold ${isDeleted ? "text-gray-500" : "text-surface"}`}
               >
-                {isSecretOther
-                  ? "익명"
-                  : (comment.user?.profile.nickname ?? "익명")}
+                {isSecretOther ? "익명" : nickname}
               </span>
-              {comment.user?.is_author && (
+              {isAuthor && (
                 <span className="text-xs text-primary border border-primary rounded px-2 py-1 leading-none">
                   내댓글
                 </span>
               )}
               {!isDeleted && (
                 <button
-                  onClick={() => setShowRecommentInput((prev) => !prev)}
+                  onClick={() => {
+                    setTaggedUser(undefined);
+                    setShowRecommentInput((prev) => !prev);
+                  }}
                   className="text-sm text-gray-500 underline"
                 >
                   답글달기
@@ -123,7 +141,7 @@ const CommentItem = ({
             </div>
             {!isDeleted && (
               <div className="flex items-center gap-3 flex-shrink-0">
-                {comment.user?.is_author ? (
+                {isAuthor ? (
                   <>
                     <button
                       onClick={() => setIsEditing(true)}
@@ -214,6 +232,11 @@ const CommentItem = ({
           onDeleteRecomment={onDeleteRecomment}
           showInput={showRecommentInput}
           onCloseInput={() => setShowRecommentInput(false)}
+          taggedUser={taggedUser}
+          onRecommentReply={(user) => {
+            setTaggedUser(user);
+            setShowRecommentInput(true);
+          }}
         />
       )}
     </div>
