@@ -17,11 +17,19 @@ export interface CommentUserAnon {
   };
 }
 
-export type CommentUser = CommentUserNormal | CommentUserAnon;
+// 탈퇴한 유저
+export type CommentUserWithdrawn = "탈퇴한 회원입니다.";
+
+export type CommentUser = CommentUserNormal | CommentUserAnon | CommentUserWithdrawn;
 
 // CommentUser 타입 가드
 export const isNormalUser = (user: CommentUser): user is CommentUserNormal => {
-  return "id" in user;
+  return typeof user !== "string" && "id" in user;
+};
+
+// 탈퇴 유저 타입 가드
+export const isWithdrawnUser = (user: CommentUser): user is CommentUserWithdrawn => {
+  return typeof user === "string";
 };
 
 export interface Recomment {
