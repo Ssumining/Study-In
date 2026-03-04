@@ -163,7 +163,7 @@ function StudyEditInner({
         onDeleteStudy={() => setShowDeleteModal(true)}
       />
 
-      <main className="mx-auto max-w-[1200px] pb-10">
+      <main className="mx-auto max-w-[1190px] pb-10">
         {apiError && (
           <div className="mx-4 mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-error">
             {apiError}
