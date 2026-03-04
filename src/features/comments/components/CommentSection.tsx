@@ -23,13 +23,7 @@ const CommentSection = ({ studyPk }: CommentSectionProps) => {
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-4">
-        댓글{" "}
-        {comments.length > 0 && (
-          <span className="text-primary">{comments.length}</span>
-        )}
-      </h2>
-
+        
       {/* 웹: 댓글 입력창 */}
       <div className="hidden md:block">
         <CommentInput onSubmit={handleCreate} />
