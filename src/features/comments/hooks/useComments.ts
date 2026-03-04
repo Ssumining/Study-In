@@ -68,7 +68,7 @@ const useComments = (studyPk: number) => {
   const handleDelete = async (commentPk: number) => {
     try {
       await deleteComment(studyPk, commentPk);
-      setComments((prev) => prev.filter((c) => c.id !== commentPk));
+      await fetchComments(); // 재호출
     } catch (err) {
       setError("댓글 삭제에 실패했습니다.");
       console.error(err);
@@ -145,18 +145,7 @@ const useComments = (studyPk: number) => {
   ) => {
     try {
       await deleteRecomment(studyPk, commentPk, recommentPk);
-      setComments((prev) =>
-        prev.map((c) =>
-          c.id === commentPk
-            ? {
-                ...c,
-                recomments: (c.recomments || []).filter(
-                  (r) => r.recomment_id !== recommentPk,
-                ),
-              }
-            : c,
-        ),
-      );
+      await fetchComments(); // 재호출
     } catch (err) {
       setError("대댓글 삭제에 실패했습니다.");
       console.error(err);
