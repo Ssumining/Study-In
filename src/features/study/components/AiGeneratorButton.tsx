@@ -45,13 +45,13 @@ export default function AiGeneratorButton({
         type="button"
         onClick={handleClick}
         disabled={isLoading}
-        className="inline-flex items-center gap-[6px] px-3 py-[6px] rounded-lg border border-primary text-primary text-xs font-medium transition-colors hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary text-primary text-sm font-medium transition-colors hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (
           /* 로딩 스피너 */
           <>
             <span
-              className="w-3.5 h-3.5 rounded-full border-2 border-primary border-t-transparent animate-spin"
+              className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"
               aria-hidden="true"
             />
             생성 중...
@@ -60,7 +60,7 @@ export default function AiGeneratorButton({
           /* 스파크 아이콘 */
           <>
             <svg
-              className="w-3.5 h-3.5"
+              className="w-4 h-4"
               viewBox="0 0 16 16"
               fill="currentColor"
               aria-hidden="true"

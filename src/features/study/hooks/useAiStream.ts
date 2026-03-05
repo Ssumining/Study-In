@@ -1,21 +1,38 @@
 import { useState, useCallback } from "react";
+import { generateAiText } from "@/api/ai";
+import type { AiContext } from "@/api/ai";
 
-export type AiField = "introduction" | "schedule" | "leaderIntro";
-
-export function useAiStream() {
+export function useAiStream(
+  onResult: (field: "schedule" | "introduction", text: string) => void,
+) {
   const [isLoading, setIsLoading] = useState(false);
 
-  // AI API 연동 시 스트리밍 로직으로 교체
-  const trigger = useCallback((field: AiField) => {
-    console.log(`[useAiStream] trigger → field: ${field}`);
-
-    setIsLoading(true);
-    // 스텁: 로딩 UI 전환 확인용 딜레이 (실제 구현 시 제거)
-    setTimeout(() => {
-      console.log(`[useAiStream] done → field: ${field}`);
-      setIsLoading(false);
-    }, 1500);
-  }, []);
+  /**
+   * 커리큘럼(schedule) → 소개글(introduction) 순차 생성.
+   * existingSchedule 이 있으면 커리큘럼 생성을 건너뛰고 바로 소개글 생성.
+   */
+  const trigger = useCallback(
+    async (context: AiContext, existingSchedule: string) => {
+      setIsLoading(true);
+      try {
+        let curriculum = existingSchedule;
+        if (!curriculum) {
+          curriculum = await generateAiText(context, "schedule");
+          onResult("schedule", curriculum);
+        }
+        const introduction = await generateAiText(
+          { ...context, curriculum },
+          "introduction",
+        );
+        onResult("introduction", introduction);
+      } catch {
+        // 에러 시 조용히 실패
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onResult],
+  );
 
   return { isLoading, trigger };
 }
