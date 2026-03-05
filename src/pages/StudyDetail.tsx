@@ -7,7 +7,6 @@ import shareIcon from "@/assets/base/icon-Share.svg";
 
 /* ========================
    TYPES
-======================== */
 
 type StudyDetailData = {
   id: number;
@@ -167,6 +166,38 @@ export default function StudyDetail() {
     setIsCommentOpen(false);
   };
 
+  const primaryButtonText = isJoined ? "채팅방 가기" : "참여하기";
+
+  const handleOpenComment = () => {
+    setIsCommentOpen(true);
+  };
+
+  const handleCloseComment = () => {
+    setIsCommentOpen(false);
+    setCommentText("");
+  };
+
+  const handleSubmitComment = () => {
+    const text = commentText.trim();
+    if (!text) return;
+
+    const today = new Date();
+    const yy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+
+    const newComment: CommentItem = {
+      id: Date.now(),
+      author: "나",
+      date: `${yy}.${mm}.${dd}`,
+      body: text,
+    };
+
+    setCommentList((prev) => [newComment, ...prev]);
+    setCommentText("");
+    setIsCommentOpen(false);
+  };
+
   return (
     <div className="w-full bg-background">
       <div className="mx-auto w-full max-w-[390px] px-4 pb-[92px] pt-4">
@@ -267,6 +298,7 @@ export default function StudyDetail() {
             ))}
 
           </div>
+        </section>
 
         </section>
 
