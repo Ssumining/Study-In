@@ -11,7 +11,7 @@ import type { StudyFormState } from "@/types/study";
 import { createStudy } from "@/api/study";
 import useUpload from "@/hooks/useUpload";
 import { getFullUrl } from "@/api/upload";
-import { getProfile } from "@/api/profile";
+import { getProfile, getMemberType } from "@/api/profile";
 import { storage } from "@/utils/storage";
 
 export default function StudyCreate() {
@@ -21,21 +21,36 @@ export default function StudyCreate() {
   const { uploading, handleImageUpload } = useUpload();
   const [userLocationId, setUserLocationId] = useState<number | undefined>(undefined);
   const [userLocation, setUserLocation] = useState<string | undefined>(undefined);
+  const [isMemberChecking, setIsMemberChecking] = useState(true);
 
   useEffect(() => {
     const userId = storage.getUserId();
-    if (!userId) return;
-    getProfile(userId)
-      .then((profile) => {
-        if (profile.preferred_region) {
-          setUserLocationId(profile.preferred_region.id);
-          setUserLocation(profile.preferred_region.location);
+    if (!userId) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    getMemberType()
+      .then(({ is_associate_member }) => {
+        if (!is_associate_member) {
+          // 준회원 → 프로필 설정 페이지로 이동
+          navigate("/profile/edit", { replace: true });
+          return;
         }
+        // 정회원 → 지역 정보 불러오기
+        return getProfile(userId).then((profile) => {
+          if (profile.preferred_region) {
+            setUserLocationId(profile.preferred_region.id);
+            setUserLocation(profile.preferred_region.location);
+          }
+          setIsMemberChecking(false);
+        });
       })
       .catch(() => {
-        // 프로필 조회 실패 시 지역 없이 진행
+        // 조회 실패 시 그대로 진행
+        setIsMemberChecking(false);
       });
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = useCallback(async (formState: StudyFormState) => {
     if (isSubmitting || uploading) return;
@@ -94,6 +109,14 @@ export default function StudyCreate() {
   const { isLoading: aiIsLoading, trigger } = useAiStream((field, text) => {
     updateField(field, text);
   });
+
+  if (isMemberChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-gray-500">불러오는 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
