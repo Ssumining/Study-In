@@ -44,9 +44,15 @@ function buildMessages(context: AiContext, field: 'introduction' | 'schedule') {
   ];
 }
 
-export async function generateAiText(
+/**
+ * 스트리밍 응답을 지원하는 AI 텍스트 생성 함수.
+ * SSE(text/event-stream) 응답이면 청크마다 onChunk를 호출하고,
+ * 일반 JSON 응답이면 완료 후 onChunk를 한 번 호출합니다.
+ */
+export async function generateAiTextStream(
   context: AiContext,
   field: 'introduction' | 'schedule',
+  onChunk: (partial: string) => void,
 ): Promise<string> {
   const messages = buildMessages(context, field);
   const res = await fetch(CHATGPT_API_URL, {
@@ -55,6 +61,47 @@ export async function generateAiText(
     body: JSON.stringify(messages),
   });
   if (!res.ok) throw new Error(`AI API error: ${res.status}`);
+
+  const contentType = res.headers.get('content-type') ?? '';
+
+  if (contentType.includes('text/event-stream') && res.body) {
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') return fullText;
+
+        try {
+          const parsed = JSON.parse(data);
+          const content = parsed.choices?.[0]?.delta?.content ?? '';
+          if (content) {
+            fullText += content;
+            onChunk(fullText);
+          }
+        } catch {
+          // 손상된 청크 무시
+        }
+      }
+    }
+
+    return fullText;
+  }
+
+  // 폴백: 일반 JSON 응답
   const data = await res.json();
-  return data.choices[0].message.content as string;
+  const text = data.choices[0].message.content as string;
+  onChunk(text);
+  return text;
 }
