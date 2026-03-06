@@ -9,6 +9,7 @@ import Footer from "@/components/layout/Footer";
 import type { StudyFormState } from "@/types/study";
 import type { StudyDay } from "@/types/study";
 import { getStudy, updateStudy, deleteStudy } from "@/api/study";
+import { useAiStream } from "@/features/study/hooks/useAiStream";
 import type { StudyApiData } from "@/api/study";
 import useUpload from "@/hooks/useUpload";
 import { getFullUrl } from "@/api/upload";
@@ -148,6 +149,10 @@ function StudyEditInner({
     handleReset,
   } = useStudyForm(handleSubmit, initialValues, currentParticipants);
 
+  const { isLoading: aiIsLoading, trigger } = useAiStream((field, text) => {
+    updateField(field, text);
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10">
@@ -187,6 +192,14 @@ function StudyEditInner({
           handleSubmit={onSubmit}
           handleReset={handleReset}
           userLocation={initialValues.location}
+          onAiGenerate={() => trigger({
+            title: form.title,
+            subject: form.subject,
+            difficulty: form.difficulty,
+            durationWeeks: form.durationWeeks,
+            days: form.days,
+          }, form.schedule)}
+          aiIsLoading={aiIsLoading}
         />
       </main>
 
