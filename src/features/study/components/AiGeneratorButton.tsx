@@ -56,6 +56,24 @@ export default function AiGeneratorButton({
             />
             생성 중...
           </>
+        ) : targetHasValue ? (
+          /* 재생성 아이콘 */
+          <>
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M13.5 8a5.5 5.5 0 1 1-1.08-3.31" />
+              <path d="M13.5 2.5v3h-3" />
+            </svg>
+            재생성
+          </>
         ) : (
           /* 스파크 아이콘 */
           <>

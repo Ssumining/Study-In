@@ -286,6 +286,23 @@ export default function StudyForm({
   const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 1024px)").matches);
   const [aiValidationMsg, setAiValidationMsg] = useState<string | null>(null);
 
+  function handleAiGenerate() {
+    const missing: string[] = [];
+    if (!form.title.trim()) missing.push("스터디 제목");
+    if (!form.subject) missing.push("스터디 주제");
+    if (!form.difficulty) missing.push("난이도");
+    if (!form.durationWeeks) missing.push("진행 기간");
+    if (form.days.length === 0) missing.push("진행 요일");
+
+    if (missing.length > 0) {
+      setAiValidationMsg(`${missing.join(", ")}을(를) 먼저 입력해주세요.`);
+      return;
+    }
+
+    setAiValidationMsg(null);
+    onAiGenerate?.();
+  }
+
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
@@ -462,7 +479,7 @@ export default function StudyForm({
       <div className="bg-background px-4 pt-6 pb-4 mt-4 space-y-5 lg:px-0 lg:pt-10 lg:pb-10 lg:space-y-[50px]">
 
         {/* AI 생성 버튼 */}
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end gap-1.5">
           {aiValidationMsg && (
             <p className="text-sm text-error">{aiValidationMsg}</p>
           )}
@@ -470,22 +487,7 @@ export default function StudyForm({
             label="AI 커리큘럼 · 소개글 생성"
             targetHasValue={form.schedule.length > 0 || form.introduction.length > 0}
             isLoading={aiIsLoading ?? false}
-            onGenerate={() => {
-              const missing: string[] = [];
-              if (!form.title.trim()) missing.push("스터디 제목");
-              if (!form.subject) missing.push("스터디 주제");
-              if (!form.difficulty) missing.push("난이도");
-              if (!form.durationWeeks) missing.push("진행 기간");
-              if (form.days.length === 0) missing.push("진행 요일");
-
-              if (missing.length > 0) {
-                setAiValidationMsg(`${missing.join(", ")}을(를) 먼저 입력해주세요.`);
-                return;
-              }
-
-              setAiValidationMsg(null);
-              onAiGenerate?.();
-            }}
+            onGenerate={handleAiGenerate}
           />
         </div>
 
