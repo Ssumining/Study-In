@@ -107,7 +107,7 @@ export default function AiGeneratorButton({
             <button
               type="button"
               onClick={handleCancel}
-              className="flex-1 py-2 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+              className="flex-1 py-2 rounded-lg border border-gray-300 text-sm text-gray-500 hover:bg-gray-100 transition-colors"
             >
               취소
             </button>
