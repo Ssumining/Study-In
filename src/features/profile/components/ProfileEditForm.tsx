@@ -141,13 +141,9 @@ const ProfileEditForm = () => {
   return (
     <div className="flex flex-col px-4 py-6 gap-4 bg-background">
 
-      {/* 전체 카드 */}
       <div className="flex flex-col border border-gray-300 rounded-xl overflow-hidden">
 
-        {/* 상단 - 이미지, 닉네임, 소개, 이메일 */}
         <div className="flex flex-col items-center gap-3 px-4 py-6">
-
-          {/* 프로필 이미지 */}
           <div className="relative">
             <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
               {profileImg ? (
@@ -171,8 +167,6 @@ const ProfileEditForm = () => {
               className="hidden"
             />
           </div>
-
-          {/* 닉네임 - 밑줄 스타일 + 체크 아이콘, 중앙 정렬 */}
           <div className="flex flex-col gap-1 items-center w-full max-w-xs">
             <div className="flex items-center gap-2 w-full border-b border-gray-300 pb-1">
               <input
@@ -212,8 +206,6 @@ const ProfileEditForm = () => {
             />
             <p className="text-xs text-gray-500 text-right">{bio.length}/{MAX_BIO_LENGTH}자</p>
           </div>
-
-          {/* 이메일(ID) */}
           <div className="flex items-center gap-3 w-full">
             <span className="text-base font-medium text-gray-900 shrink-0">이메일(ID)</span>
             <span className="text-base text-gray-500">{email}</span>
@@ -222,11 +214,8 @@ const ProfileEditForm = () => {
         </div>
 
         <div className="w-full border-t border-gray-300" />
-
-        {/* 하단 - 정보 입력 */}
         <div className="flex flex-col gap-4 px-4 py-5">
 
-          {/* 이름 */}
           <div className="flex flex-col gap-1">
             <label className="text-base font-medium text-gray-900">
               이름 <span className="text-error">*</span>
@@ -240,7 +229,6 @@ const ProfileEditForm = () => {
             />
           </div>
 
-          {/* 전화번호 + 인증 */}
           <div className="flex flex-col gap-1">
             <label className="text-base font-medium text-gray-900">
               전화번호 <span className="text-error">*</span>
@@ -259,7 +247,6 @@ const ProfileEditForm = () => {
             </div>
           </div>
 
-          {/* 내 지역 + 재인증 */}
           <div className="flex flex-col gap-1">
             <label className="text-base font-medium text-gray-900">내 지역</label>
             <div className="flex gap-2">
@@ -276,7 +263,6 @@ const ProfileEditForm = () => {
             </div>
           </div>
 
-          {/* GitHub + 인증 + 잔디 */}
           <div className="flex flex-col gap-2">
             <label className="text-base font-medium text-gray-900">GitHub User Name</label>
             <div className="flex gap-2">
@@ -308,8 +294,6 @@ const ProfileEditForm = () => {
               </div>
             )}
           </div>
-
-          {/* 관심 분야 태그 */}
           <div className="flex flex-col gap-2">
             <label className="text-base font-medium text-gray-900">관심 분야 태그</label>
             <input
@@ -356,8 +340,6 @@ const ProfileEditForm = () => {
       {apiError && (
         <p className="text-sm text-error text-center">{apiError}</p>
       )}
-
-      {/* 저장하기 버튼 */}
       <button
         onClick={handleSave}
         disabled={!isSaveEnabled || isSaving}

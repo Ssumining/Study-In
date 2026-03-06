@@ -48,11 +48,8 @@ const ProfileCard = () => {
 
   return (
     <div className="flex flex-col px-4 py-6 gap-4 bg-background">
+    <div className="flex flex-col border border-gray-300 rounded-xl overflow-hidden">
 
-      {/* 상단 + 하단 카드 붙이기 */}
-      <div className="flex flex-col border border-gray-300 rounded-xl overflow-hidden">
-
-        {/* 프로필 상단 카드 */}
         <div className="flex flex-col items-center gap-3 px-4 py-6">
           <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
             {profile.profile_img ? (
@@ -73,8 +70,6 @@ const ProfileCard = () => {
         </div>
 
         <div className="w-full border-t border-gray-300" />
-
-        {/* 하단 정보 카드 */}
         <div className="flex flex-col gap-3 px-4 py-5">
 
           <div className="flex items-center gap-3">

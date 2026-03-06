@@ -62,7 +62,7 @@ const ActivityTabs = () => {
   return (
     <div className="flex flex-col">
 
-      {/* 탭 - 2x2 그리드 */}
+     
       <div className="px-4 py-3">
         <div className="border border-gray-300 rounded-xl overflow-hidden grid grid-cols-2">
           <button
@@ -133,15 +133,13 @@ const ActivityTabs = () => {
                   className="bg-background rounded-2xl shadow-md border border-gray-200 flex flex-col cursor-pointer overflow-hidden"
                   onClick={() => navigate(`/study/${study.id}`)}
                 >
-                  {/* 상태 + 지역명 */}
+                  
                   <div className="flex justify-between items-center px-2 pt-2 pb-1">
                     <RecruitIcon className="w-16 h-6" />
                     <span className="text-xs text-gray-900 bg-gray-100 rounded-full px-2 py-0.5">
                       {locationName}
                     </span>
                   </div>
-
-                  {/* 이미지 */}
                   <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
                     {study.thumbnail ? (
                       <img
@@ -184,7 +182,6 @@ const ActivityTabs = () => {
                       )}
                     </div>
                     <p className="text-sm font-medium text-gray-900 line-clamp-2">{study.title}</p>
-                    {/* 신청자 수 */}
                     <div className="flex items-center gap-1">
                       <PeopleIcon className="w-3 h-3 text-gray-300" />
                       <p className="text-xs text-gray-300">
@@ -195,8 +192,6 @@ const ActivityTabs = () => {
                 </div>
               ))}
             </div>
-
-            {/* 페이지네이션 */}
             <div className="flex justify-center items-center gap-4 py-4">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
