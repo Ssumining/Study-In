@@ -123,7 +123,7 @@ function StudyEditInner({
     setIsDeleting(true);
     try {
       await deleteStudy(studyId);
-      navigate("/");
+      navigate("/my-study");
     } catch {
       setIsDeleting(false);
       setShowDeleteModal(false);
