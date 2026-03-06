@@ -9,6 +9,7 @@ import radioBtnOff from "@/assets/base/radio-btn-OFF.svg";
 import radioBtnOn from "@/assets/base/radio-btn-ON.svg";
 import iconBtnX from "@/assets/base/icon-btn-X.svg";
 import type { StudyFormState, StudyFormErrors, StudyDay } from "@/types/study";
+import AiGeneratorButton from "@/features/study/components/AiGeneratorButton";
 
 const DAYS: StudyDay[] = ["월", "화", "수", "목", "금", "토", "일"];
 
@@ -97,6 +98,8 @@ interface StudyFormProps {
   handleReset: () => void;
   // 프로필에서 인증된 지역 — 추후 API 연결 시 실제 값으로 주입
   userLocation?: string;
+  onAiGenerate?: () => void;
+  aiIsLoading?: boolean;
 }
 
 function SelectPicker({
@@ -275,10 +278,30 @@ export default function StudyForm({
   handleBlurField,
   handleSubmit,
   userLocation,
+  onAiGenerate,
+  aiIsLoading,
 }: StudyFormProps) {
   const [isTagFocused, setIsTagFocused] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 1024px)").matches);
+  const [aiValidationMsg, setAiValidationMsg] = useState<string | null>(null);
+
+  function handleAiGenerate() {
+    const missing: string[] = [];
+    if (!form.title.trim()) missing.push("스터디 제목");
+    if (!form.subject) missing.push("스터디 주제");
+    if (!form.difficulty) missing.push("난이도");
+    if (!form.durationWeeks) missing.push("진행 기간");
+    if (form.days.length === 0) missing.push("진행 요일");
+
+    if (missing.length > 0) {
+      setAiValidationMsg(`${missing.join(", ")}을(를) 먼저 입력해주세요.`);
+      return;
+    }
+
+    setAiValidationMsg(null);
+    onAiGenerate?.();
+  }
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -454,6 +477,19 @@ export default function StudyForm({
 
       {/* ── 소개 / 일정 ── */}
       <div className="bg-background px-4 pt-6 pb-4 mt-4 space-y-5 lg:px-0 lg:pt-10 lg:pb-10 lg:space-y-[50px]">
+
+        {/* AI 생성 버튼 */}
+        <div className="flex flex-col items-end gap-1.5">
+          {aiValidationMsg && (
+            <p className="text-sm text-error">{aiValidationMsg}</p>
+          )}
+          <AiGeneratorButton
+            label="AI 커리큘럼 · 소개글 생성"
+            targetHasValue={form.schedule.length > 0 || form.introduction.length > 0}
+            isLoading={aiIsLoading ?? false}
+            onGenerate={handleAiGenerate}
+          />
+        </div>
 
         {/* 스터디 소개 */}
         <div>
