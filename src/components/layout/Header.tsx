@@ -9,7 +9,6 @@ import logoSrc from '@/assets/base/icon-Logo.svg';
 import searchIcon from '@/assets/base/icon-Search.svg';
 import chattingIcon from '@/assets/base/icon-chatting.svg';
 import notificationIcon from '@/assets/base/icon-Notification.svg';
-import personIcon from '@/assets/base/icon-person.svg';
 import HamburgerIcon from '@/assets/base/icon-hamburger.svg?react';
 
 interface HeaderProps {
@@ -122,9 +121,7 @@ export default function Header({ variant = 'default' }: HeaderProps) {
                 {isLoggedIn && profileImg ? (
                   <img src={profileImg} alt="프로필" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <img src={personIcon} alt="프로필" className="w-5 h-5" />
-                  </div>
+                  <div className="w-full h-full flex items-center justify-center" />
                 )}
               </button>
             </div>
