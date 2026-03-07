@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import heartIcon from "@/assets/base/icon-heart.svg";
 import heartFillIcon from "@/assets/base/icon-heart-fill.svg";
 import shareIcon from "@/assets/base/icon-Share.svg";
+import crownIcon from "@/assets/base/icon-crown-fill.svg";
 
 import CommentSection from "@/features/comments/components/CommentSection";
 
@@ -272,9 +273,12 @@ export default function StudyDetail() {
 
               <div key={c.id}>
 
-                <p className="font-bold text-sm">
-                  {c.author} {c.leaderReply ? "👑" : ""}
-                </p>
+                <p className="flex items-center gap-1 font-bold text-sm">
+                  {c.author}
+                  {c.leaderReply && (
+                    <img src={crownIcon} className="w-4 h-4" />
+  )}
+</p>
 
                 <p className="text-xs text-gray-500">
                   {c.date}
