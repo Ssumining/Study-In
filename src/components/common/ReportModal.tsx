@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import BtnCloseIcon from '@/assets/base/icon-btn-X.svg?react'
 import { createReport, REPORT_REASONS, ReportTargetType } from '@/api/report'
 
 interface ReportModalProps {
@@ -23,6 +22,7 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }: ReportModalProps
       setError('신고 사유를 선택해주세요.')
       return
     }
+
     if (!content.trim()) {
       setError('신고 내용을 입력해주세요.')
       return
@@ -58,28 +58,18 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }: ReportModalProps
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60" onClick={handleClose} />
+      <div className="relative bg-background rounded-xl w-72 px-5 py-5 flex flex-col gap-3 z-10">
 
-      <div
-        className="absolute inset-0 bg-surface opacity-40"
-        onClick={handleClose}
-      />
-
-      <div className="relative bg-background rounded-2xl w-full max-w-sm mx-4 px-5 py-6 flex flex-col gap-4 z-10">
-
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold text-gray-900">신고하기</h2>
-          <button onClick={handleClose}>
-            <BtnCloseIcon className="w-5 h-5 opacity-40" />
-          </button>
-        </div>
+        <h2 className="text-base font-bold text-gray-900 text-center">신고하기</h2>
 
         {isSuccess ? (
-          <div className="flex flex-col items-center gap-3 py-6">
-            <p className="text-base font-medium text-gray-900">신고가 접수되었어요.</p>
-            <p className="text-sm text-gray-500 text-center">검토 후 조치를 취할게요.</p>
+          <div className="flex flex-col items-center gap-3 py-4">
+            <p className="text-sm font-medium text-gray-900">신고가 접수되었어요.</p>
+            <p className="text-xs text-gray-500 text-center">검토 후 조치를 취할게요.</p>
             <button
               onClick={handleClose}
-              className="w-full py-3 bg-primary text-background rounded-lg text-base font-medium mt-2"
+              className="w-full py-2 bg-primary text-background rounded-lg text-sm font-medium mt-2"
             >
               확인
             </button>
@@ -87,43 +77,55 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }: ReportModalProps
         ) : (
           <>
             <div className="flex flex-col gap-2">
-              <p className="text-base font-medium text-gray-900">신고 사유</p>
-              <div className="flex flex-col gap-1">
-                {REPORT_REASONS.map((reason) => (
-                  <button
-                    key={reason.id}
-                    onClick={() => setSelectedReason(reason.id)}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm border ${
-                      selectedReason === reason.id
-                        ? 'border-primary text-primary bg-activation'
-                        : 'border-gray-300 text-gray-700'
-                    }`}
-                  >
+              {REPORT_REASONS.map((reason) => (
+                <button
+                  key={reason.id}
+                  onClick={() => setSelectedReason(reason.id)}
+                  className="flex items-center gap-2 w-full text-left"
+                >
+    
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    selectedReason === reason.id
+                      ? 'border-primary'
+                      : 'border-gray-300'
+                  }`}>
+                    {selectedReason === reason.id && (
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                    )}
+                  </div>
+                  <span className={`text-sm ${
+                    selectedReason === reason.id ? 'text-primary' : 'text-gray-700'
+                  }`}>
                     {reason.label}
-                  </button>
-                ))}
-              </div>
+                  </span>
+                </button>
+              ))}
             </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-base font-medium text-gray-900">상세 내용</p>
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value.slice(0, 500))}
-                placeholder="신고 내용을 입력해주세요."
-                className="w-full h-28 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 resize-none focus:outline-none focus:border-primary"
-              />
-              <p className="text-xs text-gray-500 text-right">{content.length}/500</p>
-            </div>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value.slice(0, 500))}
+              placeholder="상세 내용을 입력해주세요."
+              className="w-full h-16 px-3 py-2 border border-gray-300 rounded-lg text-xs text-gray-900 resize-none focus:outline-none focus:border-primary"
+            />
             {error && (
               <p className="text-xs text-error">{error}</p>
             )}
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="w-full py-3 bg-primary text-background rounded-lg text-base font-medium disabled:opacity-50"
-            >
-              {isLoading ? '접수 중...' : '신고하기'}
-            </button>
+
+            <div className="flex gap-2">
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="flex-1 py-2 bg-primary text-background rounded-lg text-sm font-medium disabled:opacity-50"
+              >
+                {isLoading ? '접수 중...' : '신고하기'}
+              </button>
+              <button
+                onClick={handleClose}
+                className="flex-1 py-2 border border-gray-300 text-gray-500 rounded-lg text-sm font-medium"
+              >
+                취소
+              </button>
+            </div>
           </>
         )}
       </div>
