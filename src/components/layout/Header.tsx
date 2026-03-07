@@ -103,7 +103,7 @@ export default function Header({ variant = 'default' }: HeaderProps) {
               <img src={searchIcon} alt="검색" className="w-7 h-7 shrink-0" />
             </div>
 
-            {/* 우측 아이콘 영역 - 로그인 여부 관계없이 항상 표시 */}
+            {/* 우측 아이콘 영역 */}
             <div className="flex items-center ml-[32px] gap-[20px] shrink-0">
               <button onClick={() => navigate(isLoggedIn ? '/chat' : '/login')}>
                 <img src={chattingIcon} alt="채팅" className="w-[30px] h-[30px]" />
