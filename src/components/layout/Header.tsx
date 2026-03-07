@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { getNotifications } from '@/api/notification';
+import { getProfile } from '@/api/profile';
+import { storage } from '@/utils/storage';
 import MobileDrawer from '@/components/layout/MobileDrawer';
 import logoSrc from '@/assets/base/icon-Logo.svg';
 import searchIcon from '@/assets/base/icon-Search.svg';
@@ -18,6 +20,7 @@ export default function Header({ variant = 'default' }: HeaderProps) {
   const { isLoggedIn } = useAuthStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [profileImg, setProfileImg] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,12 +36,28 @@ export default function Header({ variant = 'default' }: HeaderProps) {
     fetchUnread();
   }, [isLoggedIn]);
 
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const fetchProfile = async () => {
+      try {
+        const userId = storage.getUserId();
+        if (!userId) return;
+        const profile = await getProfile(userId);
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+        setProfileImg(baseUrl + profile.profile_img);
+      } catch {
+        // 에러 무시
+      }
+    };
+    fetchProfile();
+  }, [isLoggedIn]);
+
   return (
     <>
-      <header className="h-14 lg:h-20 bg-background border-b border-gray-300">
+      <header className="bg-background border-b border-gray-300">
 
         {/* ── 모바일 헤더 ── */}
-        <div className="flex lg:hidden items-center justify-between h-full px-4">
+        <div className="flex lg:hidden items-center justify-between h-14 px-4">
           <button onClick={() => setDrawerOpen(true)}>
             <HamburgerIcon className="w-7 h-7 text-surface" />
           </button>
@@ -54,57 +73,63 @@ export default function Header({ variant = 'default' }: HeaderProps) {
         </div>
 
         {/* ── 데스크탑 헤더 ── */}
-        <div className="hidden lg:flex items-center h-full w-full max-w-[990px] mx-auto px-4 gap-6">
+        <div className="hidden lg:flex items-center h-[80px]">
+          <div className="flex items-center w-full max-w-[1190px] mx-auto">
 
-          <Link to="/" className="shrink-0">
-            <img src={logoSrc} alt="Studyin" className="h-5" />
-          </Link>
+            {/* 로고 */}
+            <Link to="/" className="shrink-0">
+              <img src={logoSrc} alt="Studyin" className="h-[32px]" />
+            </Link>
 
-          <nav className="flex shrink-0 h-full">
-            <button className="relative flex items-center px-3 text-base font-medium text-gray-900">
-              내 지역
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60px] h-1 bg-primary" />
-            </button>
-            <button className="flex items-center px-3 text-base font-medium text-gray-500">
-              온라인
-            </button>
-          </nav>
-
-          <div className="flex items-center flex-1 gap-2 px-4 py-2 border border-gray-300 rounded-full min-w-0">
-            <input
-              type="text"
-              placeholder="어떤 스터디를 찾고 계신가요?"
-              className="flex-1 text-base outline-none text-gray-900 placeholder:text-gray-500 bg-transparent min-w-0"
-            />
-            <img src={searchIcon} alt="검색" className="w-5 h-5 shrink-0" />
-          </div>
-
-          {isLoggedIn ? (
-            <div className="flex items-center gap-3 shrink-0">
-              <button onClick={() => navigate('/chat')}>
-                <img src={chattingIcon} alt="채팅" className="w-6 h-6" />
+            {/* 내지역 / 온라인 */}
+            <nav className="flex items-center shrink-0 ml-[40px] gap-[30px]">
+              <button className="relative flex items-center h-[80px] text-lg font-regular text-surface">
+                내 지역
               </button>
-              <button className="relative" onClick={() => navigate('/notification')}>
-                <img src={notificationIcon} alt="알림" className="w-6 h-6" />
-                {unreadCount > 0 && (
+              <button className="flex items-center text-lg font-regular text-surface">
+                온라인
+              </button>
+            </nav>
+
+            {/* 빈 공간으로 검색창 오른쪽으로 밀기 */}
+            <div className="flex-1" />
+
+            {/* 검색창 */}
+            <div className="flex items-center w-[400px] h-[44px] px-5 border-2 border-gray-300 rounded-full shrink-0">
+              <input
+                type="text"
+                placeholder="어떤 스터디를 찾고 계신가요?"
+                className="flex-1 text-base font-medium outline-none text-surface placeholder:text-gray-500 bg-transparent min-w-0"
+              />
+              <img src={searchIcon} alt="검색" className="w-7 h-7 shrink-0" />
+            </div>
+
+            {/* 우측 아이콘 영역 - 로그인 여부 관계없이 항상 표시 */}
+            <div className="flex items-center ml-[32px] gap-[20px] shrink-0">
+              <button onClick={() => navigate(isLoggedIn ? '/chat' : '/login')}>
+                <img src={chattingIcon} alt="채팅" className="w-[30px] h-[30px]" />
+              </button>
+              <button className="relative" onClick={() => navigate(isLoggedIn ? '/notification' : '/login')}>
+                <img src={notificationIcon} alt="알림" className="w-[30px] h-[30px]" />
+                {isLoggedIn && unreadCount > 0 && (
                   <span className="absolute bottom-0.5 right-0 w-[10px] h-[10px] bg-error rounded-full" />
                 )}
               </button>
               <button
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center overflow-hidden"
-                onClick={() => navigate('/profile')}
+                className="w-[44px] h-[44px] rounded-full border-2 border-gray-300 overflow-hidden shrink-0 block"
+                onClick={() => navigate(isLoggedIn ? '/profile' : '/login')}
               >
-                <img src={personIcon} alt="프로필" className="w-5 h-5" />
+                {isLoggedIn && profileImg ? (
+                  <img src={profileImg} alt="프로필" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <img src={personIcon} alt="프로필" className="w-5 h-5" />
+                  </div>
+                )}
               </button>
             </div>
-          ) : (
-            <button
-              className="shrink-0 px-4 py-2 bg-primary text-background text-base font-medium rounded-lg"
-              onClick={() => navigate('/login')}
-            >
-              시작하기
-            </button>
-          )}
+
+          </div>
         </div>
       </header>
 
