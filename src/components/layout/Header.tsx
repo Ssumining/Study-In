@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
+import { getNotifications } from '@/api/notification';
 import MobileDrawer from '@/components/layout/MobileDrawer';
 import logoSrc from '@/assets/base/icon-Logo.svg';
 import searchIcon from '@/assets/base/icon-Search.svg';
@@ -16,7 +17,21 @@ interface HeaderProps {
 export default function Header({ variant = 'default' }: HeaderProps) {
   const { isLoggedIn } = useAuthStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const fetchUnread = async () => {
+      try {
+        const data = await getNotifications();
+        setUnreadCount(data.results.filter((n) => !n.checked).length);
+      } catch {
+        // 에러 무시
+      }
+    };
+    fetchUnread();
+  }, [isLoggedIn]);
 
   if (variant === 'auth') {
     return (
@@ -43,8 +58,11 @@ export default function Header({ variant = 'default' }: HeaderProps) {
             <img src={logoSrc} alt="Studyin" className="h-5" />
           </Link>
           {isLoggedIn ? (
-            <button onClick={() => navigate('/chat')}>
+            <button onClick={() => navigate('/chat')} className="relative">
               <img src={chattingIcon} alt="채팅" className="w-6 h-6" />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 w-2 h-2 bg-error rounded-full" />
+              )}
             </button>
           ) : (
             <button onClick={() => navigate('/login')}>
@@ -86,7 +104,9 @@ export default function Header({ variant = 'default' }: HeaderProps) {
               </button>
               <button className="relative" onClick={() => navigate('/notification')}>
                 <img src={notificationIcon} alt="알림" className="w-6 h-6" />
-                <span className="absolute top-0 right-0 w-2 h-2 bg-error rounded-full" />
+                {unreadCount > 0 && (
+                  <span className="absolute bottom-0.5 right-0 w-[10px] h-[10px] bg-error rounded-full" />
+                )}
               </button>
               <button
                 className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center overflow-hidden"
