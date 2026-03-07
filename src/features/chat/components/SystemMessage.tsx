@@ -1,10 +1,13 @@
 interface SystemMessageProps {
     type: 'date' | 'notice';
-    content: string;
+    content: string | null;
     isLastNotice?: boolean;
 }
 
 export default function SystemMessage({ type, content, isLastNotice }: SystemMessageProps) {
+    // 데이터가 없을 경우 렌더링 방지
+    if (!content) return null;
+
     if (type === 'date') {
         // 날짜 구분선
         return (
