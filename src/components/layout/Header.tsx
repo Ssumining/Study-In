@@ -128,8 +128,8 @@ export default function Header({ variant = 'default' }: HeaderProps) {
 
           </div>
         </div>
-      </header>
 
+      </header>
       <MobileDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </>
   );
