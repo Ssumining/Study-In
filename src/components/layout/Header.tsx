@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { getNotifications } from '@/api/notification';
 import { getProfile } from '@/api/profile';
 import { storage } from '@/utils/storage';
-import { useModalStore } from '@/store/modalStore';
 import MobileDrawer from '@/components/layout/MobileDrawer';
+import { useAssociateGuard } from '@/hooks/useAssociateGuard';
 import logoSrc from '@/assets/base/icon-Logo.svg';
 import searchIcon from '@/assets/base/icon-Search.svg';
 import chattingIcon from '@/assets/base/icon-chatting.svg';
@@ -18,12 +18,25 @@ interface HeaderProps {
 }
 
 export default function Header({ variant = 'default' }: HeaderProps) {
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn, logout } = useAuthStore();
+  const { withAssociateGuard } = useAssociateGuard();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [profileImg, setProfileImg] = useState<string | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { openModal } = useModalStore();
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -159,9 +172,37 @@ export default function Header({ variant = 'default' }: HeaderProps) {
                 )}
               </button>
               {isLoggedIn && (
-                <button onClick={() => openModal('header')}>
-                  <MoreIcon className="w-[30px] h-[30px] text-surface" />
-                </button>
+                <div className="relative" ref={dropdownRef}>
+                  <button onClick={() => setDropdownOpen((prev) => !prev)}>
+                    <MoreIcon className="w-[30px] h-[30px] text-surface" />
+                  </button>
+                  {dropdownOpen && (
+                    <div className="absolute right-0 top-[calc(100%+8px)] w-[130px] bg-background rounded-[10px] shadow-[0px_5px_15px_rgba(71,73,77,0.10)] border border-[#D9DBE0] z-50 overflow-hidden py-1">
+                      <button
+                        onClick={() => { setDropdownOpen(false); withAssociateGuard(() => navigate('/study/create')); }}
+                        className="w-full h-[40px] flex items-center px-2"
+                      >
+                        <span className="w-full h-[30px] flex items-center px-[10px] bg-primary text-background text-base rounded-[8px]">
+                          스터디 만들기
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => { setDropdownOpen(false); navigate('/profile'); }}
+                        className="w-full h-[40px] flex items-center px-2"
+                      >
+                        <span className="w-full h-[30px] flex items-center px-[10px] bg-[#F3F5FA] text-surface text-base rounded-[8px]">
+                          마이페이지
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => { setDropdownOpen(false); logout(); navigate('/'); }}
+                        className="w-full h-[40px] flex items-center px-[18px] text-base text-surface"
+                      >
+                        로그아웃
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
