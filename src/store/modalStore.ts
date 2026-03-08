@@ -7,9 +7,11 @@ export type ModalType =
   | 'study-mine'        // 내 스터디: 수정/삭제
   | 'study-other'       // 타인 스터디: 신고
   | 'header'            // 헤더: 설정/로그아웃
-  | 'confirm';          // 확인 모달 (로그아웃/삭제/신고)
+  | 'confirm'           // 확인 모달 (로그아웃/삭제/신고)
+  | 'user-info'         // 유저 정보 모달
+  | 'report';           // 신고 모달 (확인 없이 바로)
 
-export type ConfirmType = 'logout' | 'delete' | 'report';
+export type ConfirmType = 'logout' | 'delete' | 'report' | 'associate';
 
 interface ModalState {
   isOpen: boolean;

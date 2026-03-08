@@ -86,6 +86,17 @@ const CommentItem = ({
       <div className="flex gap-[10px]">
         {comment.is_secret && !isAuthor ? (
           <div className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-100 border border-gray-300" />
+        ) : !isWithdrawnUser(comment.user!) && isNormalUser(comment.user!) && !isAuthor ? (
+          <button
+            className="flex-shrink-0"
+            onClick={() => openModal('user-info', comment.user && isNormalUser(comment.user) ? comment.user.id : undefined)}
+          >
+            <img
+              src={profileImg}
+              alt={nickname}
+              className="w-10 h-10 rounded-full object-cover border border-gray-300"
+            />
+          </button>
         ) : (
           <img
             src={profileImg}
@@ -185,7 +196,7 @@ const CommentItem = ({
                 ) : (
                   <button
                     onClick={() =>
-                      openConfirm("report", () => console.log("신고"))
+                      openModal('report', comment.id, undefined, 'comment')
                     }
                     className="text-sm text-gray-500 underline"
                   >

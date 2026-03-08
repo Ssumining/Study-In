@@ -108,6 +108,17 @@ const RecommentList = ({
                 {/* 프로필 이미지 */}
                 {recomment.is_secret && !isAuthor ? (
                   <div className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-100 border border-gray-300" />
+                ) : !isWithdrawnUser(recomment.user) && isNormalUser(recomment.user) && !isAuthor ? (
+                  <button
+                    className="flex-shrink-0"
+                    onClick={() => openModal('user-info', isNormalUser(recomment.user) ? recomment.user.id : undefined)}
+                  >
+                    <img
+                      src={profileImg}
+                      alt={nickname}
+                      className="w-10 h-10 rounded-full object-cover border border-gray-300"
+                    />
+                  </button>
                 ) : (
                   <img
                     src={profileImg}
