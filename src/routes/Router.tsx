@@ -6,16 +6,17 @@ import ProfileEdit from "@/pages/ProfileEdit";
 import MyStudy from "@/pages/Mystudy";
 import StudyCreate from "@/pages/StudyCreate";
 import StudyEdit from "@/pages/StudyEdit";
-import Layout from "@/components/layout/Layout";
-import AuthLayout from "@/components/layout/AuthLayout";
-import ChatLayout from "@/components/layout/ChatLayout";
-import Login from "@/pages/Login";
-import ForgotPassword from "@/pages/ForgotPassword";
-import ResetPassword from "@/pages/ResetPassword";
-import Notification from "@/pages/Notification";
-import Register from "@/pages/Register";
-import CommentWritePage from "@/pages/CommentWritePage";
-import Chat from "@/pages/Chat";
+import Layout from '@/components/layout/Layout';
+import AuthLayout from '@/components/layout/AuthLayout';
+import ChatLayout from '@/components/layout/ChatLayout';
+import Login from '@/pages/Login';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
+import Notification from '@/pages/Notification';
+import Register from '@/pages/Register';
+import CommentWritePage from '@/pages/CommentWritePage';
+import Chat from '@/pages/Chat';
+import Search from '@/pages/Search';
 
 export default function Router() {
   return (
@@ -24,6 +25,7 @@ export default function Router() {
         {/* 공통 레이아웃 (헤더 + 푸터) */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/study/:studyId" element={<StudyDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<ProfileEdit />} />
