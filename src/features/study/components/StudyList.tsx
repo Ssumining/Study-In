@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useStudyList } from "../hooks/useStudyList";
 import StudyCard from "./StudyCard";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,9 @@ interface StudyListProps {
   selectedCategory: string;
   searchTerm: string;
   activeTab: string;
+  locationId?: number;
+  large?: boolean;
+  cols?: 3 | 4;
 }
 
 function Pagination({
@@ -90,24 +93,40 @@ export default function StudyList({
   selectedCategory,
   searchTerm,
   activeTab,
+  locationId,
+  large = false,
+  cols = 4,
 }: StudyListProps) {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const topRef = useRef<HTMLDivElement>(null);
 
   // 탭/검색어 바뀌면 1페이지로 리셋
   useEffect(() => {
     setPage(1);
-  }, [activeTab, searchTerm, selectedCategory]);
+  }, [activeTab, searchTerm, selectedCategory, locationId]);
+
   const { studies, isLoading, error, totalPages } = useStudyList(
     selectedCategory,
     searchTerm,
     activeTab,
     page,
+    locationId,
   );
+
+  // page가 totalPages를 초과하면 마지막 페이지로 되돌아가기
+  useEffect(() => {
+    if (!isLoading && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [isLoading, page, totalPages]);
 
   const handleTabChange = (newPage: number) => {
     setPage(newPage);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (topRef.current) {
+      const top = topRef.current.getBoundingClientRect().top + window.scrollY - 130;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }
   };
 
   if (isLoading)
@@ -143,9 +162,9 @@ export default function StudyList({
 
   return (
     <>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-6 md:px-4">
+      <div ref={topRef} className={`grid grid-cols-2 ${cols === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4"} gap-[10px] md:gap-6 md:px-4`}>
         {studies.map((study) => (
-          <StudyCard key={study.id} study={study} />
+          <StudyCard key={study.id} study={study} large={large} />
         ))}
       </div>
       <Pagination
