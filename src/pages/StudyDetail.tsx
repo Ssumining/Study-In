@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import heartIcon from "@/assets/base/icon-heart.svg";
 import heartFillIcon from "@/assets/base/icon-heart-fill.svg";
 import shareIcon from "@/assets/base/icon-Share.svg";
-import crownIcon from "@/assets/base/icon-crown-fill.svg";
 
 import CommentSection from "@/features/comments/components/CommentSection";
 
@@ -55,8 +54,7 @@ export default function StudyDetail() {
   const [liked, setLiked] = useState(false);
   const [isJoined, setIsJoined] = useState(false);
 
-  const [isCommentOpen, setIsCommentOpen] = useState(false);
-  const [commentText, setCommentText] = useState("");
+
 
   const data: StudyDetailData | null = useMemo(() => {
     if (!studyId) return null;
@@ -98,44 +96,13 @@ export default function StudyDetail() {
     };
   }, [studyId]);
 
-  const comments: CommentItem[] = [
-    {
-      id: 1,
-      author: "주커버그사촌동생",
-      date: "2022.03.23",
-      body: "주말에는 계획 없나요?",
-    },
-    {
-      id: 2,
-      author: "파이썬마술사",
-      date: "2022.03.23",
-      body: "주말은 어려워요 ㅠㅠ",
-      isReply: true,
-      leaderReply: true,
-    },
-  ];
 
-  const [commentList, setCommentList] = useState(comments);
 
   if (!data) return null;
 
   const primaryButtonText = isJoined ? "채팅방 가기" : "참여하기";
 
-  const handleSubmitComment = () => {
-    if (!commentText.trim()) return;
 
-    const newComment: CommentItem = {
-      id: Date.now(),
-      author: "나",
-      date: "오늘",
-      body: commentText,
-    };
-
-    setCommentList((prev) => [newComment, ...prev]);
-
-    setCommentText("");
-    setIsCommentOpen(false);
-  };
 
   const DAYS = ["월", "화", "수", "목", "금", "토", "일"];
 
@@ -260,77 +227,14 @@ export default function StudyDetail() {
           </section>
 
 
-          <button
-            onClick={() => setIsCommentOpen(true)}
-            className="mt-3 w-full rounded border border-gray-300 p-2"
-          >
-            작성하기
-          </button>
-
-          <div className="mt-4 space-y-4">
-
-            {commentList.map((c) => (
-
-              <div key={c.id}>
-
-                <p className="flex items-center gap-1 font-bold text-sm">
-                  {c.author}
-                  {c.leaderReply && (
-                    <img src={crownIcon} className="w-4 h-4" />
-  )}
-</p>
-
-                <p className="text-xs text-gray-500">
-                  {c.date}
-                </p>
-
-                <p className="text-sm">
-                  {c.body}
-                </p>
-
-              </div>
-
-            ))}
-          </div>
+         
+         
         </section>
 
       </div>
 
       {/* COMMENT SHEET */}
 
-      {isCommentOpen && (
-
-        <div className="fixed inset-0 flex items-end bg-black/40">
-
-          <div className="mx-auto w-full max-w-[390px] rounded-t-2xl bg-background p-4">
-
-            <textarea
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="w-full rounded border p-2"
-            />
-
-            <div className="mt-4 flex gap-2">
-
-              <button
-                onClick={() => setIsCommentOpen(false)}
-                className="flex-1 rounded border p-2"
-              >
-                취소
-              </button>
-
-              <button
-                onClick={handleSubmitComment}
-                className="flex-1 rounded bg-primary p-2 text-white"
-              >
-                등록
-              </button>
-
-            </div>
-
-          </div>
-        </div>
-      )}
 
       {/* BOTTOM BAR */}
 
