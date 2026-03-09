@@ -6,14 +6,13 @@ import { getProfile } from '@/api/profile';
 import { getFullUrl } from '@/api/upload';
 import { storage } from '@/utils/storage';
 import { useAssociateGuard } from '@/hooks/useAssociateGuard';
-
 import MobileDrawer from '@/components/layout/MobileDrawer';
 import LogoIcon from '@/assets/base/icon-Logo.svg?react';
 import SearchIcon from '@/assets/base/icon-Search.svg?react';
 import ChattingIcon from '@/assets/base/icon-chatting.svg?react';
 import NotificationIcon from '@/assets/base/icon-Notification.svg?react';
 import HamburgerIcon from '@/assets/base/icon-hamburger.svg?react';
-import DotsIcon from '@/assets/base/icon-dots.svg?react';
+
 
 interface HeaderProps {
   variant?: "default" | "auth";
@@ -181,69 +180,64 @@ export default function Header({ variant = "default" }: HeaderProps) {
                 )}
               </button>
 
-              {/* 프로필 */}
-              <button
-                className="w-[44px] h-[44px] rounded-full border-2 border-gray-300 overflow-hidden shrink-0 block"
-                onClick={() => navigate(isLoggedIn ? "/profile" : "/login")}
-              >
-                {isLoggedIn && profileImg ? (
-                  <img src={profileImg} alt="프로필" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100" />
-                )}
-              </button>
-
-              {/* 더보기 드롭다운 */}
-              {isLoggedIn && (
-                <div className="relative" ref={dropdownRef}>
-                  <button onClick={() => setDropdownOpen((prev) => !prev)}>
-                    <DotsIcon className="w-[30px] h-[30px] text-surface" />
-                  </button>
-
-                  {dropdownOpen && (
-                    <div className="absolute right-0 top-[calc(100%+8px)] w-[130px] bg-background rounded-[10px] shadow-[0px_5px_15px_rgba(71,73,77,0.10)] border border-[#D9DBE0] z-50 overflow-hidden py-1">
-
-                      <button
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          withAssociateGuard(() => navigate("/study/create"));
-                        }}
-                        className="w-full h-[40px] flex items-center px-2"
-                      >
-                        <span className="w-full h-[30px] flex items-center px-[10px] bg-primary text-background text-base rounded-[8px]">
-                          스터디 만들기
-                        </span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          navigate("/profile");
-                        }}
-                        className="w-full h-[40px] flex items-center px-2"
-                      >
-                        <span className="w-full h-[30px] flex items-center px-[10px] bg-[#F3F5FA] text-surface text-base rounded-[8px]">
-                          마이페이지
-                        </span>
-                      </button>
-
-                      {/* 로그아웃 - storage 정리 + store 초기화 + 홈 이동 */}
-                      <button
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          logout();
-                          storage.clearAuth();
-                          navigate("/");
-                        }}
-                        className="w-full h-[40px] flex items-center px-[18px] text-base text-surface"
-                      >
-                        로그아웃
-                      </button>
-
-                    </div>
+              {/* 프로필 + 드롭다운 */}
+              <div className="relative shrink-0" ref={dropdownRef}>
+                <button
+                  className="w-[44px] h-[44px] rounded-full border-2 border-gray-300 overflow-hidden block"
+                  onClick={() => isLoggedIn ? setDropdownOpen((prev) => !prev) : navigate("/login")}
+                >
+                  {isLoggedIn && profileImg ? (
+                    <img src={profileImg} alt="프로필" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100" />
                   )}
-                </div>
-              )}
+                </button>
+
+                {isLoggedIn && dropdownOpen && (
+                  <div className="absolute right-0 top-[calc(100%+8px)] w-[130px] bg-background rounded-[10px] shadow-[0px_5px_15px_rgba(71,73,77,0.10)] border border-gray-300 z-50 overflow-hidden py-1">
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        withAssociateGuard(() => navigate("/study/create"));
+                      }}
+                      className="w-full h-[40px] flex items-center px-2"
+                    >
+                      <span className="w-full h-[30px] flex items-center px-[10px] bg-primary text-background text-base rounded-[8px]">
+                        스터디 만들기
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        navigate("/profile");
+                      }}
+                      className="w-full h-[40px] flex items-center px-2 group"
+                    >
+                      <span className="w-full h-[30px] flex items-center px-[10px] text-surface text-base rounded-[8px] group-hover:bg-gray-100">
+                        마이페이지
+                      </span>
+                    </button>
+
+                    {/* 로그아웃 */}
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        logout();
+                        storage.clearAuth();
+                        navigate("/");
+                      }}
+                      className="w-full h-[40px] flex items-center px-2 group"
+                    >
+                      <span className="w-full h-[30px] flex items-center px-[10px] text-surface text-base rounded-[8px] group-hover:bg-gray-100">
+                        로그아웃
+                      </span>
+                    </button>
+
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>
