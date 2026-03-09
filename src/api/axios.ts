@@ -5,8 +5,8 @@ import { storage } from '@/utils/storage';
 export const axiosInstance = axios.create({
     // .env 파일에 VITE_API_BASE_URL이 있으면 그걸 쓰고, 없으면 임시로 localhost:8080 사용
     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
-    // 5초 동안 서버 응답이 없으면 에러 처리
-    timeout: 5000, 
+    // 10초 동안 서버 응답이 없으면 에러 처리
+    timeout: 10000,
     // 서버로 보내는 데이터는 모두 JSON 형태
     headers: {
         'Content-Type': 'application/json',
@@ -72,7 +72,8 @@ axiosInstance.interceptors.response.use(
                 const currentPath = window.location.pathname;
                 const isPublicPage = 
                     currentPath === '/' || 
-                    currentPath.startsWith('/study/'); 
+                    currentPath.startsWith('/study/') ||
+                    currentPath.startsWith('/chat');
                 
                 // 스터디 생성 페이지는 로그인이 필요하므로 제외
                 const isCreatePage = currentPath === '/study/create';
