@@ -12,11 +12,11 @@ import triangleDownIcon from '@/assets/base/icon-Triangle-Down.svg';
 const SUBJECTS = ['개념학습', '응용/활용', '프로젝트', '챌린지', '자격증/시험', '취업/코테', '기타', '특강'];
 const DIFFICULTIES = ['초급', '중급', '고급'];
 const TYPES = ['내지역', '온라인'];
-const STATUSES = ['모집 중', '진행 중', '종료'];
+const STATUSES = ['모집 중', '모집 완료', '진행 중', '완료'];
 const DAY_MAP: Record<string, number> = { 월: 1, 화: 2, 수: 3, 목: 4, 금: 5, 토: 6, 일: 7 };
 const SUBJECT_MAP: Record<string, number> = { '개념학습': 1, '응용/활용': 2, '프로젝트': 3, '챌린지': 4, '자격증/시험': 5, '취업/코테': 6, '기타': 7, '특강': 8 };
 const DIFFICULTY_MAP: Record<string, number> = { '초급': 1, '중급': 2, '고급': 3 };
-const STATUS_MAP: Record<string, number> = { '모집 중': 1, '진행 중': 2, '종료': 3 };
+const STATUS_MAP: Record<string, number> = { '모집 중': 1, '모집 완료': 2, '진행 중': 3, '완료': 4 };
 
 function Chip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (

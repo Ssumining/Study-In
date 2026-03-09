@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useModalStore } from "@/store/modalStore";
+import { useAuthStore } from "@/store/authStore";
+import { storage } from "@/utils/storage";
 import ReportModal from "@/components/common/ReportModal";
 import UserInfoModal from "@/components/common/UserInfoModal";
 
@@ -27,6 +30,8 @@ const Modal = () => {
     targetId,
     reportTargetType,
   } = useModalStore();
+  const { logout } = useAuthStore();
+  const navigate = useNavigate();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   useEffect(() => {
@@ -42,7 +47,7 @@ const Modal = () => {
 
   if (!isOpen && !isReportModalOpen) return null;
 
-  // 신고 모달
+  // 신고 모달 (바텀시트 → 신고하기 클릭 후)
   if (isReportModalOpen && targetId !== null && reportTargetType !== null) {
     return (
       <ReportModal
@@ -54,7 +59,7 @@ const Modal = () => {
     );
   }
 
-  // 신고 모달 (바로 열기 - 웹 댓글 신고 등)
+  // 신고 모달 (바로 열기)
   if (modalType === "report" && isOpen && targetId !== null && reportTargetType !== null) {
     return (
       <ReportModal
@@ -99,7 +104,7 @@ const Modal = () => {
     );
   }
 
-  // 확인 모달
+  // 확인 모달 (로그아웃 / 삭제 / 신고)
   if (modalType === "confirm" && confirmType) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -175,15 +180,22 @@ const Modal = () => {
       case "study-mine":
         return (
           <>
-            <button className="w-full py-4 text-center text-base text-gray-700 font-medium border-b border-gray-100">
-              수정
-            </button>
+            {/* 수정: onEdit 콜백 연결 */}
             <button
               onClick={() => {
                 closeModal();
-                openConfirm("delete", () => {
-                  console.log("스터디 삭제");
-                });
+                onEdit?.();
+              }}
+              className="w-full py-4 text-center text-base text-gray-700 font-medium border-b border-gray-100"
+            >
+              수정
+            </button>
+            {/* 삭제: onConfirm 콜백 연결 */}
+            <button
+              onClick={() => {
+                const deleteCallback = onConfirm;
+                closeModal();
+                openConfirm("delete", () => deleteCallback?.());
               }}
               className="w-full py-4 text-center text-base text-error font-medium border-b border-gray-100"
             >
@@ -194,14 +206,24 @@ const Modal = () => {
       case "header":
         return (
           <>
-            <button className="w-full py-4 text-center text-base text-gray-700 font-medium border-b border-gray-100">
+            {/* 설정 및 개인정보: 프로필 편집으로 이동 */}
+            <button
+              onClick={() => {
+                closeModal();
+                navigate("/profile/edit");
+              }}
+              className="w-full py-4 text-center text-base text-gray-700 font-medium border-b border-gray-100"
+            >
               설정 및 개인정보
             </button>
+            {/* 로그아웃: 실제 logout + storage 정리 연동 */}
             <button
               onClick={() => {
                 closeModal();
                 openConfirm("logout", () => {
-                  console.log("로그아웃");
+                  logout();
+                  storage.clearAuth();
+                  navigate("/");
                 });
               }}
               className="w-full py-4 text-center text-base text-error font-medium border-b border-gray-100"

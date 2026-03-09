@@ -3,7 +3,7 @@ import type { Comment } from "@/api/comment";
 import { getFullUrl } from "@/api/upload";
 import { useModalStore } from "@/store/modalStore";
 import IconLock from "@/assets/base/icon-Lock.svg?react";
-import MoreIcon from "@/assets/base/icon-000.svg?react";
+import DotsIcon from "@/assets/base/icon-dots.svg?react";
 import RecommentList from "./RecommentList";
 import { isNormalUser, isWithdrawnUser } from "@/api/comment";
 import withdrawnProfileImg from "@/assets/base/User-Profile-L.svg";
@@ -140,7 +140,7 @@ const CommentItem = ({
                     )
                   }
                 >
-                  <MoreIcon className="w-5 h-5 text-gray-500" />
+                  <DotsIcon className="w-5 h-5 text-gray-500" />
                 </button>
               )}
             </div>
