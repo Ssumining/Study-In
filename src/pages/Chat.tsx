@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { axiosInstance } from '@/api/axios';
+import { getParticipatingStudies } from '@/api/study';
 import ChatHeader from '@/features/chat/components/ChatHeader';
 import ChatEmptyState from '@/features/chat/components/ChatEmptyState';
 import ChatInput from '@/features/chat/components/ChatInput';
@@ -19,19 +19,23 @@ export default function Chat() {
 
     useEffect(() => {
         if (isLoggedIn) {
-            axiosInstance.get('/study/my-participating-study/')
-                .then((res) => setHasStudy(res.data.length > 0))
+            // fix: axiosInstance 직접 호출 → getParticipatingStudies() 사용
+            getParticipatingStudies()
+                .then((studies) => setHasStudy(studies.length > 0))
                 .catch(() => setHasStudy(false));
         }
     }, [isLoggedIn]);
 
     // 실제 데이터 존재 여부 판별
-    const isNoData = !isLoggedIn || hasStudy === false || !study_pk;
+    const isNoData = !isLoggedIn || (hasStudy !== null && hasStudy === false) || !study_pk;
 
-    // 메시지 전송 로직 (WebSocket 연결 시 이 함수를 통해 메시지를 보냄)
+    // WebSocket URL: wss://api.wenivops.co.kr/services/studyin-chat/chat/study/{study_pk}/?token={jwt}
+    // 메시지 포맷: { type: "text" | "image" | "file", message: string }
+    // 현재는 컴포넌트 구조만 유지하고 실제 WebSocket 연결은 ChatMessageList/ChatInput 내부에서 처리
     const handleSendMessage = (content: string, type: 'text' | 'image' | 'file' = 'text') => {
         console.log(`전송할 메시지 (${type}):`, content);
-        // 여기에 WebSocket 전송 로직이 들어감
+        // TODO: WebSocket 전송 로직
+        // ws.send(JSON.stringify({ type, message: content }))
     };
 
     return (
@@ -40,7 +44,7 @@ export default function Chat() {
             {/* ChatHeader */}
             <div className="relative z-[40]">
                 <ChatHeader 
-                    studyPk={Number(study_pk)} // 🟢 추가
+                    studyPk={Number(study_pk)} 
                     title={!isNoData ? "스터디 채팅방" : undefined} 
                     statusName="진행 중"
                     isRoomListOpen={isRoomListOpen}
