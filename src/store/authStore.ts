@@ -9,19 +9,27 @@ interface User {
 
 interface AuthState {
   isLoggedIn: boolean;
-  user: User | null; // 내 정보 저장
+  isAssociateMember: boolean;       
+  user: User | null;
   login: (userData: User) => void;
   logout: () => void;
   setUser: (userData: User) => void;
+  setIsAssociateMember: (value: boolean) => void;  
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: !!storage.getAccessToken(),
-  user: null, 
+  isAssociateMember: false,          
+
+  user: storage.getUserId()
+    ? { pk: storage.getUserId()!, email: storage.getEmail() ?? '', nickname: '' }
+    : null,
+
   login: (userData) => set({ isLoggedIn: true, user: userData }),
   logout: () => {
     storage.clearAuth();
-    set({ isLoggedIn: false, user: null });
+    set({ isLoggedIn: false, user: null, isAssociateMember: false });
   },
   setUser: (userData) => set({ user: userData }),
+  setIsAssociateMember: (value) => set({ isAssociateMember: value }),  // fix: 추가
 }));
