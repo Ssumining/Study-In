@@ -1,10 +1,13 @@
 import ProfileEditForm from '../features/profile/components/ProfileEditForm'
+import MyPageSidebar from '@/components/common/MyPageSidebar'
 
-// 프로필 수정 페이지
 const ProfileEdit = () => {
   return (
-    <div className="max-w-md mx-auto">
-      <ProfileEditForm />
+    <div className="flex gap-8 py-6">
+      <MyPageSidebar />
+      <div className="flex-1 min-w-0">
+        <ProfileEditForm />
+      </div>
     </div>
   )
 }
