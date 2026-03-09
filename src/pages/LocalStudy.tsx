@@ -51,7 +51,7 @@ export default function LocalStudy() {
     <div className="max-w-[1190px] mx-auto px-4 py-10 min-h-[600px]">
       {/* 헤더 */}
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl md:text-[30px] font-bold text-surface">내 지역 스터디</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-surface">내 지역 스터디</h1>
 
         {/* 드롭다운 버튼 (지역 인증 시에만 표시) */}
         {region && (
@@ -121,7 +121,7 @@ export default function LocalStudy() {
             내 지역 스터디를 확인하려면 인증이 필요해요.
           </p>
           <button
-            onClick={() => navigate("/profile/edit")}
+            onClick={() => navigate(isLoggedIn ? "/profile/edit" : "/login")}
             className="w-[250px] h-[50px] bg-primary text-background rounded-[8px] font-medium text-lg"
           >
             내 지역 인증하기

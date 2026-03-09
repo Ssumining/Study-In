@@ -7,7 +7,7 @@ export default function OnlineStudy() {
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-10 min-h-[800px]">
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">온라인 스터디</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-surface mb-2">온라인 스터디</h1>
       </div>
 
       <div className="space-y-6">
