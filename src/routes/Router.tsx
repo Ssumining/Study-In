@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { useAuthStore } from '@/store/authStore';
 import Home from "@/pages/Home";
 import StudyDetail from "@/pages/StudyDetail";
 import Profile from "@/pages/Profile";
@@ -19,10 +20,17 @@ import Chat from '@/pages/Chat';
 import Search from '@/pages/Search';
 import LocalStudy from "@/pages/LocalStudy";
 import OnlineStudy from "@/pages/OnlineStudy";
+import Modal from '@/components/common/Modal';
+
+function PrivateRoute() {
+    const { isLoggedIn } = useAuthStore();
+    return isLoggedIn ? <Outlet /> : <Navigate to="/login" replace />;
+}
 
 export default function Router() {
   return (
     <BrowserRouter>
+      <Modal />
       <Routes>
         {/* 공통 레이아웃 (헤더 + 푸터) */}
         <Route element={<Layout />}>
@@ -39,6 +47,7 @@ export default function Router() {
 
         <Route element={<ChatLayout />}>
           <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/:study_pk" element={<Chat />} />
         </Route>
 
         {/* 스터디 */}
@@ -49,7 +58,7 @@ export default function Router() {
         />
         <Route path="/study/:studyId/edit" element={<StudyEdit />} />
         <Route path="/local" element={<LocalStudy />} />
-<Route path="/online" element={<OnlineStudy />} />
+        <Route path="/online" element={<OnlineStudy />} />
 
         {/* 인증 관련 레이아웃 */}
         <Route element={<AuthLayout />}>

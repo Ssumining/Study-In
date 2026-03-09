@@ -26,7 +26,7 @@ const Notification = () => {
     const fetchNotifications = async () => {
       setIsLoading(true)
       try {
-        const data = await getNotifications()
+        const data = await getNotifications(currentPage)
         setNotifications(data.results)
         setTotalCount(data.count)
       } catch {
@@ -36,7 +36,7 @@ const Notification = () => {
       }
     }
     fetchNotifications()
-  }, [currentPage])
+  }, [currentPage]) // currentPage가 의존성 배열에 있으므로 페이지 변경 시 재요청
 
   const handleDelete = async (notificationId: number) => {
     try {
@@ -159,6 +159,28 @@ const Notification = () => {
       <div className="flex-1 min-w-0 px-0 md:px-0">
         {renderContent()}
       </div>
+
+      {/* 페이지네이션 */}
+      <div className="flex justify-center items-center gap-4 mt-2">
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+          className={currentPage === 1 ? 'text-gray-300' : 'text-gray-500'}
+        >
+          <LeftIcon className="w-4 h-4" />
+        </button>
+        <span className="w-8 h-8 rounded-full bg-primary text-background text-sm flex items-center justify-center">
+          {currentPage}
+        </span>
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(Math.max(totalPages, 1), p + 1))}
+          disabled={currentPage === totalPages || totalPages === 0}
+          className={currentPage === totalPages || totalPages === 0 ? 'text-gray-300' : 'text-gray-500'}
+        >
+          <RightIcon className="w-4 h-4" />
+        </button>
+      </div>
+
     </div>
   )
 }

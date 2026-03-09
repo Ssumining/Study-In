@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { axiosInstance } from '@/api/axios';
+import { normalizeStudy } from '@/utils/study';
 import StudyCard from '@/features/study/components/StudyCard';
 import type { Study } from '@/types/study';
 import searchIcon from '@/assets/base/icon-Search.svg';
@@ -12,11 +13,11 @@ import triangleDownIcon from '@/assets/base/icon-Triangle-Down.svg';
 const SUBJECTS = ['개념학습', '응용/활용', '프로젝트', '챌린지', '자격증/시험', '취업/코테', '기타', '특강'];
 const DIFFICULTIES = ['초급', '중급', '고급'];
 const TYPES = ['내지역', '온라인'];
-const STATUSES = ['모집 중', '진행 중', '종료'];
+const STATUSES = ['모집 중', '모집 완료', '진행 중', '완료'];
 const DAY_MAP: Record<string, number> = { 월: 1, 화: 2, 수: 3, 목: 4, 금: 5, 토: 6, 일: 7 };
 const SUBJECT_MAP: Record<string, number> = { '개념학습': 1, '응용/활용': 2, '프로젝트': 3, '챌린지': 4, '자격증/시험': 5, '취업/코테': 6, '기타': 7, '특강': 8 };
 const DIFFICULTY_MAP: Record<string, number> = { '초급': 1, '중급': 2, '고급': 3 };
-const STATUS_MAP: Record<string, number> = { '모집 중': 1, '진행 중': 2, '종료': 3 };
+const STATUS_MAP: Record<string, number> = { '모집 중': 1, '모집 완료': 2, '진행 중': 3, '완료': 4 };
 
 function Chip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (
@@ -80,7 +81,8 @@ export default function Search() {
 
       const res = await axiosInstance.get('/study/', { params: urlParams });
       const data = res.data.results ?? res.data;
-      setStudies(Array.isArray(data) ? data : []);
+      const raw = Array.isArray(data) ? data : [];
+      setStudies(raw.map(normalizeStudy));
     } catch {
       setStudies([]);
     } finally {
@@ -162,7 +164,7 @@ export default function Search() {
 
       {/* 필터 패널 */}
       {filterOpen && (
-        <div className="border border-gray-300 rounded-[12px] p-[14px] mb-6 bg-background -mx-4 w-[calc(100%+32px)] h-[460px] overflow-hidden md:-mx-8 md:w-[calc(100%+64px)] md:h-[360px] md:pt-[10px] md:pl-[30px] md:pb-[30px] md:mb-[30px]">
+        <div className="border border-gray-300 rounded-[12px] p-[14px] mb-6 bg-background h-[460px] overflow-hidden md:-mx-8 md:w-[calc(100%+64px)] md:h-[360px] md:pt-[10px] md:pl-[30px] md:pb-[30px] md:mb-[30px]">
           <FilterRow label="주제">
             {SUBJECTS.map((s) => (
               <Chip key={s} label={s} selected={subjects.includes(s)} onClick={() => toggle(subjects, setSubjects, s)} />
@@ -239,7 +241,7 @@ export default function Search() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-6 md:px-4">
               {studies.map((study) => (
                 <StudyCard key={study.id} study={study} />
               ))}
