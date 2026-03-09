@@ -39,7 +39,6 @@ const ProfileEditForm = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
-
   const [regions, setRegions] = useState<Region[]>([])
   const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null)
 
@@ -70,7 +69,6 @@ const ProfileEditForm = () => {
         }
         const emailFromStorage = storage.getEmail()
         if (emailFromStorage) setEmail(emailFromStorage)
-        // 초기 로드 시 닉네임은 이미 본인 것이므로 중복확인 통과 처리
         setIsNicknameChecked(true)
         setIsNicknameAvailable(true)
       } catch {
@@ -139,14 +137,12 @@ const ProfileEditForm = () => {
         tag: selectedTags,
         preferred_region: selectedRegionId ? { id: selectedRegionId } : undefined,
       })
-
       try {
         const res = await getMemberType()
         setIsAssociateMember(res.is_associate_member)
       } catch {
-        // 회원 타입 조회 실패는 저장 성공에 영향 없음 — 무시
+        // 회원 타입 조회 실패는 저장 성공에 영향 없음
       }
-
       navigate('/profile')
     } catch {
       setApiError('저장에 실패했어요. 다시 시도해주세요.')
@@ -164,25 +160,28 @@ const ProfileEditForm = () => {
   }
 
   return (
-    <div className="flex flex-col px-4 py-6 gap-4 bg-background">
+    <div className="flex flex-col py-3 gap-4 bg-background w-full">
 
       <div className="flex flex-col border border-gray-300 rounded-xl overflow-hidden">
 
-        <div className="flex flex-col items-center gap-3 px-4 py-6">
+        {/* 상단 - 프로필 이미지 + 닉네임 + 소개 */}
+        <div className="flex flex-col items-center gap-3 px-6 py-6">
+
+          {/* 프로필 이미지 */}
           <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
               {profileImg ? (
                 <img src={profileImg} alt="프로필 이미지" className="w-full h-full object-cover" />
               ) : (
-                <PersonIcon className="w-14 h-14 text-gray-300" />
+                <PersonIcon className="w-12 h-12 text-gray-300" />
               )}
             </div>
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="absolute bottom-0 right-0 w-7 h-7 bg-gray-700 rounded-full flex items-center justify-center"
+              className="absolute bottom-0 right-0 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center"
             >
-              <ImageIcon className="w-4 h-4 text-background" />
+              <ImageIcon className="w-3 h-3 text-background" />
             </button>
             <input
               type="file"
@@ -205,13 +204,9 @@ const ProfileEditForm = () => {
                   setIsNicknameAvailable(false)
                   setNicknameMessage(null)
                 }}
-                className="flex-1 text-lg font-bold text-gray-900 bg-transparent focus:outline-none text-center"
+                className="flex-1 text-base font-bold text-gray-900 bg-transparent focus:outline-none text-center"
               />
-              <button
-                onClick={handleCheckNickname}
-                disabled={!isNicknameValid}
-                className="shrink-0"
-              >
+              <button onClick={handleCheckNickname} disabled={!isNicknameValid} className="shrink-0">
                 <CheckIcon className={`w-5 h-5 ${isNicknameValid ? 'text-primary' : 'text-gray-300'}`} />
               </button>
             </div>
@@ -229,23 +224,26 @@ const ProfileEditForm = () => {
               value={bio}
               maxLength={MAX_BIO_LENGTH}
               onChange={(e) => setBio(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 resize-none h-24 focus:outline-none focus:border-primary-light w-full"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 resize-none h-20 focus:outline-none focus:border-primary w-full"
             />
-            <p className="text-xs text-gray-500 text-right">{bio.length}/{MAX_BIO_LENGTH}자</p>
-          </div>
-
-          <div className="flex items-center gap-3 w-full">
-            <span className="text-base font-medium text-gray-900 shrink-0">이메일(ID)</span>
-            <span className="text-base text-gray-500">{email}</span>
+            <p className="text-xs text-gray-500 text-right">{bio.length}/{MAX_BIO_LENGTH}</p>
           </div>
         </div>
 
         <div className="w-full border-t border-gray-300" />
-        <div className="flex flex-col gap-4 px-4 py-5">
+
+        {/* 하단 - 정보 폼 */}
+        <div className="flex flex-col gap-4 px-6 py-5">
+
+          {/* 이메일(ID) */}
+          <div className="flex items-center">
+            <span className="text-sm font-medium text-gray-700 w-24 shrink-0">이메일(ID)</span>
+            <span className="text-sm text-gray-500">{email}</span>
+          </div>
 
           {/* 이름 */}
-          <div className="flex flex-col gap-1">
-            <label className="text-base font-medium text-gray-900">
+          <div className="flex items-center">
+            <label className="text-sm font-medium text-gray-700 w-24 shrink-0">
               이름 <span className="text-error">*</span>
             </label>
             <input
@@ -253,31 +251,36 @@ const ProfileEditForm = () => {
               placeholder="이름 입력"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary-light"
+              className="w-72 border border-gray-300 rounded-lg px-3 py-1.5 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary"
             />
           </div>
 
           {/* 전화번호 */}
-          <div className="flex flex-col gap-1">
-            <label className="text-base font-medium text-gray-900">
+          <div className="flex items-center">
+            <label className="text-sm font-medium text-gray-700 w-24 shrink-0">
               전화번호 <span className="text-error">*</span>
             </label>
-            <input
-              type="text"
-              placeholder="010-0000-0000"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary-light"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="010-0000-0000"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-72 border border-gray-300 rounded-lg px-3 py-1.5 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary"
+              />
+              <button className="w-20 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 shrink-0">
+                인증
+              </button>
+            </div>
           </div>
 
-          {/* 지역 */}
-          <div className="flex flex-col gap-1">
-            <label className="text-base font-medium text-gray-900">내 지역</label>
+          {/* 내 지역 - select 드롭다운 */}
+          <div className="flex items-center">
+            <label className="text-sm font-medium text-gray-700 w-24 shrink-0">내 지역</label>
             <select
               value={selectedRegionId ?? ''}
               onChange={(e) => setSelectedRegionId(e.target.value ? Number(e.target.value) : null)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 focus:outline-none focus:border-primary-light bg-background"
+              className="w-72 border border-gray-300 rounded-lg px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-primary bg-background"
             >
               <option value="">지역 선택</option>
               {regions
@@ -291,71 +294,83 @@ const ProfileEditForm = () => {
           </div>
 
           {/* GitHub */}
-          <div className="flex flex-col gap-2">
-            <label className="text-base font-medium text-gray-900">GitHub User Name</label>
-            <input
-              type="text"
-              placeholder="GitHub 아이디 입력 (영문/숫자/하이픈)"
-              value={github}
-              onChange={(e) => setGithub(e.target.value)}
-              className={`border rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none ${
-                github && !isGithubValid ? 'border-error' : 'border-gray-300 focus:border-primary-light'
-              }`}
-            />
-            {github && !isGithubValid && (
-              <p className="text-sm text-error">영문, 숫자, 하이픈(-)만 입력 가능해요!</p>
-            )}
-            {github && isGithubValid && (
-              <div className="w-full overflow-x-auto">
-                <GitHubCalendar
-                  username={github}
-                  blockSize={8}
-                  blockMargin={2}
-                  fontSize={8}
-                  colorScheme="light"
+          <div className="flex items-start">
+            <label className="text-sm font-medium text-gray-700 w-24 shrink-0 pt-1.5">
+              GitHub<br />User Name
+            </label>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="GitHub 아이디"
+                  value={github}
+                  onChange={(e) => setGithub(e.target.value)}
+                  className={`w-72 border rounded-lg px-3 py-1.5 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none ${
+                    github && !isGithubValid ? 'border-error' : 'border-gray-300 focus:border-primary'
+                  }`}
                 />
+                <button className="w-20 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 shrink-0">
+                  {github ? '연동 해제' : '인증'}
+                </button>
               </div>
-            )}
+              {github && !isGithubValid && (
+                <p className="text-xs text-error">영문, 숫자, 하이픈(-)만 입력 가능해요!</p>
+              )}
+              {github && isGithubValid && (
+                <div className="w-full overflow-x-auto">
+                  <GitHubCalendar
+                    username={github}
+                    blockSize={8}
+                    blockMargin={2}
+                    fontSize={8}
+                    colorScheme="light"
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 관심 분야 태그 */}
-          <div className="flex flex-col gap-2">
-            <label className="text-base font-medium text-gray-900">관심 분야 태그</label>
-            <input
-              type="text"
-              placeholder="태그 입력 (최대 5개)"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addCustomTag()}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary-light"
-            />
-            <div className="flex flex-wrap gap-2">
-              {selectedTags.map((tag, index) => (
-                <span
-                  key={tag.id ?? `new-${index}`}
-                  className="flex items-center gap-1 bg-primary text-background text-sm px-3 py-1 rounded-full"
-                >
-                  {tag.name}
-                  <button onClick={() => removeTag(tag.name)}>
-                    <CloseIcon className="w-3 h-3 text-background" />
+          <div className="flex items-start">
+            <label className="text-sm font-medium text-gray-700 w-24 shrink-0 pt-2">관심 분야 태그</label>
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="border border-gray-300 rounded-lg px-3 py-2 flex flex-wrap gap-2 items-center">
+                {selectedTags.map((tag, index) => (
+                  <span
+                    key={tag.id ?? `new-${index}`}
+                    className="flex items-center gap-1 bg-primary text-background text-xs px-2.5 py-1 rounded-full"
+                  >
+                    {tag.name}
+                    <button onClick={() => removeTag(tag.name)}>
+                      <CloseIcon className="w-2.5 h-2.5 text-background" />
+                    </button>
+                  </span>
+                ))}
+                <input
+                  type="text"
+                  placeholder={selectedTags.length >= 5 ? '' : '태그 입력 (최대 5개)'}
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && addCustomTag()}
+                  disabled={selectedTags.length >= 5}
+                  className="flex-1 min-w-20 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none bg-transparent"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {allTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => toggleTag(tag)}
+                    className={`text-xs px-3 py-1 rounded-full ${
+                      selectedTags.find((t) => t.name === tag)
+                        ? 'bg-primary text-background'
+                        : 'bg-gray-100 text-gray-500'
+                    }`}
+                  >
+                    {tag}
                   </button>
-                </span>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {allTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`text-sm px-3 py-1 rounded-full ${
-                    selectedTags.find((t) => t.name === tag)
-                      ? 'bg-primary text-background'
-                      : 'bg-gray-100 text-gray-500'
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
@@ -366,26 +381,30 @@ const ProfileEditForm = () => {
         <p className="text-sm text-error text-center">{apiError}</p>
       )}
 
-      <button
-        onClick={handleSave}
-        disabled={!isSaveEnabled || isSaving}
-        className={`w-40 py-3 rounded-lg text-base mx-auto ${
-          isSaveEnabled && !isSaving
-            ? 'bg-primary text-background'
-            : 'bg-gray-300 text-background cursor-not-allowed'
-        }`}
-      >
-        {isSaving ? '저장 중...' : '저장하기'}
-      </button>
-
-      <a
-        href="https://weniv.world"
-        target="_blank"
-        rel="noreferrer"
-        className="text-sm text-gray-500 text-center underline"
-      >
-        위니브월드 달리하기
-      </a>
+      <div className="flex items-center justify-between px-2">
+        <div className="flex-1" />
+        <button
+          onClick={handleSave}
+          disabled={!isSaveEnabled || isSaving}
+          className={`w-36 py-2.5 rounded-lg text-base ${
+            isSaveEnabled && !isSaving
+              ? 'bg-primary text-background'
+              : 'bg-gray-300 text-background cursor-not-allowed'
+          }`}
+        >
+          {isSaving ? '저장 중...' : '저장하기'}
+        </button>
+        <div className="flex-1 flex justify-end">
+          <a
+            href="https://weniv.world"
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm text-gray-500 underline"
+          >
+            위니브월드 탈퇴하기
+          </a>
+        </div>
+      </div>
 
     </div>
   )

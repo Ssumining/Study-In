@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import HeartIcon from '@/assets/base/icon-heart.svg?react'
 import HeartFillIcon from '@/assets/base/icon-heart-fill.svg?react'
 import PeopleIcon from '@/assets/base/icon-people.svg?react'
-import RecruitIcon from '@/assets/base/icon-모집중.svg?react'
 import LeftIcon from '@/assets/base/icon-left.svg?react'
 import RightIcon from '@/assets/base/icon-right.svg?react'
 import { likeStudy, unlikeStudy } from '@/api/study'
@@ -13,8 +12,6 @@ import { useAssociateGuard } from '@/hooks/useAssociateGuard'
 const PAGE_SIZE = 10
 
 interface ActivityTabsProps {
-  // ProfileCard와 getProfile()을 공유하기 위해 부모에서 prop으로 받음
-  // 부모(Profile 페이지)에서 한 번만 fetch → 중복 API 호출 제거
   locationName?: string
 }
 
@@ -74,43 +71,42 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="px-4 py-3">
 
-      <div className="px-4 py-3">
-        <div className="border border-gray-300 rounded-xl overflow-hidden grid grid-cols-2">
-          <button
-            onClick={() => handleTab('my')}
-            className={`py-3 text-base font-medium border-b border-r border-gray-300 ${
-              activeTab === 'my' ? 'bg-primary text-background' : 'bg-background text-gray-500'
-            }`}
-          >
-            내가 만든 스터디
-          </button>
-          <button
-            onClick={() => handleTab('joined')}
-            className={`py-3 text-base font-medium border-b border-gray-300 ${
-              activeTab === 'joined' ? 'bg-primary text-background' : 'bg-background text-gray-500'
-            }`}
-          >
-            참여 중 스터디
-          </button>
-          <button
-            onClick={() => handleTab('ended')}
-            className={`py-3 text-base font-medium border-r border-gray-300 ${
-              activeTab === 'ended' ? 'bg-primary text-background' : 'bg-background text-gray-500'
-            }`}
-          >
-            종료된 스터디
-          </button>
-          <button
-            onClick={() => handleTab('liked')}
-            className={`py-3 text-base font-medium ${
-              activeTab === 'liked' ? 'bg-primary text-background' : 'bg-background text-gray-500'
-            }`}
-          >
-            관심 스터디
-          </button>
-        </div>
+      {/* 탭 버튼 - 2x2 그리드 */}
+      <div className="border border-gray-300 rounded-xl overflow-hidden grid grid-cols-2">
+        <button
+          onClick={() => handleTab('my')}
+          className={`py-3 text-base font-medium border-b border-r border-gray-300 ${
+            activeTab === 'my' ? 'bg-primary text-background' : 'bg-background text-gray-500'
+          }`}
+        >
+          내가 만든 스터디
+        </button>
+        <button
+          onClick={() => handleTab('joined')}
+          className={`py-3 text-base font-medium border-b border-gray-300 ${
+            activeTab === 'joined' ? 'bg-primary text-background' : 'bg-background text-gray-500'
+          }`}
+        >
+          참여 중 스터디
+        </button>
+        <button
+          onClick={() => handleTab('ended')}
+          className={`py-3 text-base font-medium border-r border-gray-300 ${
+            activeTab === 'ended' ? 'bg-primary text-background' : 'bg-background text-gray-500'
+          }`}
+        >
+          종료된 스터디
+        </button>
+        <button
+          onClick={() => handleTab('liked')}
+          className={`py-3 text-base font-medium ${
+            activeTab === 'liked' ? 'bg-primary text-background' : 'bg-background text-gray-500'
+          }`}
+        >
+          관심 스터디
+        </button>
       </div>
 
       {isLoading && (
@@ -145,7 +141,8 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-5 px-2 pb-3">
+            {/* 카드 그리드 - 모바일 2열 / 웹 3열 */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-5 px-2 pb-3 mt-4">
               {pagedStudies.map((study) => (
                 <div
                   key={study.id}
@@ -153,7 +150,7 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
                   onClick={() => navigate(`/study/${study.id}`)}
                 >
                   <div className="flex justify-between items-center px-2 pt-2 pb-1">
-                    <RecruitIcon className="w-16 h-6" />
+                    <span className="text-xs font-medium text-primary">모집중</span>
                     <span className="text-xs text-gray-900 bg-gray-100 rounded-full px-2 py-0.5">
                       {locationName}
                     </span>
@@ -183,7 +180,6 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
                       )}
                     </button>
                   </div>
-
                   <div className="px-2 py-4 flex flex-col gap-2">
                     <div className="flex gap-1 flex-wrap">
                       {study.subject && (
@@ -199,8 +195,8 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
                     </div>
                     <p className="text-sm font-medium text-gray-900 line-clamp-2">{study.title}</p>
                     <div className="flex items-center gap-1">
-                      <PeopleIcon className="w-3 h-3 text-gray-300" />
-                      <p className="text-xs text-gray-300">
+                      <PeopleIcon className="w-3 h-3 text-gray-500" />
+                      <p className="text-xs text-gray-500">
                         현재 <span className="text-primary font-medium">{study.current_participants ?? 0}명</span>이 신청했어요.
                       </p>
                     </div>
@@ -208,6 +204,8 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
                 </div>
               ))}
             </div>
+
+            {/* 페이지네이션 */}
             <div className="flex justify-center items-center gap-4 py-4">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
@@ -221,9 +219,7 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`w-8 h-8 rounded-full text-sm ${
-                    currentPage === page
-                      ? 'bg-primary text-background'
-                      : 'text-gray-500'
+                    currentPage === page ? 'bg-primary text-background' : 'text-gray-500'
                   }`}
                 >
                   {page}

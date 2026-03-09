@@ -1,10 +1,13 @@
 import ActivityTabs from '@/features/profile/components/ActivityTabs'
+import MyPageSidebar from '@/components/common/MyPageSidebar'
 
-// 마이 스터디 페이지
 const MyStudy = () => {
   return (
-    <div className="max-w-md mx-auto">
-      <ActivityTabs />
+    <div className="flex gap-8 py-6">
+      <MyPageSidebar />
+      <div className="flex-1 min-w-0">
+        <ActivityTabs />
+      </div>
     </div>
   )
 }

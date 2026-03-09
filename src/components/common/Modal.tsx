@@ -7,15 +7,15 @@ import ReportModal from "@/components/common/ReportModal";
 import UserInfoModal from "@/components/common/UserInfoModal";
 
 const CONFIRM_LABELS: Record<string, string> = {
-  logout: "로그아웃",
-  delete: "삭제",
-  report: "신고",
+  logout: '로그아웃',
+  delete: '삭제',
+  report: '신고',
 };
 
 const CONFIRM_MESSAGES: Record<string, string> = {
-  logout: "정말 로그아웃 하시겠어요?",
-  delete: "정말 삭제하시겠어요?\n삭제된 댓글은 복구할 수 없습니다.",
-  report: "이 댓글을 신고하시겠어요?",
+  logout: '정말 로그아웃 하시겠어요?',
+  delete: '정말 삭제하시겠어요?\n삭제된 댓글은 복구할 수 없습니다.',
+  report: '이 댓글을 신고하시겠어요?',
 };
 
 const Modal = () => {
@@ -36,13 +36,11 @@ const Modal = () => {
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   if (!isOpen && !isReportModalOpen) return null;
@@ -121,12 +119,9 @@ const Modal = () => {
               취소
             </button>
             <button
-              onClick={() => {
-                onConfirm?.();
-                closeModal();
-              }}
+              onClick={() => { onConfirm?.(); closeModal(); }}
               className={`flex-1 rounded-xl py-2.5 text-sm font-medium text-background ${
-                confirmType === "report" ? "bg-error" : "bg-primary"
+                confirmType === 'report' ? 'bg-error' : 'bg-primary'
               }`}
             >
               {CONFIRM_LABELS[confirmType]}
@@ -140,32 +135,22 @@ const Modal = () => {
   // 바텀시트 모달
   const renderItems = () => {
     switch (modalType) {
-      case "comment-mine":
+      case 'comment-mine':
         return (
-          <>
-            <button
-              onClick={() => {
-                closeModal();
-                onEdit?.();
-              }}
-              className="w-full py-4 text-center text-base text-gray-700 font-medium border-b border-gray-100"
-            >
-              수정
-            </button>
-            <button
-              onClick={() => {
-                const deleteCallback = onConfirm;
-                closeModal();
-                openConfirm("delete", () => deleteCallback?.());
-              }}
-              className="w-full py-4 text-center text-base text-error font-medium border-b border-gray-100"
-            >
-              삭제
-            </button>
-          </>
+          <button
+            onClick={() => {
+              closeModal();
+              openConfirm('delete', () => {
+                useModalStore.getState().onConfirm?.();
+              });
+            }}
+            className="w-full py-4 text-center text-base text-error font-medium border-b border-gray-100"
+          >
+            삭제
+          </button>
         );
-      case "comment-other":
-      case "study-other":
+      case 'comment-other':
+      case 'study-other':
         return (
           <button
             onClick={() => {
@@ -177,7 +162,7 @@ const Modal = () => {
             신고하기
           </button>
         );
-      case "study-mine":
+      case 'study-mine':
         return (
           <>
             {/* 수정: onEdit 콜백 연결 */}
@@ -203,7 +188,7 @@ const Modal = () => {
             </button>
           </>
         );
-      case "header":
+      case 'header':
         return (
           <>
             {/* 설정 및 개인정보: 프로필 편집으로 이동 */}
