@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, NavLink, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { getNotifications } from '@/api/notification';
+import { getNotifications, deleteNotification } from '@/api/notification';
+import type { Notification } from '@/api/notification';
 import { storage } from '@/utils/storage';
 import { useAssociateGuard } from '@/hooks/useAssociateGuard';
 import useOutsideClick from '@/hooks/useOutsideClick';
@@ -20,6 +21,13 @@ function loadSearchHistory(): string[] {
   } catch {
     return [];
   }
+}
+
+function formatNotifTime(dateStr: string): string {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+  return new Date(dateStr).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
 function getSearchBase(pathname: string): string {
@@ -69,8 +77,10 @@ export default function Header({ variant }: HeaderProps) {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const profileImg = useProfileImage(isLoggedIn);
+  const unreadCount = notifications.filter((n) => !n.checked).length;
   const [searchHistory, setSearchHistory] = useState<string[]>(loadSearchHistory);
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -78,19 +88,26 @@ export default function Header({ variant }: HeaderProps) {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   const urlQuery = searchParams.get('q') ?? '';
   const displayValue = searchEditing ? searchValue : urlQuery;
 
   useOutsideClick(searchRef, searchFocused, () => setSearchFocused(false));
   useOutsideClick(dropdownRef, dropdownOpen, () => setDropdownOpen(false));
+  useOutsideClick(notificationRef, notificationOpen, () => setNotificationOpen(false));
 
   useEffect(() => {
     if (!isLoggedIn) return;
     getNotifications()
-      .then((data) => setUnreadCount(data.results.filter((n) => !n.checked).length))
+      .then((data) => setNotifications(data.results))
       .catch(() => {});
   }, [isLoggedIn]);
+
+  const handleDeleteNotification = async (id: number): Promise<void> => {
+    await deleteNotification(id);
+    setNotifications((prev) => prev.filter((n) => n.notification_id !== id));
+  };
 
 
   const saveSearch = (q: string): void => {
@@ -140,7 +157,6 @@ export default function Header({ variant }: HeaderProps) {
             <LogoIcon className="h-5 w-auto" />
             <button onClick={() => navigate('/chat')} className="relative">
               <ChattingIcon className="w-[30px] h-[30px] text-surface" />
-              {isLoggedIn && unreadCount > 0 && <UnreadBadge />}
             </button>
           </div>
 
@@ -167,7 +183,6 @@ export default function Header({ variant }: HeaderProps) {
           </Link>
           <button onClick={() => navigate('/chat')} className="relative" aria-label="채팅 확인">
             <ChattingIcon className="w-[30px] h-[30px] text-surface" />
-            {isLoggedIn && unreadCount > 0 && <UnreadBadge />}
           </button>
         </div>
 
@@ -229,14 +244,56 @@ export default function Header({ variant }: HeaderProps) {
               <button onClick={() => navigate('/chat')} aria-label="채팅 페이지 이동">
                 <ChattingIcon className="w-[30px] h-[30px] text-surface" />
               </button>
-              <button
-                className="relative"
-                onClick={() => navigate(isLoggedIn ? '/notification' : '/login')}
-                aria-label="알림 페이지 이동"
-              >
-                <NotificationIcon className="w-[30px] h-[30px] text-surface" />
-                {isLoggedIn && unreadCount > 0 && <UnreadBadge />}
-              </button>
+              <div className="relative" ref={notificationRef}>
+                <button
+                  className="relative"
+                  onClick={() => isLoggedIn ? setNotificationOpen((prev) => !prev) : navigate('/login')}
+                  aria-label="알림 페이지 이동"
+                >
+                  <NotificationIcon className="w-[30px] h-[30px] text-surface" />
+                  {isLoggedIn && unreadCount > 0 && <UnreadBadge />}
+                </button>
+
+                {isLoggedIn && notificationOpen && (
+                  <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+8px)] w-[358px] bg-background rounded-[12px] shadow-[0px_5px_15px_rgba(71,73,77,0.10)] border border-gray-300 z-50">
+                    <div className="px-5 pt-5 pb-3">
+                      <span className="text-base font-bold text-surface">확인하지 않은 알림 </span>
+                      <span className="text-base font-bold text-primary">{unreadCount}개</span>
+                    </div>
+                    <div className="px-5 flex flex-col gap-2">
+                      {notifications.length === 0 ? (
+                        <p className="text-sm text-gray-500 text-center py-4">알림이 없습니다.</p>
+                      ) : (
+                        notifications.slice(0, 5).map((n) => (
+                          <div key={n.notification_id} className="relative">
+                            {!n.checked && (
+                              <span className="absolute top-0 left-0 w-2 h-2 bg-error rounded-full z-10" />
+                            )}
+                            <div className={`w-full p-[10px] rounded-[8px] pr-8 ${n.checked ? 'bg-gray-100' : 'bg-background border border-gray-300'}`}>
+                              <p className={`text-sm leading-5 ${n.checked ? 'text-gray-700' : 'text-surface'}`}>{n.content}</p>
+                              <p className={`text-xs mt-1 ${n.checked ? 'text-gray-500' : 'text-primary'}`}>{formatNotifTime(n.created)}</p>
+                            </div>
+                            <button
+                              onClick={() => handleDeleteNotification(n.notification_id)}
+                              className="absolute top-[10px] right-[10px] w-[18px] h-[18px] bg-gray-300 rounded-full flex items-center justify-center"
+                            >
+                              <span className="text-background text-xs leading-none">×</span>
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <div className="px-5 py-4 text-center">
+                      <button
+                        onClick={() => { setNotificationOpen(false); navigate('/notification'); }}
+                        className="text-xs text-gray-500 underline"
+                      >
+                        알림 더보기
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* 프로필 + 드롭다운 */}
               <div className="relative shrink-0" ref={dropdownRef}>
@@ -252,7 +309,7 @@ export default function Header({ variant }: HeaderProps) {
                 </button>
 
                 {isLoggedIn && dropdownOpen && (
-                  <div className="absolute right-0 top-[calc(100%+8px)] w-[130px] bg-background rounded-[10px] shadow-[0px_5px_15px_rgba(71,73,77,0.10)] border border-gray-300 z-50 overflow-hidden py-1">
+                  <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+8px)] w-[130px] bg-background rounded-[10px] shadow-[0px_5px_15px_rgba(71,73,77,0.10)] border border-gray-300 z-50 overflow-hidden py-1">
                     <button
                       onClick={() => { setDropdownOpen(false); withAssociateGuard(() => navigate('/study/create')); }}
                       className="w-full h-[40px] flex items-center px-2"
