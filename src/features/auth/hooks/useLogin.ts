@@ -22,12 +22,12 @@ export const useLogin = () => {
       storage.setRefreshToken(data.refresh_token);
       storage.setUserId(data.user.pk);
       storage.setEmail(email);
-      setLogin({ pk: data.user.pk, email: email, nickname: '' });
+      setLogin({ pk: data.user.pk, email: email, nickname: "" });
 
-      // 준회원 → 프로필 생성 페이지, 정회원 → 메인
+      // 정회원 → 메인, 준회원 → 프로필 생성 페이지
       try {
         const { is_associate_member } = await getMemberType();
-        navigate(is_associate_member ? "/profile/edit" : "/");
+        navigate(is_associate_member ? "/" : "/profile/edit");
       } catch {
         navigate("/");
       }
