@@ -1,6 +1,6 @@
 import { useState } from "react";
 import RegenerationIcon from "@/assets/base/icon-Regeneration.svg?react";
-import SparkleIcon from "@/assets/base/icon-Sparkle.svg?react";
+import SparkleIcon from "@/assets/base/icon-sparkle.svg?react";
 
 interface AiGeneratorButtonProps {
   /** 버튼 라벨 (예: "소개글 AI 생성") */
