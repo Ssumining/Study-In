@@ -1,35 +1,178 @@
-import React from 'react';
-import { useStudyList } from '../hooks/useStudyList'; // 커스텀 훅 가져오기
-import StudyCard from './StudyCard';
+import { useState, useEffect, useRef } from "react";
+import { useStudyList } from "../hooks/useStudyList";
+import StudyCard from "./StudyCard";
+import { useNavigate } from "react-router-dom";
+import LeftIcon from "@/assets/base/icon-left.svg?react";
+import RightIcon from "@/assets/base/icon-right.svg?react";
 
-// 1. Props 타입 정의에 activeTab을 추가합니다.
 interface StudyListProps {
   selectedCategory: string;
   searchTerm: string;
-  activeTab: string; // 추가된 부분
+  activeTab: string;
+  locationId?: number;
+  large?: boolean;
+  cols?: 3 | 4;
 }
 
-export default function StudyList({ 
-  selectedCategory, 
-  searchTerm, 
-  activeTab // 2. 여기서 부모(Home.tsx)가 보내준 탭 정보를 받습니다.
-}: StudyListProps) {
+function Pagination({
+  page,
+  totalPages,
+  onChange,
+}: {
+  page: number;
+  totalPages: number;
+  onChange: (p: number) => void;
+}) {
+  if (totalPages <= 1) return null;
 
-  // 3. 커스텀 훅에 activeTab을 전달합니다. (훅 내부에서 탭에 맞는 필터링을 수행하게 됩니다)
-  const { studies, isLoading, error } = useStudyList(selectedCategory, searchTerm, activeTab); 
+  // 최대 5개 페이지 번호 표시
+  const getPageNumbers = () => {
+    const delta = 2;
+    const left = Math.max(1, page - delta);
+    const right = Math.min(totalPages, page + delta);
+    const pages: (number | "...")[] = [];
 
-  // 로딩 중이거나 에러가 났을 때의 화면 처리
-  if (isLoading) return <div className="p-10 text-center text-gray-500 font-medium">스터디를 불러오는 중입니다...</div>;
-  if (error) return <div className="p-10 text-center text-error font-medium">{error}</div>;
-
-  // 데이터가 없을 때의 예외 처리
-  if (studies.length === 0) return <div className="p-10 text-center text-gray-500">해당 카테고리에 등록된 스터디가 없습니다.</div>;
+    if (left > 1) {
+      pages.push(1);
+      if (left > 2) pages.push("...");
+    }
+    for (let i = left; i <= right; i++) pages.push(i);
+    if (right < totalPages) {
+      if (right < totalPages - 1) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-      {studies.map((study) => (
-        <StudyCard key={study.id} study={study} />
-      ))}
+    <div className="flex justify-center items-center gap-1 mt-8">
+      <button
+        onClick={() => onChange(page - 1)}
+        disabled={page === 1}
+        className="w-8 h-8 flex items-center justify-center rounded-full disabled:opacity-30 hover:bg-gray-100"
+        aria-label="이전 페이지"
+      >
+        <LeftIcon className="w-4 h-4 text-gray-300" />
+      </button>
+
+      {getPageNumbers().map((p, i) =>
+        p === "..." ? (
+          <span
+            key={`dot-${i}`}
+            className="w-8 h-8 flex items-center justify-center text-gray-400 text-sm"
+          >
+            …
+          </span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onChange(p)}
+            className={`w-8 h-8 rounded-full text-sm font-medium transition-all ${
+              page === p
+                ? "bg-primary text-background"
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            {p}
+          </button>
+        ),
+      )}
+
+      <button
+        onClick={() => onChange(page + 1)}
+        disabled={page === totalPages}
+        className="w-8 h-8 flex items-center justify-center rounded-full disabled:opacity-30 hover:bg-gray-100 rotate-180"
+        aria-label="다음 페이지"
+      >
+        <RightIcon className="w-4 h-4 text-gray-300" />
+      </button>
     </div>
+  );
+}
+
+export default function StudyList({
+  selectedCategory,
+  searchTerm,
+  activeTab,
+  locationId,
+  large = false,
+  cols = 4,
+}: StudyListProps) {
+  const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const topRef = useRef<HTMLDivElement>(null);
+
+  // 탭/검색어 바뀌면 1페이지로 리셋
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab, searchTerm, selectedCategory, locationId]);
+
+  const { studies, isLoading, error, totalPages } = useStudyList(
+    selectedCategory,
+    searchTerm,
+    activeTab,
+    page,
+    locationId,
+  );
+
+  // page가 totalPages를 초과하면 마지막 페이지로 되돌아가기
+  useEffect(() => {
+    if (!isLoading && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [isLoading, page, totalPages]);
+
+  const handleTabChange = (newPage: number) => {
+    setPage(newPage);
+    if (topRef.current) {
+      const top = topRef.current.getBoundingClientRect().top + window.scrollY - 130;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }
+  };
+
+  if (isLoading)
+    return (
+      <div className="p-10 text-center text-gray-500 font-medium">
+        스터디를 불러오는 중입니다...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="p-10 text-center text-error font-medium">{error}</div>
+    );
+
+  if (studies.length === 0)
+    return (
+      <div className="flex flex-col items-center py-16 gap-5">
+        <div className="flex flex-col items-center gap-[10px]">
+          <p className="text-[18px] font-bold text-surface text-center">
+            아직 열린 스터디가 없어요.
+          </p>
+          <p className="text-lg text-gray-700 text-center">
+            첫 스터디를 직접 만들어 보세요!
+          </p>
+        </div>
+        <button
+          onClick={() => navigate("/study/create")}
+          className="w-[250px] h-[50px] bg-primary text-background text-lg font-medium rounded-[8px]"
+        >
+          스터디 만들기
+        </button>
+      </div>
+    );
+
+  return (
+    <>
+      <div ref={topRef} className={`grid grid-cols-2 ${cols === 3 ? "md:grid-cols-3" : "md:grid-cols-4"} gap-[10px] md:gap-6 md:px-4`}>
+        {studies.map((study) => (
+          <StudyCard key={study.id} study={study} large={large} />
+        ))}
+      </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onChange={handleTabChange}
+      />
+    </>
   );
 }

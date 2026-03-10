@@ -1,11 +1,12 @@
 import { useState } from "react";
 import type { Recomment } from "@/api/comment";
-//
 import { getFullUrl } from "@/api/upload";
 import { useModalStore } from "@/store/modalStore";
+import { createReport } from "@/api/report";
 import CommentArrowIcon from "@/assets/base/icon-comment-arrow.svg?react";
 import IconLock from "@/assets/base/icon-Lock.svg?react";
 import IconSend from "@/assets/base/icon-Send.svg?react";
+import DotsIcon from "@/assets/base/icon-dots.svg?react";
 import withdrawnProfileImg from "@/assets/base/User-Profile-L.svg";
 import { isNormalUser, isWithdrawnUser } from "@/api/comment";
 
@@ -59,7 +60,7 @@ const RecommentList = ({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
   const [replyInput, setReplyInput] = useState("");
-  const { openConfirm } = useModalStore();
+  const { openConfirm, openModal } = useModalStore();
 
   const handleUpdate = (recommentPk: number, isSecret: boolean) => {
     if (!editContent.trim()) return;
@@ -72,6 +73,22 @@ const RecommentList = ({
     onCreateRecomment(commentPk, replyInput, false, taggedUser?.id);
     setReplyInput("");
     onCloseInput();
+  };
+
+  // 대댓글 신고 — POST /report/ 연동
+  // report_reason 7(기타)로 고정, 필요 시 신고 사유 선택 UI 추가 가능
+  const handleReport = async (recommentPk: number) => {
+    try {
+      await createReport({
+        report_reason: 7,
+        report_content: "대댓글 신고",
+        reported_recomment: recommentPk,
+      });
+      alert("신고가 접수되었습니다.");
+    } catch (error: any) {
+      const msg = error.response?.data?.error || "신고에 실패했습니다.";
+      alert(msg);
+    }
   };
 
   return (
@@ -91,15 +108,14 @@ const RecommentList = ({
         const profileImg = isWithdrawnUser(recomment.user)
           ? withdrawnProfileImg
           : isNormalUser(recomment.user)
-            ? getFullUrl(recomment.user.profile.profile_img) ||
-              "/default-profile.png"
-            : "/default-profile.png";
+            ? getFullUrl(recomment.user.profile.profile_img) || withdrawnProfileImg
+            : withdrawnProfileImg;
+
         return (
           <div
             key={recomment.recomment_id}
             className="flex gap-[12px] mt-[1px]"
           >
-            {/* 화살표 아이콘 */}
             <CommentArrowIcon className="w-[22px] h-[26px] text-gray-300 flex-shrink-0 mt-2" />
 
             <div className="flex-1 min-w-0">
@@ -107,6 +123,17 @@ const RecommentList = ({
                 {/* 프로필 이미지 */}
                 {recomment.is_secret && !isAuthor ? (
                   <div className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-100 border border-gray-300" />
+                ) : !isWithdrawnUser(recomment.user) && isNormalUser(recomment.user) && !isAuthor ? (
+                  <button
+                    className="flex-shrink-0"
+                    onClick={() => openModal('user-info', isNormalUser(recomment.user) ? recomment.user.id : undefined)}
+                  >
+                    <img
+                      src={profileImg}
+                      alt={nickname}
+                      className="w-10 h-10 rounded-full object-cover border border-gray-300"
+                    />
+                  </button>
                 ) : (
                   <img
                     src={profileImg}
@@ -114,10 +141,10 @@ const RecommentList = ({
                     className="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-gray-300"
                   />
                 )}
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-1">
                     <div>
-                      {/* 닉네임 + 날짜 */}
                       <div className="flex items-center gap-2">
                         <span className="text-base font-bold text-surface">
                           {nickname}
@@ -148,6 +175,26 @@ const RecommentList = ({
                       </p>
                     </div>
 
+                    {/* 모바일 전용: ⋮ 버튼 */}
+                    <button
+                      className="md:hidden flex-shrink-0"
+                      onClick={() =>
+                        openModal(
+                          isAuthor ? 'comment-mine' : 'comment-other',
+                          recomment.recomment_id,
+                          undefined,
+                          'recomment',
+                          isAuthor ? () => {
+                            setEditingId(recomment.recomment_id);
+                            setEditContent(recomment.content);
+                          } : undefined,
+                          isAuthor ? () => onDeleteRecomment(commentPk, recomment.recomment_id) : undefined,
+                        )
+                      }
+                    >
+                      <DotsIcon className="w-5 h-5 text-gray-500" />
+                    </button>
+
                     {/* 웹 전용: 수정/삭제/신고 */}
                     <div className="hidden md:flex gap-2 flex-shrink-0">
                       {isAuthor ? (
@@ -164,10 +211,7 @@ const RecommentList = ({
                           <button
                             onClick={() =>
                               openConfirm("delete", () =>
-                                onDeleteRecomment(
-                                  commentPk,
-                                  recomment.recomment_id,
-                                ),
+                                onDeleteRecomment(commentPk, recomment.recomment_id),
                               )
                             }
                             className="text-sm text-gray-500 underline"
@@ -176,9 +220,10 @@ const RecommentList = ({
                           </button>
                         </>
                       ) : (
+                        // POST /report/ 연동
                         <button
                           onClick={() =>
-                            openConfirm("report", () => console.log("신고"))
+                            openConfirm("report", () => handleReport(recomment.recomment_id))
                           }
                           className="text-sm text-gray-500 underline"
                         >
@@ -197,10 +242,7 @@ const RecommentList = ({
                         onChange={(e) => setEditContent(e.target.value)}
                         onKeyDown={(e) =>
                           e.key === "Enter" &&
-                          handleUpdate(
-                            recomment.recomment_id,
-                            recomment.is_secret,
-                          )
+                          handleUpdate(recomment.recomment_id, recomment.is_secret)
                         }
                         className="flex-1 text-base focus:outline-none min-w-0"
                       />
@@ -211,12 +253,7 @@ const RecommentList = ({
                         취소
                       </button>
                       <button
-                        onClick={() =>
-                          handleUpdate(
-                            recomment.recomment_id,
-                            recomment.is_secret,
-                          )
-                        }
+                        onClick={() => handleUpdate(recomment.recomment_id, recomment.is_secret)}
                         className="text-sm text-primary underline flex-shrink-0"
                       >
                         저장
@@ -244,14 +281,11 @@ const RecommentList = ({
         );
       })}
 
-      {/* 답글 입력창 - 모바일 기준 */}
+      {/* 답글 입력창 */}
       {showInput && (
         <div className="flex items-center gap-[12px] mt-[16px]">
           <CommentArrowIcon className="w-[22px] h-[26px] text-gray-300 flex-shrink-0" />
-          <div
-            className="flex-1 flex items-center overflow-hidden"
-            style={{ height: "40px", borderRadius: "8px", outline: "1px solid #D9DBE0", outlineOffset: "-1px" }}
-          >
+          <div className="h-10 rounded-[8px] border border-gray-300 flex-1 flex items-center overflow-hidden">
             <div className="flex-1 flex items-center px-[16px] h-full min-w-0">
               {taggedUser && (
                 <span className="text-primary text-base font-medium flex-shrink-0 mr-1">
@@ -264,16 +298,14 @@ const RecommentList = ({
                 onChange={(e) => setReplyInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmitReply()}
                 placeholder="답글을 입력하세요"
-                className="w-full text-base focus:outline-none bg-transparent"
-                style={{ color: "text-gray-500", lineHeight: "24px" }}
+                className="w-full text-base focus:outline-none bg-transparent leading-6"
                 autoFocus
               />
             </div>
             <button
               onClick={handleSubmitReply}
               disabled={!replyInput.trim()}
-              className="flex-shrink-0 flex items-center justify-center"
-              style={{ width: "50px", height: "50px", backgroundColor: "bg-gray-300" }}
+              className="flex-shrink-0 flex items-center justify-center w-[50px] h-[50px] bg-gray-300"
             >
               <IconSend className="w-[26px] h-[26px] text-background" />
             </button>

@@ -3,55 +3,58 @@ import { useNavigate } from 'react-router-dom'
 import HeartIcon from '@/assets/base/icon-heart.svg?react'
 import HeartFillIcon from '@/assets/base/icon-heart-fill.svg?react'
 import PeopleIcon from '@/assets/base/icon-people.svg?react'
-import RecruitIcon from '@/assets/base/icon-모집중.svg?react'
 import LeftIcon from '@/assets/base/icon-left.svg?react'
 import RightIcon from '@/assets/base/icon-right.svg?react'
-import { getProfile } from '@/api/profile'
-import { storage } from '@/utils/storage'
+import { likeStudy, unlikeStudy } from '@/api/study'
 import { useMyStudies } from '../hooks/useMyStudies'
+import { useAssociateGuard } from '@/hooks/useAssociateGuard'
+import { STATUS_COLOR } from '@/constants/study'
 
 const PAGE_SIZE = 10
 
-const ActivityTabs = () => {
+interface ActivityTabsProps {
+  locationName?: string
+}
+
+const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
   const navigate = useNavigate()
+  const { withAssociateGuard } = useAssociateGuard()
   const [activeTab, setActiveTab] = useState<'my' | 'joined' | 'ended' | 'liked'>('my')
   const [likedStudies, setLikedStudies] = useState<number[]>([])
+  const [likeLoadingIds, setLikeLoadingIds] = useState<number[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [locationName, setLocationName] = useState<string>('-')
 
-  const endpoint =
-    activeTab === 'ended'
-      ? '/study/my-closed-study/'
-      : activeTab === 'my'
-        ? '/study/my-study/'
-        : activeTab === 'joined'
-          ? '/study/my-participating-study/'
-          : null
-
-  const { studies, isLoading, error } = useMyStudies(
-    activeTab === 'liked' ? null : endpoint,
-  )
+  const { studies, isLoading, error } = useMyStudies(activeTab)
 
   const totalPages = Math.ceil(studies.length / PAGE_SIZE)
   const pagedStudies = studies.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-
-  useEffect(() => {
-    const userId = storage.getUserId()
-    if (!userId) return
-    getProfile(userId).then((profile) => {
-      setLocationName(profile.preferred_region?.location ?? '-')
-    })
-  }, [])
 
   useEffect(() => {
     setLikedStudies(studies.filter((s) => s.is_liked).map((s) => s.id))
     setCurrentPage(1)
   }, [studies])
 
-  const toggleLike = (id: number) => {
-    setLikedStudies((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    )
+  const toggleLike = async (id: number) => {
+    if (likeLoadingIds.includes(id)) return
+    setLikeLoadingIds((prev) => [...prev, id])
+    const isLiked = likedStudies.includes(id)
+    try {
+      if (isLiked) {
+        await unlikeStudy(id)
+        setLikedStudies((prev) => prev.filter((i) => i !== id))
+      } else {
+        await likeStudy(id)
+        setLikedStudies((prev) => [...prev, id])
+      }
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        setLikedStudies((prev) =>
+          isLiked ? prev.filter((i) => i !== id) : [...prev, id],
+        )
+      }
+    } finally {
+      setLikeLoadingIds((prev) => prev.filter((i) => i !== id))
+    }
   }
 
   const handleTab = (tab: 'my' | 'joined' | 'ended' | 'liked') => {
@@ -60,44 +63,41 @@ const ActivityTabs = () => {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="px-4 py-3">
 
-     
-      <div className="px-4 py-3">
-        <div className="border border-gray-300 rounded-xl overflow-hidden grid grid-cols-2">
-          <button
-            onClick={() => handleTab('my')}
-            className={`py-3 text-base font-medium border-b border-r border-gray-300 ${
-              activeTab === 'my' ? 'bg-primary text-background' : 'bg-background text-gray-500'
-            }`}
-          >
-            내가 만든 스터디
-          </button>
-          <button
-            onClick={() => handleTab('joined')}
-            className={`py-3 text-base font-medium border-b border-gray-300 ${
-              activeTab === 'joined' ? 'bg-primary text-background' : 'bg-background text-gray-500'
-            }`}
-          >
-            참여 중 스터디
-          </button>
-          <button
-            onClick={() => handleTab('ended')}
-            className={`py-3 text-base font-medium border-r border-gray-300 ${
-              activeTab === 'ended' ? 'bg-primary text-background' : 'bg-background text-gray-500'
-            }`}
-          >
-            종료된 스터디
-          </button>
-          <button
-            onClick={() => handleTab('liked')}
-            className={`py-3 text-base font-medium ${
-              activeTab === 'liked' ? 'bg-primary text-background' : 'bg-background text-gray-500'
-            }`}
-          >
-            관심 스터디
-          </button>
-        </div>
+      <div className="border border-gray-300 rounded-xl overflow-hidden grid grid-cols-2">
+        <button
+          onClick={() => handleTab('my')}
+          className={`py-3 text-base font-medium border-b border-r border-gray-300 ${
+            activeTab === 'my' ? 'bg-primary text-background' : 'bg-background text-gray-500'
+          }`}
+        >
+          내가 만든 스터디
+        </button>
+        <button
+          onClick={() => handleTab('joined')}
+          className={`py-3 text-base font-medium border-b border-gray-300 ${
+            activeTab === 'joined' ? 'bg-primary text-background' : 'bg-background text-gray-500'
+          }`}
+        >
+          참여 중 스터디
+        </button>
+        <button
+          onClick={() => handleTab('ended')}
+          className={`py-3 text-base font-medium border-r border-gray-300 ${
+            activeTab === 'ended' ? 'bg-primary text-background' : 'bg-background text-gray-500'
+          }`}
+        >
+          종료된 스터디
+        </button>
+        <button
+          onClick={() => handleTab('liked')}
+          className={`py-3 text-base font-medium ${
+            activeTab === 'liked' ? 'bg-primary text-background' : 'bg-background text-gray-500'
+          }`}
+        >
+          관심 스터디
+        </button>
       </div>
 
       {isLoading && (
@@ -112,37 +112,44 @@ const ActivityTabs = () => {
         </div>
       )}
 
-      {!isLoading && !error && activeTab === 'liked' && (
-        <div className="flex flex-col items-center gap-2 py-16 text-gray-500">
-          <p className="text-base">관심 스터디 기능은 준비 중이에요!</p>
-        </div>
-      )}
-
-      {!isLoading && !error && activeTab !== 'liked' && (
+      {!isLoading && !error && (
         studies.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-16 text-gray-500">
             <p className="text-base">아직 스터디가 없어요!</p>
-            <p className="text-sm">스터디를 만들거나 참여해보세요</p>
+            <p className="text-sm">
+              {activeTab === 'liked'
+                ? '관심 있는 스터디에 좋아요를 눌러보세요'
+                : '스터디를 만들거나 참여해보세요'}
+            </p>
+            {activeTab === 'my' && (
+              <button
+                onClick={() => withAssociateGuard(() => navigate('/study/create'))}
+                className="mt-2 px-6 py-2 bg-primary text-background rounded-lg text-base font-medium"
+              >
+                스터디 만들기
+              </button>
+            )}
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-5 px-2 pb-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-5 px-2 pb-3 mt-4">
               {pagedStudies.map((study) => (
                 <div
                   key={study.id}
                   className="bg-background rounded-2xl shadow-md border border-gray-300 flex flex-col cursor-pointer overflow-hidden"
                   onClick={() => navigate(`/study/${study.id}`)}
                 >
-                  
                   <div className="flex justify-between items-center px-2 pt-2 pb-1">
-                    <RecruitIcon className="w-16 h-6" />
+                    <span className={`text-xs font-medium ${STATUS_COLOR[study.status] ?? 'text-gray-300'}`}>
+                      {study.status}
+                    </span>
                     <span className="text-xs text-gray-900 bg-gray-100 rounded-full px-2 py-0.5">
                       {locationName}
                     </span>
                   </div>
                   <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
                     {study.thumbnail ? (
-                      <img
+                      <img 
                         src={study.thumbnail}
                         alt={study.title}
                         className="w-full h-full object-cover"
@@ -150,12 +157,12 @@ const ActivityTabs = () => {
                     ) : (
                       <div className="w-full h-full bg-gray-100" />
                     )}
-                    {/* 하트 */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         toggleLike(study.id)
                       }}
+                      disabled={likeLoadingIds.includes(study.id)}
                       className="absolute bottom-2 right-2 w-9 h-9 bg-background rounded-full flex items-center justify-center shadow-md"
                     >
                       {likedStudies.includes(study.id) ? (
@@ -165,26 +172,23 @@ const ActivityTabs = () => {
                       )}
                     </button>
                   </div>
-
-                  {/* 카드 내용 */}
                   <div className="px-2 py-4 flex flex-col gap-2">
-                    {/* 카테고리 태그 */}
                     <div className="flex gap-1 flex-wrap">
-                      {study.subject && (
+                      {study.topic && (
                         <span className="text-xs border border-gray-300 rounded-full px-2 py-0.5 text-gray-500">
-                          {study.subject.name}
+                          {study.topic}
                         </span>
                       )}
                       {study.difficulty && (
                         <span className="text-xs border border-gray-300 rounded-full px-2 py-0.5 text-gray-500">
-                          {study.difficulty.name}
+                          {study.difficulty}
                         </span>
                       )}
                     </div>
                     <p className="text-sm font-medium text-gray-900 line-clamp-2">{study.title}</p>
                     <div className="flex items-center gap-1">
-                      <PeopleIcon className="w-3 h-3 text-gray-300" />
-                      <p className="text-xs text-gray-300">
+                      <PeopleIcon className="w-3 h-3 text-gray-500" />
+                      <p className="text-xs text-gray-500">
                         현재 <span className="text-primary font-medium">{study.current_participants ?? 0}명</span>이 신청했어요.
                       </p>
                     </div>
@@ -192,6 +196,8 @@ const ActivityTabs = () => {
                 </div>
               ))}
             </div>
+
+            {/* 페이지네이션 */}
             <div className="flex justify-center items-center gap-4 py-4">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
@@ -205,9 +211,7 @@ const ActivityTabs = () => {
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`w-8 h-8 rounded-full text-sm ${
-                    currentPage === page
-                      ? 'bg-primary text-background'
-                      : 'text-gray-500'
+                    currentPage === page ? 'bg-primary text-background' : 'text-gray-500'
                   }`}
                 >
                   {page}

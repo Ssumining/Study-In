@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import BtnCloseIcon from '@/assets/base/icon-btn-X.svg?react'
 import LeftIcon from '@/assets/base/icon-left.svg?react'
 import RightIcon from '@/assets/base/icon-right.svg?react'
+import MyPageSidebar from '@/components/common/MyPageSidebar'
 import {
   getNotifications,
   deleteNotification,
@@ -25,7 +26,7 @@ const Notification = () => {
     const fetchNotifications = async () => {
       setIsLoading(true)
       try {
-        const data = await getNotifications()
+        const data = await getNotifications(currentPage)
         setNotifications(data.results)
         setTotalCount(data.count)
       } catch {
@@ -70,94 +71,96 @@ const Notification = () => {
     return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-16 text-gray-500 text-sm">
-        불러오는 중...
-      </div>
-    )
-  }
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center py-16 text-gray-500 text-sm">
+          불러오는 중...
+        </div>
+      )
+    }
 
-  if (error) {
+    if (error) {
+      return (
+        <div className="flex justify-center py-16 text-error text-sm">
+          {error}
+        </div>
+      )
+    }
+
     return (
-      <div className="flex justify-center py-16 text-error text-sm">
-        {error}
+      <div className="flex flex-col gap-4">
+        <h2 className="text-base font-medium text-gray-900 md:text-left text-center">
+          확인하지 않은 알림{' '}
+          <span className="text-primary font-bold">{unreadCount}개</span>
+        </h2>
+        <div className="border border-gray-300 rounded-xl px-5 py-4 flex flex-col gap-2">
+          {notifications.length === 0 ? (
+            <div className="flex justify-center py-8 text-gray-500 text-sm">
+              알림이 없어요.
+            </div>
+          ) : (
+            notifications.map((notification) => (
+              <div
+                key={notification.notification_id}
+                onClick={() => !notification.checked && handleRead(notification.notification_id)}
+                className="relative cursor-pointer"
+              >
+                {!notification.checked && (
+                  <div className="absolute -left-2 top-0 w-2 h-2 rounded-full bg-error z-10" />
+                )}
+                <div className={`flex items-start gap-2 border border-gray-300 rounded-lg px-3 py-3 ${
+                  notification.checked ? 'bg-gray-100' : 'bg-background'
+                }`}>
+                  <div className="flex-1 flex flex-col gap-1">
+                    <p className="text-sm text-gray-900">{notification.content}</p>
+                    <p className="text-xs text-primary">{formatDate(notification.created)}</p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(notification.notification_id)
+                    }}
+                    className="shrink-0"
+                  >
+                    <BtnCloseIcon className="w-4 h-4 opacity-25" />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* 페이지네이션 */}
+        <div className="flex justify-center items-center gap-4 mt-2">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className={currentPage === 1 ? 'text-gray-300' : 'text-gray-500'}
+          >
+            <LeftIcon className="w-4 h-4" />
+          </button>
+          <span className="w-8 h-8 rounded-full bg-primary text-background text-sm flex items-center justify-center">
+            {currentPage}
+          </span>
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(Math.max(totalPages, 1), p + 1))}
+            disabled={currentPage === totalPages || totalPages === 0}
+            className={currentPage === totalPages || totalPages === 0 ? 'text-gray-300' : 'text-gray-500'}
+          >
+            <RightIcon className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6 flex flex-col gap-4">
-
-      {/* 미확인 알림 개수 */}
-      <h2 className="text-base font-medium text-gray-900 text-center">
-        확인하지 않은 알림{' '}
-        <span className="text-primary font-bold">{unreadCount}개</span>
-      </h2>
-
-      {/* 전체 감싸는 큰 카드 */}
-      <div className="border border-gray-300 rounded-xl px-5 py-4 flex flex-col gap-2">
-
-        {notifications.length === 0 ? (
-          <div className="flex justify-center py-8 text-gray-500 text-sm">
-            알림이 없어요.
-          </div>
-        ) : (
-          notifications.map((notification) => (
-            <div
-              key={notification.notification_id}
-              onClick={() => !notification.checked && handleRead(notification.notification_id)}
-              className="relative cursor-pointer"
-            >
-              
-              {!notification.checked && (
-                <div className="absolute -left-2 top-0 w-2 h-2 rounded-full bg-error z-10" />
-              )}
-
-              {/* 알림 박스 */}
-              <div className={`flex items-start gap-2 border border-gray-300 rounded-lg px-3 py-3 ${
-                notification.checked ? 'bg-gray-100' : 'bg-background'
-              }`}>
-                <div className="flex-1 flex flex-col gap-1">
-                  <p className="text-sm text-gray-900">{notification.content}</p>
-                  <p className="text-xs text-primary">{formatDate(notification.created)}</p>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleDelete(notification.notification_id)
-                  }}
-                  className="shrink-0"
-                >
-                  <BtnCloseIcon className="w-4 h-4 opacity-25" />
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+    <div className="flex gap-8 py-6">
+      <MyPageSidebar />
+      <div className="flex-1 min-w-0 px-0 md:px-0">
+        {renderContent()}
       </div>
-
-      {/* 페이지네이션 - 항상 보임 */}
-      <div className="flex justify-center items-center gap-4 mt-2">
-        <button
-          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-          className={currentPage === 1 ? 'text-gray-300' : 'text-gray-500'}
-        >
-          <LeftIcon className="w-4 h-4" />
-        </button>
-        <span className="w-8 h-8 rounded-full bg-primary text-background text-sm flex items-center justify-center">
-          {currentPage}
-        </span>
-        <button
-          onClick={() => setCurrentPage((p) => Math.min(Math.max(totalPages, 1), p + 1))}
-          disabled={currentPage === totalPages || totalPages === 0}
-          className={currentPage === totalPages || totalPages === 0 ? 'text-gray-300' : 'text-gray-500'}
-        >
-          <RightIcon className="w-4 h-4" />
-        </button>
-      </div>
-
     </div>
   )
 }

@@ -1,27 +1,24 @@
 import { useState, useEffect } from 'react';
-import { axiosInstance } from '../../../api/axios';
+import { getMyStudies, getParticipatingStudies, getMyClosedStudies, getLikedStudies } from '@/api/study';
+import { normalizeStudy } from '@/utils/study';
+import type { Study } from '@/types/study';
 
-export interface MyStudyItem {
-  id: number;
-  title: string;
-  thumbnail: string | null;
-  study_status: { id: number; name: string };
-  is_offline?: boolean;
-  location?: string; 
-  difficulty?: { id: number; name: string };
-  subject?: { id: number; name: string };
-  recruitment?: number;
-  current_participants?: number;
-  is_liked?: boolean;
-}
+type TabKey = 'my' | 'joined' | 'ended' | 'liked';
 
-export const useMyStudies = (endpoint: string | null) => {
-  const [studies, setStudies] = useState<MyStudyItem[]>([]);
+const API_MAP: Record<TabKey, () => Promise<any[]>> = {
+  my: getMyStudies,
+  joined: getParticipatingStudies,
+  ended: getMyClosedStudies,
+  liked: getLikedStudies,
+};
+
+export const useMyStudies = (tab: TabKey | null) => {
+  const [studies, setStudies] = useState<Study[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!endpoint) {
+    if (!tab) {
       setStudies([]);
       return;
     }
@@ -31,9 +28,9 @@ export const useMyStudies = (endpoint: string | null) => {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await axiosInstance.get<MyStudyItem[]>(endpoint);
+        const raw = await API_MAP[tab]();
         if (!cancelled) {
-          setStudies(Array.isArray(res.data) ? res.data : []);
+          setStudies(raw.map(normalizeStudy));
         }
       } catch {
         if (!cancelled) setError('스터디 목록을 불러오는 데 실패했습니다.');
@@ -43,10 +40,8 @@ export const useMyStudies = (endpoint: string | null) => {
     };
 
     fetchStudies();
-    return () => {
-      cancelled = true;
-    };
-  }, [endpoint]);
+    return () => { cancelled = true; };
+  }, [tab]);
 
   return { studies, isLoading, error };
 };
