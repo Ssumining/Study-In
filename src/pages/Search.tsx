@@ -164,7 +164,7 @@ export default function Search() {
 
       {/* 필터 패널 */}
       {filterOpen && (
-        <div className="border border-gray-300 rounded-[12px] p-[14px] mb-6 bg-background h-[460px] overflow-hidden md:-mx-8 md:w-[calc(100%+64px)] md:h-[360px] md:pt-[10px] md:pl-[30px] md:pb-[30px] md:mb-[30px]">
+        <div className="border border-gray-300 rounded-[12px] p-[14px] mb-6 bg-background h-auto md:h-[360px] md:overflow-hidden md:-mx-8 md:w-[calc(100%+64px)] md:pt-[10px] md:pl-[30px] md:pb-[30px] md:mb-[30px]">
           <FilterRow label="주제">
             {SUBJECTS.map((s) => (
               <Chip key={s} label={s} selected={subjects.includes(s)} onClick={() => toggle(subjects, setSubjects, s)} />
