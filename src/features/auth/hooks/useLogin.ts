@@ -27,7 +27,7 @@ export const useLogin = () => {
       // 준회원 → 프로필 생성 페이지, 정회원 → 메인
       try {
         const { is_associate_member } = await getMemberType();
-        navigate(is_associate_member ? "/profile/edit" : "/");
+        navigate(is_associate_member ? "/" : "/profile/edit");
       } catch {
         navigate("/");
       }
