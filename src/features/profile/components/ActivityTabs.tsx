@@ -65,7 +65,6 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
   return (
     <div className="px-4 py-3">
 
-      {/* 탭 버튼 - 2x2 그리드 */}
       <div className="border border-gray-300 rounded-xl overflow-hidden grid grid-cols-2">
         <button
           onClick={() => handleTab('my')}
@@ -133,7 +132,6 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
           </div>
         ) : (
           <>
-            {/* 카드 그리드 - 모바일 2열 / 웹 3열 */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-5 px-2 pb-3 mt-4">
               {pagedStudies.map((study) => (
                 <div
@@ -142,7 +140,7 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
                   onClick={() => navigate(`/study/${study.id}`)}
                 >
                   <div className="flex justify-between items-center px-2 pt-2 pb-1">
-                    <span className={`text-xs font-medium ${STATUS_COLOR[study.status] ?? 'text-gray-400'}`}>
+                    <span className={`text-xs font-medium ${STATUS_COLOR[study.status] ?? 'text-gray-300'}`}>
                       {study.status}
                     </span>
                     <span className="text-xs text-gray-900 bg-gray-100 rounded-full px-2 py-0.5">

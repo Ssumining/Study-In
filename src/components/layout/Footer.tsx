@@ -1,4 +1,4 @@
-import logo2022Src from '@/assets/base/icon-logo.svg';
+import logo2022Src from '@/assets/base/icon-Logo.svg';
 import wenivWorldLogo from '@/assets/base/icon-weniv.svg';
 import arrowIcon from '@/assets/base/icon-diagonal-arrow.svg';
 import { useLocation } from 'react-router-dom';
