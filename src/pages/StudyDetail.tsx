@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { axiosInstance } from '@/api/axios';
+import { getStudy, joinStudy } from '@/api/study';
 import { storage } from '@/utils/storage';
 import { StudyApiData, likeStudy, unlikeStudy } from '@/api/study';
 import { useAssociateGuard } from '@/hooks/useAssociateGuard';
@@ -32,11 +32,11 @@ export default function StudyDetail() {
       if (!studyId) return;
       try {
         setIsLoading(true);
-        const response = await axiosInstance.get(`/study/${studyId}/`);
-        setStudyDetail(response.data);
-        const alreadyJoined = response.data.participants.some((p: any) => p.id === myPk);
+        const data = await getStudy(Number(studyId));
+        setStudyDetail(data);
+        const alreadyJoined = data.participants.some((p: any) => p.id === myPk);
         if (alreadyJoined) setIsJoined(true);
-        const alreadyLiked = response.data.like_users?.includes(myPk) ?? false;
+        const alreadyLiked = data.like_users?.includes(myPk) ?? false;
         setLiked(alreadyLiked);
       } catch (error) {
         console.error("데이터 로드 실패:", error);
@@ -71,7 +71,7 @@ export default function StudyDetail() {
       return;
     }
     try {
-      await axiosInstance.post(`/study/${studyId}/participate/`);
+      await joinStudy(Number(studyId));
       setIsJoined(true);
       alert("스터디에 성공적으로 참여되었습니다!");
     } catch (error: any) {
@@ -148,7 +148,7 @@ export default function StudyDetail() {
 
       {/* ── 웹 레이아웃 (md 이상) ── */}
       <div className="hidden md:block">
-        <div className="mx-auto max-w-5xl px-6 py-6">
+        <div className="mx-auto max-w-[1190px] px-6 py-6">
           <div className="flex gap-6 items-start">
             <div className="flex-1 flex flex-col gap-4 min-w-0">
 

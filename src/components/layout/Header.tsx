@@ -150,7 +150,8 @@ export default function Header({ variant }: HeaderProps) {
       <>
         <header className="bg-background border-b border-gray-300">
 
-          <div className="flex lg:hidden items-center justify-between h-14 px-4">
+          {/* 모바일 */}
+          <div className="flex md:hidden items-center justify-between h-14 px-4">          
             <button onClick={() => setDrawerOpen(true)}>
               <HamburgerIcon className="w-7 h-7 text-surface" />
             </button>
@@ -160,8 +161,11 @@ export default function Header({ variant }: HeaderProps) {
             </button>
           </div>
 
-          <div className="hidden lg:flex items-center justify-center h-[80px]">
-            <Link to="/"><LogoIcon className="h-[32px] w-auto" /></Link>
+          {/* 데스크탑 */}
+          <div className="hidden md:flex items-center justify-center h-[80px]">
+            <Link to="/">
+              <LogoIcon className="h-[32px] w-auto" />
+            </Link>
           </div>
         </header>
 

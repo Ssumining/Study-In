@@ -5,10 +5,10 @@ import HeartFillIcon from '@/assets/base/icon-heart-fill.svg?react'
 import PeopleIcon from '@/assets/base/icon-people.svg?react'
 import LeftIcon from '@/assets/base/icon-left.svg?react'
 import RightIcon from '@/assets/base/icon-right.svg?react'
-import SpeakerIcon from '@/assets/base/icon-speaker.svg?react'
 import { likeStudy, unlikeStudy } from '@/api/study'
 import { useMyStudies } from '../hooks/useMyStudies'
 import { useAssociateGuard } from '@/hooks/useAssociateGuard'
+import { STATUS_COLOR } from '@/constants/study'
 
 const PAGE_SIZE = 10
 
@@ -24,16 +24,7 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
   const [likeLoadingIds, setLikeLoadingIds] = useState<number[]>([])
   const [currentPage, setCurrentPage] = useState(1)
 
-  const endpoint =
-    activeTab === 'ended'
-      ? '/study/my-closed-study/'
-      : activeTab === 'my'
-        ? '/study/my-study/'
-        : activeTab === 'joined'
-          ? '/study/my-participating-study/'
-          : '/study/my-like-study/'
-
-  const { studies, isLoading, error } = useMyStudies(endpoint)
+  const { studies, isLoading, error } = useMyStudies(activeTab)
 
   const totalPages = Math.ceil(studies.length / PAGE_SIZE)
   const pagedStudies = studies.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -149,17 +140,16 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
                   onClick={() => navigate(`/study/${study.id}`)}
                 >
                   <div className="flex justify-between items-center px-2 pt-2 pb-1">
-                    <div className="flex items-center gap-1">
-                      <SpeakerIcon className="w-4 h-4 text-primary" />
-                      <span className="text-xs font-medium text-primary">모집중</span>
-                    </div>
+                    <span className={`text-xs font-medium ${STATUS_COLOR[study.status] ?? 'text-gray-300'}`}>
+                      {study.status}
+                    </span>
                     <span className="text-xs text-gray-900 bg-gray-100 rounded-full px-2 py-0.5">
                       {locationName}
                     </span>
                   </div>
                   <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
                     {study.thumbnail ? (
-                      <img
+                      <img 
                         src={study.thumbnail}
                         alt={study.title}
                         className="w-full h-full object-cover"
@@ -184,14 +174,14 @@ const ActivityTabs = ({ locationName = '-' }: ActivityTabsProps) => {
                   </div>
                   <div className="px-2 py-4 flex flex-col gap-2">
                     <div className="flex gap-1 flex-wrap">
-                      {study.subject && (
+                      {study.topic && (
                         <span className="text-xs border border-gray-300 rounded-full px-2 py-0.5 text-gray-500">
-                          {study.subject.name}
+                          {study.topic}
                         </span>
                       )}
                       {study.difficulty && (
                         <span className="text-xs border border-gray-300 rounded-full px-2 py-0.5 text-gray-500">
-                          {study.difficulty.name}
+                          {study.difficulty}
                         </span>
                       )}
                     </div>
