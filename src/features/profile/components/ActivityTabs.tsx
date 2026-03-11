@@ -2,36 +2,26 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LeftIcon from '@/assets/base/icon-left.svg?react'
 import RightIcon from '@/assets/base/icon-right.svg?react'
-import { useMyStudies, type MyStudyItem } from '../hooks/useMyStudies'
+import { useMyStudies, type TabKey } from '../hooks/useMyStudies'
 import { useAssociateGuard } from '@/hooks/useAssociateGuard'
 import StudyCard from '@/features/study/components/StudyCard'
-import type { Study } from '@/types/study'
-import { normalizeStudy } from '@/utils/study'
 
 const PAGE_SIZE = 10
 
-const toStudy = (s: MyStudyItem): Study =>
-  normalizeStudy({
-    ...s,
-    study_location: s.study_location ?? (s.location ? { id: 0, location: s.location } : null),
-  })
+const TABS: { key: TabKey; label: string }[] = [
+  { key: 'my',     label: '내가 만든 스터디' },
+  { key: 'joined', label: '참여 중 스터디' },
+  { key: 'ended',  label: '종료된 스터디' },
+  { key: 'liked',  label: '관심 스터디' },
+]
 
 const ActivityTabs = () => {
   const navigate = useNavigate()
   const { withAssociateGuard } = useAssociateGuard()
-  const [activeTab, setActiveTab] = useState<'my' | 'joined' | 'ended' | 'liked'>('my')
+  const [activeTab, setActiveTab] = useState<TabKey>('my')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const TABS = [
-    { key: 'my',     label: '내가 만든 스터디', endpoint: '/study/my-study/' },
-    { key: 'joined', label: '참여 중 스터디',   endpoint: '/study/my-participating-study/' },
-    { key: 'ended',  label: '종료된 스터디',    endpoint: '/study/my-closed-study/' },
-    { key: 'liked',  label: '관심 스터디',      endpoint: '/study/my-like-study/' },
-  ] as const
-
-  const endpoint = TABS.find((t) => t.key === activeTab)!.endpoint
-
-  const { studies, isLoading, error } = useMyStudies(endpoint)
+  const { studies, isLoading, error } = useMyStudies(activeTab)
 
   const totalPages = Math.ceil(studies.length / PAGE_SIZE)
   const pagedStudies = studies.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -40,7 +30,7 @@ const ActivityTabs = () => {
     setCurrentPage(1)
   }, [studies])
 
-  const handleTab = (tab: 'my' | 'joined' | 'ended' | 'liked') => {
+  const handleTab = (tab: TabKey) => {
     setActiveTab(tab)
     setCurrentPage(1)
   }
@@ -117,11 +107,10 @@ const ActivityTabs = () => {
             <>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-[10px] md:gap-5 w-full">
                 {pagedStudies.map((study) => (
-                  <StudyCard key={study.id} study={toStudy(study)} />
+                  <StudyCard key={study.id} study={study} />
                 ))}
               </div>
 
-              {/* 페이지네이션 */}
               {totalPages > 1 && (
                 <div className="flex justify-center items-center gap-[10px] py-4">
                   <button

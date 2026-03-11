@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { axiosInstance } from '@/api/axios';
+import { getStudies } from '@/api/study';
 import { normalizeStudy } from '@/utils/study';
 import StudyCard from '@/features/study/components/StudyCard';
 import type { Study } from '@/types/study';
-import searchIcon from '@/assets/base/icon-Search.svg';
-import leftIcon from '@/assets/base/icon-left.svg';
-import filterIcon from '@/assets/base/icon-filter.svg';
-import triangleUpIcon from '@/assets/base/icon-Triangle-Up.svg';
-import triangleDownIcon from '@/assets/base/icon-Triangle-Down.svg';
+
+import SearchIcon from '@/assets/base/icon-Search.svg?react';
+import LeftIcon from '@/assets/base/icon-left.svg?react';
+import FilterIcon from '@/assets/base/icon-filter.svg?react';
+import TriangleUpIcon from '@/assets/base/icon-Triangle-Up.svg?react';
+import TriangleDownIcon from '@/assets/base/icon-Triangle-Down.svg?react';
 
 const SUBJECTS = ['개념학습', '응용/활용', '프로젝트', '챌린지', '자격증/시험', '취업/코테', '기타', '특강'];
 const DIFFICULTIES = ['초급', '중급', '고급'];
@@ -141,13 +142,10 @@ export default function Search() {
       params.statuses.forEach((s) => urlParams.append('study_status', String(STATUS_MAP[s])));
       urlParams.append('page', String(params.page));
 
-      const res = await axiosInstance.get('/study/', { params: urlParams });
-      setTotalCount(res.data.count ?? 0);
-      const results = res.data.results ?? res.data;
-      const raw = Array.isArray(results) ? results : [];
-      if (raw.length > 0 && res.data.count) {
-        setPageSize(Math.max(raw.length, 1));
-      }
+      const res = await getStudies(Object.fromEntries(urlParams));
+      const raw = res.results ?? [];
+      setTotalCount(res.count ?? 0);
+      if (res.count && raw.length > 0) setPageSize(raw.length);
       setStudies(raw.map(normalizeStudy));
     } catch {
       setStudies([]);
@@ -207,7 +205,7 @@ export default function Search() {
       {/* 검색바 */}
       <div className="flex items-center gap-3 py-4 md:hidden">
         <button onClick={() => navigate(-1)} className="shrink-0 p-1">
-          <img src={leftIcon} alt="뒤로" className="w-6 h-6" />
+          <LeftIcon className="w-6 h-6" />
         </button>
         <div className="flex-1 flex items-center h-11 px-4 border-2 border-gray-300 rounded-full gap-2 bg-background">
           <input
@@ -219,7 +217,7 @@ export default function Search() {
             className="flex-1 text-sm outline-none bg-transparent text-surface placeholder:text-gray-500"
           />
           <button onClick={handleSearch}>
-            <img src={searchIcon} alt="검색" className="w-5 h-5 shrink-0" />
+            <SearchIcon className="w-5 h-5 shrink-0" />
           </button>
         </div>
       </div>
@@ -232,13 +230,9 @@ export default function Search() {
             filterOpen ? 'border border-primary' : 'border border-gray-300'
           }`}
         >
-          <img src={filterIcon} alt="" className="w-5 h-5" />
+          <FilterIcon className="w-5 h-5" />
           <span>검색 필터</span>
-          <img
-            src={filterOpen ? triangleUpIcon : triangleDownIcon}
-            alt=""
-            className="w-[18px] h-[18px] ml-auto"
-          />
+            {filterOpen ? <TriangleUpIcon className="w-[18px] h-[18px] ml-auto" /> : <TriangleDownIcon className="w-[18px] h-[18px] ml-auto" />}
         </button>
       </div>
 
@@ -327,7 +321,7 @@ export default function Search() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-[10px] md:gap-6 md:px-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-[10px] md:gap-6 md:px-4">
                 {studies.map((study) => (
                   <StudyCard key={study.id} study={study} />
                 ))}
