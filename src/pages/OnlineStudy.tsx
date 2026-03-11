@@ -33,6 +33,7 @@ export default function OnlineStudy() {
           activeTab={activeTab}
           selectedCategory="전체"
           searchTerm=""
+          offline={0}
           large
         />
 

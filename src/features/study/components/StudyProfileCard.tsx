@@ -49,7 +49,7 @@ export default function StudyProfileCard({
   return (
     <div className="flex flex-col gap-6 w-[290px]">
       {/* 상단 프로필 카드 영역 */}
-      <div className="bg-activation rounded-[12px] p-6 flex flex-col items-center border border-gray-100 shadow-sm">
+      <div className="bg-blue-50/30 rounded-[12px] p-6 flex flex-col items-center border border-gray-100 shadow-sm">
         <div className="relative mb-4">
           <img
             src={userImage || defaultProfile}
