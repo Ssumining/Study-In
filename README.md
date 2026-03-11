@@ -72,7 +72,7 @@
 ### 4. 1 개발 일정 (WBS)
 
 ```mermaid
-%%{init: { 'gantt': { 'barHeight': 40, 'fontSize': 10, 'sectionFontSize': 10, 'barGap': 0 } } }%%
+%%{init: { 'gantt': { 'barHeight': 30, 'fontSize': 10, 'sectionFontSize': 10, 'barGap': 0 } } }%%
 gantt
     title Study-In 플렛폼 개발 계획 (2/24 ~ 3/13)
     dateFormat YYYY-MM-DD
@@ -100,7 +100,7 @@ gantt
 
 <br>
 
-### 4. 2 작업 과정
+### 4. 2 개발 작업 과정
 
 ### 4. 2. 1 사전 기획 및 요구사항 분해
 
@@ -143,6 +143,8 @@ gantt
 |                        |    신고 시스템    |      스터디, 사용자, 댓글에 대한 공통 신고하기 API 및 폼 구현       |   B2   |          E3(공통 모달)에 부착           | 선택 |
 
 ---
+ <div align="right"><b>*</b>&nbsp;&nbsp; E1 강수민 &nbsp;&nbsp; E2 강주현 &nbsp;&nbsp; E3 최서원 &nbsp;&nbsp; B1 강수정 &nbsp;&nbsp; B2 권하리 &nbsp;&nbsp; B3 박외숙</div> |
+
 
 - #### 전공자 / 경험자 역할 (Core & Infrastructure)
 
@@ -255,7 +257,7 @@ npm run dev
 
 ## 🎠 배너 Carousel
 
-<div style="display: flex; justify-content: center; gap:410px;">
+<div style="display: flex; justify-content: center; gap:40px;">
   <img src="src/assets/images/banner-1.gif" style="height: 120px;" alt="과정" />
   <img src="src/assets/images/banner-2.gif" style="height: 120px;" alt="결과" />
 </div>
