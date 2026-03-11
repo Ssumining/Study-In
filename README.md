@@ -194,7 +194,7 @@ npm install
 
 #### 3. 환경 변수 설정
 
-- .env 파일 생성 후 아래 내용 추가
+- .env 파일 생성 후 아래 내용 추가 -> .ignore 파일에 저장
 
 <div align="center">
 
@@ -248,23 +248,26 @@ npm run dev
 
 ## 🏠 메인 페이지
 
-![Home](screenshots/home.png)
+<div style="display: flex; justify-content: center; gap: 30px;">
+  <img src="src/assets/images/main-1.gif" style="height: 240px;" alt="과정" />
+  <img src="src/assets/images/main-2.gif" style="height: 240px;" alt="결과" />
+</div>
 
 ## 🎠 배너 Carousel
 
-![Banner](screenshots/banner.gif)
+<div style="display: flex; justify-content: center; gap:410px;">
+  <img src="src/assets/images/banner-1.gif" style="height: 120px;" alt="과정" />
+  <img src="src/assets/images/banner-2.gif" style="height: 120px;" alt="결과" />
+</div>
 
-## <img src="./src/assets/base/icon-location.svg" style= "color:bg-primary; width:24px; height:24px;"/> 지역 스터디 페이지
+## <img src="./src/assets/base/icon-location.svg" style= "color:bg-primary; width:24px; height:24px;"/> 내 지역 & 온라인 스터디 페이지
 
-![Local](screenshots/local.png)
-
-## 💻 온라인 스터디 페이지
-
-![Online](screenshots/online.png)
+<div align="center">
+<img src="src/assets/images/local-online.gif" style="width: 240px;" alt="과정" /> </div>
 
 <br><br>
 
-# 📂 프로젝트 구조
+## 📂 프로젝트 구조
 
 ```mermade
 📦 studyin-frontend
