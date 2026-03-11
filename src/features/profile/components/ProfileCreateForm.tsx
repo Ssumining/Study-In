@@ -502,8 +502,8 @@ const ProfileCreateForm = () => {
                       blockMargin={1}
                       fontSize={8}
                       colorScheme="light"
-                      hideColorLegend
-                      hideTotalCount
+                      showColorLegend={false}
+                      showTotalCount={false}
                     />
                   </div>
                   {/* 데스크탑 */}
