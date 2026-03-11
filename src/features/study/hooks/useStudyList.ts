@@ -18,6 +18,7 @@ export const useStudyList = (
   activeTab: string = DEFAULT_STUDY_TAB,
   page: number = 1,
   locationId?: number,
+  offline?: 0 | 1,
 ) => {
   const [studies, setStudies] = useState<Study[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +37,7 @@ export const useStudyList = (
           study_status: STATUS_MAP[activeTab as StudyTab] ?? undefined,
           page,
           study_location: locationId ?? undefined,
+          offline,
         });
 
         const results = Array.isArray(raw.results)

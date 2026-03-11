@@ -10,6 +10,7 @@ interface StudyListProps {
   searchTerm: string;
   activeTab: string;
   locationId?: number;
+  offline?: 0 | 1;
   large?: boolean;
   cols?: 3 | 4;
 }
@@ -95,6 +96,7 @@ export default function StudyList({
   searchTerm,
   activeTab,
   locationId,
+  offline,
   large = false,
   cols = 4,
 }: StudyListProps) {
@@ -113,6 +115,7 @@ export default function StudyList({
     activeTab,
     page,
     locationId,
+    offline,
   );
 
   // page가 totalPages를 초과하면 마지막 페이지로 되돌아가기
