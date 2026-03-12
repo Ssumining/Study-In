@@ -102,6 +102,62 @@ const Modal = () => {
     );
   }
 
+  // 스터디 삭제 확인 모달
+  if (modalType === "confirm" && confirmType === "study-delete") {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
+        <div className="relative z-10 w-full max-w-[400px] rounded-[10px] bg-background shadow-[0px_5px_15px_rgba(71,73,77,0.10)] outline outline-1 outline-gray-300 overflow-hidden">
+          <p className="text-center text-sm sm:text-base text-black py-7 sm:py-[36px] px-6">
+            스터디를 삭제하시겠습니까?
+          </p>
+          <div className="flex border-t border-gray-300">
+            <button
+              onClick={() => { onConfirm?.(); closeModal(); }}
+              className="flex-1 h-11 sm:h-[50px] bg-background text-gray-700 text-sm sm:text-base font-medium border-r border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              삭제하기
+            </button>
+            <button
+              onClick={closeModal}
+              className="flex-1 h-11 sm:h-[50px] bg-background text-gray-700 text-sm sm:text-base font-medium hover:bg-gray-50 transition-colors"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 스터디 생성 확인 모달
+  if (modalType === "confirm" && confirmType === "study-create") {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
+        <div className="relative z-10 w-full max-w-[400px] rounded-[10px] bg-background shadow-[0px_5px_15px_rgba(71,73,77,0.10)] outline outline-1 outline-gray-300 overflow-hidden">
+          <p className="text-center text-sm sm:text-base text-black py-7 sm:py-[36px] px-6">
+            스터디를 생성하시겠습니까?
+          </p>
+          <div className="flex border-t border-gray-300">
+            <button
+              onClick={() => { onConfirm?.(); closeModal(); }}
+              className="flex-1 h-11 sm:h-[50px] bg-background text-gray-700 text-sm sm:text-base font-medium border-r border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              생성하기
+            </button>
+            <button
+              onClick={closeModal}
+              className="flex-1 h-11 sm:h-[50px] bg-background text-gray-700 text-sm sm:text-base font-medium hover:bg-gray-50 transition-colors"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // 확인 모달 (로그아웃 / 삭제 / 신고)
   if (modalType === "confirm" && confirmType) {
     return (

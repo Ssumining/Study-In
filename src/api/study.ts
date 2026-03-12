@@ -57,7 +57,7 @@ const DIFFICULTY_MAP: Record<string, { id: number; name: string }> = {
 
 // 스터디 주제 폼값 → API {id, name}
 const SUBJECT_MAP: Record<string, { id: number; name: string }> = {
-  '개념학습':   { id: 1, name: '개념학습' },
+  '개념/학습':  { id: 1, name: '개념학습' },
   '응용/활용':   { id: 2, name: '응용/활용' },
   '프로젝트':    { id: 3, name: '프로젝트' },
   '챌린지':      { id: 4, name: '챌린지' },
