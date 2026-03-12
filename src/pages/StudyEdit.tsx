@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useModalStore } from "@/store/modalStore";
 import axios from "axios";
 import StudyForm from "@/features/study/components/StudyForm";
 import StudyCreateTopBar from "@/features/study/components/StudyCreateTopBar";
@@ -75,9 +76,9 @@ function StudyEditInner({
   existingThumbnailUrl,
 }: StudyEditInnerProps) {
   const navigate = useNavigate();
+  const { openConfirm } = useModalStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { uploading, handleImageUpload } = useUpload();
 
@@ -140,7 +141,6 @@ function StudyEditInner({
       navigate("/my-study");
     } catch (error) {
       setIsDeleting(false);
-      setShowDeleteModal(false);
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         const serverMsg: string | undefined = error.response?.data?.detail;
@@ -194,7 +194,7 @@ function StudyEditInner({
         submitLabel="저장하기"
         submittingLabel="저장 중..."
         onViewStudy={() => navigate(`/study/${studyId}`)}
-        onDeleteStudy={() => setShowDeleteModal(true)}
+        onDeleteStudy={() => openConfirm('study-delete', handleDelete)}
       />
 
       <main className="mx-auto max-w-[1190px] pb-10">
@@ -234,36 +234,6 @@ function StudyEditInner({
 
       <Footer />
 
-      {/* 삭제 확인 모달 */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="mx-4 w-full max-w-sm rounded-2xl bg-background p-6 shadow-xl">
-            <h2 className="text-lg font-bold">스터디 삭제</h2>
-            <p className="mt-2 text-sm text-gray-700">
-              정말 이 스터디를 삭제하시겠습니까?
-              <br />이 작업은 되돌릴 수 없습니다.
-            </p>
-            <div className="mt-6 flex gap-3">
-              <button
-                type="button"
-                onClick={() => setShowDeleteModal(false)}
-                disabled={isDeleting}
-                className="flex-1 rounded-xl border border-gray-300 py-2 text-sm font-medium transition hover:bg-gray-100 disabled:opacity-50"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="flex-1 rounded-xl bg-error py-2 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
-              >
-                {isDeleting ? "삭제 중..." : "삭제"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

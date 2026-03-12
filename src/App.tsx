@@ -4,6 +4,7 @@ import Router from "./routes/Router";
 import { useAuthStore } from '@/store/authStore';
 import { getProfile } from '@/api/profile';
 import { storage } from '@/utils/storage';
+import Snackbar from '@/components/common/Snackbar';
 
 function App() {
   const { isLoggedIn, user, setUser } = useAuthStore();
@@ -16,11 +17,12 @@ function App() {
         .then(res => setUser({ pk: res.user, email: storage.getEmail() ?? '', nickname: res.nickname }))
         .catch(err => console.error('유저 정보 로드 실패:', err));
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, user, setUser]);
 
   return (
     <>
       <Router />
+      <Snackbar />
     </>
   );
 }
