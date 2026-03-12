@@ -231,16 +231,16 @@ export async function leaveStudy(studyId: number): Promise<{ detail: string }> {
   return res.data;
 }
 
-/** 내가 만든 스터디 조회 - GET /study/my-study/ */
+/** 내가 만든 스터디 조회 - results 배열만 반환하도록 수정 */
 export async function getMyStudies(): Promise<StudyApiData[]> {
-  const res = await axiosInstance.get<StudyApiData[]>('/study/my-study/');
-  return res.data;
+  const res = await axiosInstance.get<StudyApiData[]>('/study/my-study/'); 
+  // API 명세에 따라 만약 객체로 온다면 res.data.results를 반환해야 합니다.
+  // 현재 코드 구조상 배열로 기대하고 있으므로 아래와 같이 안전하게 처리합니다.
+  return Array.isArray(res.data) ? res.data : (res.data as any).results;
 }
 
-/** 내 마감된 스터디 조회 - GET /study/my-closed-study/ */
-export async function getMyClosedStudies(): Promise<StudyListResponse> {
-  const res = await axiosInstance.get<StudyListResponse>('/study/my-study/', {
-    params: { study_status: 4 }
-  });
-  return res.data;
+/** 내 마감된 스터디 조회 */
+export async function getMyClosedStudies(): Promise<StudyApiData[]> {
+  const res = await axiosInstance.get<any>('/study/my-closed-study/');
+  return res.data.results || res.data;
 }
