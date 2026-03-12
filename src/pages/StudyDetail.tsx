@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getStudy, joinStudy } from '@/api/study';
 import { storage } from '@/utils/storage';
@@ -36,7 +36,7 @@ export default function StudyDetail() {
 
   const thumbnailCardRef = useRef<HTMLDivElement>(null);
 
-  const myPk = Number(storage.getUserId());
+  const myPk = useMemo(() => Number(storage.getUserId()), []);
   const isLeader = studyDetail?.leader?.id === myPk;
 
   useEffect(() => {
@@ -115,69 +115,6 @@ export default function StudyDetail() {
     const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
     return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, "0")}. ${String(d.getDate()).padStart(2, "0")}(${dayNames[d.getDay()]})`;
   };
-
-  // 웹 오른쪽 사이드카드
-  const SideCard = () => (
-    <div className="border border-gray-300 rounded-xl overflow-hidden">
-      <div className="bg-primary px-4 py-3 flex items-center justify-between">
-        <SpeakerIcon className="h-7 w-7 text-background" />
-        <span className="text-background text-sm font-medium">{studyDetail.study_status.name}</span>
-      </div>
-      <div className="p-4 flex flex-col gap-4">
-        <div className="flex justify-between">
-          {DAYS_ORDER.map((d) => {
-            const active = studyDetail.study_day.some((day) => day.name === d);
-            return (
-              <div key={d} className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium ${active ? "bg-primary text-background" : "bg-gray-100 text-gray-500"}`}>
-                {d}
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex flex-col divide-y divide-gray-100">
-          <div className="flex justify-between py-2.5 text-sm">
-            <span className="text-gray-700">시작일</span>
-            <span className="font-medium text-primary">{studyDetail.start_date}</span>
-          </div>
-          <div className="flex justify-between py-2.5 text-sm">
-            <span className="text-gray-700">시간</span>
-            <div className="text-right">
-              <div className="font-medium text-gray-900">{studyDetail.start_time.slice(0, 5)} ~ {studyDetail.end_time.slice(0, 5)}</div>
-              <div className="text-xs text-gray-500">{studyDetail.term}주 진행</div>
-            </div>
-          </div>
-          <div className="flex justify-between py-2.5 text-sm">
-            <span className="text-gray-700">모집 인원</span>
-            <span className="font-bold text-primary">{studyDetail.participants.length} / {studyDetail.recruitment}</span>
-          </div>
-        </div>
-        <button
-          onClick={() => withAssociateGuard(handleJoinOrChat, 'associate-join')}
-          className="w-full h-11 rounded-lg bg-primary text-background font-medium"
-        >
-          {primaryButtonText}
-        </button>
-        <div className="flex gap-2">
-          <button 
-              onClick={() => {
-                  if (navigator.share) {
-                      navigator.share({ title: studyDetail.title, url: window.location.href });
-                  } else {
-                      navigator.clipboard.writeText(window.location.href);
-                      alert("링크가 복사되었습니다.");
-                  }
-              }}
-              className="flex-1 h-10 flex items-center justify-center gap-2 rounded-lg border border-gray-300 text-sm text-gray-700">
-            <ShareIcon className="w-4 h-4" />
-            공유하기
-          </button>
-          <button onClick={handleLike} disabled={isLikeLoading} className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300">
-            {liked ? <HeartFillIcon className="w-5 h-5 text-error" /> : <HeartIcon className="w-5 h-5 text-gray-500" />}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="w-full min-h-screen bg-background">
@@ -324,7 +261,11 @@ export default function StudyDetail() {
                 그룹장에게 질문하기
               </h2>
               <div className="flex flex-col gap-4">
-                <CommentSection studyPk={studyDetail.id} leaderId={studyDetail.leader.id} currentUserId={myPk} />
+                <CommentSection
+                  studyPk={studyDetail.id}
+                  leaderId={studyDetail.leader.id}
+                  currentUserId={myPk}
+                />
               </div>
             </div>
           </div>
