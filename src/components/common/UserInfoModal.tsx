@@ -5,7 +5,7 @@ import { getFullUrl } from '@/api/upload';
 import ReportModal from '@/components/common/ReportModal';
 import defaultProfileImg from '@/assets/base/User-Profile-L.svg';
 import HelpCircleIcon from '@/assets/base/icon-help-circle.svg?react';
-import CloseIcon from '@/assets/base/icon-button-(X).svg?react';
+import CloseIcon from '@/assets/base/icon-btn-X.svg?react';
 
 interface GitHubCalendarBoundaryProps {
   username: string;

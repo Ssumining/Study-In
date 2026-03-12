@@ -4,9 +4,8 @@ import { useModalStore } from '@/store/modalStore';
 import CrownIcon from '@/assets/base/icon-crown-fill.svg?react';
 import DotsIcon from '@/assets/base/icon-dots.svg?react';
 import HomeIcon from '@/assets/base/icon-Home.svg?react';
-import PersonIcon from '@/assets/base/icon-person.svg?react';
-import { getStudy } from '@/api/study';
-import { leaveStudy } from '@/api/study';;
+import EmptyProfileIcon from '@/assets/base/icon-empty-profile.svg?react';
+import { getStudy, leaveStudy } from '@/api/study';
 import { getFullUrl } from '@/api/upload';
 
 interface MemberProfile {
@@ -24,9 +23,10 @@ interface StudyDetail {
 
 interface ChatSidebarProps {
     onClose?: () => void;
+    onLeave?: () => void;
 }
 
-export default function ChatSidebar({ onClose }: ChatSidebarProps) {
+export default function ChatSidebar({ onClose, onLeave }: ChatSidebarProps) {
     const navigate = useNavigate();
     const { study_pk } = useParams();
     const { openModal } = useModalStore();
@@ -72,8 +72,17 @@ export default function ChatSidebar({ onClose }: ChatSidebarProps) {
 
     const totalMembers = studyData ? studyData.participants.length + 1 : 0;
 
-    if (isLoading) return <div className="p-4 text-gray-500 text-sm">로딩 중...</div>;
-    if (!studyData) return <div className="p-4 text-gray-500 text-sm font-regular">데이터가 없습니다.</div>;
+    // 수정 후
+if (isLoading) return (
+    <div className="flex-1 flex items-center justify-center text-gray-500 text-base font-regular">
+        로딩 중...
+    </div>
+);
+if (!studyData) return (
+    <div className="flex-1 flex items-center justify-center text-gray-500 text-base font-regular">
+        데이터가 없습니다.
+    </div>
+);
 
     return (
         <div className="flex flex-col h-full bg-background">
@@ -89,7 +98,7 @@ export default function ChatSidebar({ onClose }: ChatSidebarProps) {
                             setIsMenuOpen(!isMenuOpen);
                         }}
                     >
-                        <DotsIcon className="w-6 h-6" />
+                        <DotsIcon className="w-6 h-6 md:hidden"/>
                     </button>
 
                     {isMenuOpen && (
@@ -108,7 +117,7 @@ export default function ChatSidebar({ onClose }: ChatSidebarProps) {
                                 {/* 나가기 API 연동 */}
                                 <button
                                     className="w-[184px] text-left px-[10px] py-[5px] text-base font-regular rounded-[8px] text-error mt-1 hover:bg-gray-100"
-                                    onClick={handleLeaveStudy}
+                                    onClick={onLeave}
                                 >
                                     스터디 나가기
                                 </button>
@@ -132,7 +141,7 @@ export default function ChatSidebar({ onClose }: ChatSidebarProps) {
                                 alt="방장"
                             />
                         ) : (
-                            <PersonIcon className="w-6 h-6 text-gray-500 opacity-50" />
+                            <EmptyProfileIcon className="w-full h-ful" />
                         )}
                     </div>
                     <span className="text-base font-medium text-surface truncate flex-1">
@@ -155,7 +164,7 @@ export default function ChatSidebar({ onClose }: ChatSidebarProps) {
                                     alt="멤버"
                                 />
                             ) : (
-                                <PersonIcon className="w-6 h-6 text-gray-500 opacity-50" />
+                                <EmptyProfileIcon className="w-full h-ful" />
                             )}
                         </div>
                         <span className="text-base font-regular text-surface truncate flex-1">
