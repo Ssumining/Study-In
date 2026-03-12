@@ -39,7 +39,7 @@ const CommentSection = ({ studyPk }: CommentSectionProps) => {
 
       {error && <p className="text-sm text-error mt-2">{error}</p>}
 
-      <div>
+      <div className="md:mt-6">
         {loading ? (
           <p className="text-base text-gray-500">댓글을 불러오는 중...</p>
         ) : comments.length === 0 ? (

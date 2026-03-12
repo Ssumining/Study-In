@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useModalStore } from '@/store/modalStore';
 import CrownIcon from '@/assets/base/icon-crown-fill.svg?react';
 import DotsIcon from '@/assets/base/icon-dots.svg?react';
 import HomeIcon from '@/assets/base/icon-Home.svg?react';
@@ -28,6 +29,7 @@ interface ChatSidebarProps {
 export default function ChatSidebar({ onClose }: ChatSidebarProps) {
     const navigate = useNavigate();
     const { study_pk } = useParams();
+    const { openModal } = useModalStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [studyData, setStudyData] = useState<StudyDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -119,7 +121,10 @@ export default function ChatSidebar({ onClose }: ChatSidebarProps) {
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
                 {/* 스터디장 */}
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-[42px] bg-gray-300 overflow-hidden shrink-0">
+                    <div
+                        className="w-10 h-10 rounded-[42px] bg-gray-300 overflow-hidden shrink-0 cursor-pointer"
+                        onClick={() => openModal('user-info', studyData.leader.id)}
+                    >
                         {studyData.leader.profile.profile_img ? (
                             <img
                                 src={getFullUrl(studyData.leader.profile.profile_img)}
@@ -139,7 +144,10 @@ export default function ChatSidebar({ onClose }: ChatSidebarProps) {
                 {/* 일반 멤버 */}
                 {studyData.participants.map((member) => (
                     <div key={member.id} className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-[42px] bg-gray-300 overflow-hidden">
+                        <div
+                            className="w-10 h-10 rounded-[42px] bg-gray-300 overflow-hidden cursor-pointer"
+                            onClick={() => openModal('user-info', member.id)}
+                        >
                             {member.profile.profile_img ? (
                                 <img
                                     src={getFullUrl(member.profile.profile_img)}

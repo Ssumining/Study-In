@@ -151,7 +151,7 @@ export default function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                 <div className="relative w-[30px] h-[30px]">
                   <NotificationIcon className="w-[30px] h-[30px] text-surface" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 w-[10px] h-[10px] bg-error rounded-full" />
+                    <span className="absolute bottom-0.5 right-0 w-[10px] h-[10px] bg-error rounded-full" />
                   )}
                 </div>
                 <span className="text-xs text-gray-700">알림</span>

@@ -30,53 +30,63 @@ const CommentInput = ({
 
   return (
     <div className="flex flex-col">
-      {/* textarea */}
-      <div className="border border-gray-300 rounded-lg overflow-hidden">
+      {/* 모바일: textarea 박스 */}
+      <div className="md:hidden border border-gray-300 rounded-lg overflow-hidden">
         <textarea
           value={content}
           onChange={(e) => {
             if (e.target.value.length <= MAX_LENGTH) setContent(e.target.value);
           }}
           placeholder={placeholder}
-          className="w-full px-4 pt-4 pb-2 text-base text-gray-900 placeholder:text-gray-500 resize-none focus:outline-none min-h-20 max-md:min-h-48"
+          className="w-full px-4 pt-4 pb-2 text-base text-gray-900 placeholder:text-gray-500 resize-none focus:outline-none min-h-48"
         />
-        {/* 웹: 글자수 + 비밀댓글 + 등록 버튼 */}
-        <div className="hidden md:flex items-center justify-between border-t border-gray-300 px-4 py-2">
-          <div className="flex items-center gap-2">
-            {!isRecomment && (
-              <>
-                <button onClick={() => setIsSecret((prev) => !prev)}>
-                  {isSecret ? (
-                    <IconSquareCheckFill className="w-5 h-5 text-primary flex-shrink-0" />
-                  ) : (
-                    <IconSquareCheck className="w-5 h-5 text-gray-300 flex-shrink-0" />
-                  )}
-                </button>
-                <label
-                  htmlFor="is_secret_web"
-                  className="text-base text-gray-500 cursor-pointer"
-                >
-                  비밀댓글
-                </label>
-              </>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">
+      </div>
+
+      {/* 웹: 2컬럼 (왼쪽 textarea / 오른쪽 컨트롤 150px) */}
+      <div className="hidden md:flex border border-[#D9DBE0] rounded-[10px] overflow-hidden h-[150px]">
+        <textarea
+          value={content}
+          onChange={(e) => {
+            if (e.target.value.length <= MAX_LENGTH) setContent(e.target.value);
+          }}
+          placeholder={placeholder}
+          className="flex-1 px-6 py-5 text-base text-gray-900 placeholder:text-gray-400 resize-none focus:outline-none"
+        />
+        {/* 오른쪽 컨트롤 컬럼 */}
+        <div className="w-[150px] flex flex-col border-l border-[#D9DBE0] shrink-0">
+          {/* 상단: 글자수 + 비밀댓글 */}
+          <div className="flex-1 flex flex-col items-center justify-between py-5">
+            <span className="text-base font-medium text-[#47494D]">
               {content.length}/{MAX_LENGTH}
             </span>
-            <button
-              onClick={handleSubmit}
-              disabled={!content.trim()}
-              className={`px-5 py-2 rounded text-base font-medium transition ${
-                content.trim()
-                  ? "bg-primary text-background"
-                  : "bg-gray-100 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              등록
-            </button>
+            {!isRecomment && (
+              <button
+                onClick={() => setIsSecret((prev) => !prev)}
+                className="flex items-center gap-1"
+              >
+                {isSecret ? (
+                  <IconSquareCheckFill className="w-5 h-5 text-primary flex-shrink-0" />
+                ) : (
+                  <IconSquareCheck className="w-5 h-5 text-gray-300 flex-shrink-0" />
+                )}
+                <span className={`text-sm font-medium ${isSecret ? "text-primary" : "text-gray-400"}`}>
+                  비밀댓글
+                </span>
+              </button>
+            )}
           </div>
+          {/* 하단: 등록 버튼 (50px) */}
+          <button
+            onClick={handleSubmit}
+            disabled={!content.trim()}
+            className={`h-[50px] border-t border-[#D9DBE0] text-base font-medium transition ${
+              content.trim()
+                ? "bg-primary text-background"
+                : "bg-[#F3F5FA] text-[#47494D] cursor-not-allowed"
+            }`}
+          >
+            등록
+          </button>
         </div>
       </div>
 

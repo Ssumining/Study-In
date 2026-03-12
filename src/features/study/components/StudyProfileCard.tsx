@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import IconSpeaker from "@/assets/base/icon-speaker.svg?react";
 import { STATUS_COLOR } from "@/constants/study";
 import defaultProfile from "@/assets/base/icon-empty-profile.svg";
+import { useModalStore } from "@/store/modalStore";
 
 interface Study {
   id: number;
@@ -15,16 +16,19 @@ interface StudyProfileCardProps {
   isLoggedIn: boolean;
   userName?: string;
   userImage?: string;
+  userId?: number;
   studies?: Study[];
 }
 
 export default function StudyProfileCard({
   isLoggedIn,
   userName = "파이썬 연금술사",
-  userImage, // assets에서 가져온 토끼 이미지 경로
+  userImage,
+  userId,
   studies = [],
 }: StudyProfileCardProps) {
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
   // 1. 로그인 이전 (세 번째 사진 상황)
   if (!isLoggedIn) {
     return (
@@ -54,7 +58,8 @@ export default function StudyProfileCard({
           <img
             src={userImage || defaultProfile}
             alt="프로필"
-            className="w-[100px] h-[100px] rounded-full object-cover border-4 border-background shadow-sm"
+            onClick={() => userId && openModal('user-info', userId)}
+            className="w-[100px] h-[100px] rounded-full object-cover border-4 border-background shadow-sm cursor-pointer"
           />
         </div>
         <h3 className="font-bold text-lg mb-6">{userName}</h3>

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import personIcon from '@/assets/base/icon-person.svg'; 
+import personIcon from '@/assets/base/icon-person.svg';
 import CrownIcon from '@/assets/base/icon-crown-fill.svg?react';
 import CopyIcon from '@/assets/base/icon-copy.svg?react';
 import CheckIcon from '@/assets/base/icon-square-Check.svg?react';
 import { getFullUrl } from '@/api/upload';
 import { ChatMessage } from '@/types/chat';
+import { useModalStore } from '@/store/modalStore';
 
 interface ChatBubbleProps {
     message: ChatMessage; // 더미 props 대신 API 메시지 객체를 통째로 받음
@@ -19,6 +20,7 @@ export default function ChatBubble({ message, isMine, isOwner }: ChatBubbleProps
     
     const [copied, setCopied] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
+    const { openModal } = useModalStore();
 
     // API 데이터 매핑
     // 옵셔널 체이닝(?.)을 사용하여 데이터가 없을 때 터지는 것 방지
@@ -55,7 +57,10 @@ export default function ChatBubble({ message, isMine, isOwner }: ChatBubbleProps
             
             {/* 상대방 프로필 이미지 */}
             {!isMine && (
-                <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center shrink-0 border border-gray-300 shadow-sm">
+                <div
+                    className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center shrink-0 border border-gray-300 shadow-sm cursor-pointer"
+                    onClick={() => message.user?.pk && openModal('user-info', message.user.pk)}
+                >
                     {profileImg ? (
                         <img 
                             src={getFullUrl(profileImg)} 

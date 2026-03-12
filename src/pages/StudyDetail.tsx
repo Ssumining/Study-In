@@ -5,6 +5,7 @@ import { storage } from '@/utils/storage';
 import { StudyApiData, likeStudy, unlikeStudy } from '@/api/study';
 import { useAssociateGuard } from '@/hooks/useAssociateGuard';
 import { getFullUrl } from '@/api/upload';
+import { useModalStore } from '@/store/modalStore';
 
 import SpeakerIcon from "@/assets/base/icon-speaker.svg?react";
 import HeartIcon from "@/assets/base/icon-heart.svg?react";
@@ -17,6 +18,7 @@ export default function StudyDetail() {
   const navigate = useNavigate();
   const { studyId } = useParams<{ studyId: string }>();
   const { withAssociateGuard } = useAssociateGuard();
+  const { openModal } = useModalStore();
 
   const [liked, setLiked] = useState(false);
   const [isJoined, setIsJoined] = useState(false);
@@ -187,7 +189,7 @@ export default function StudyDetail() {
               {/* 그룹장 소개 */}
               <section className="rounded-xl border border-gray-300 bg-background p-5">
                 <h2 className="text-lg font-bold text-gray-900 mb-4">그룹장 소개</h2>
-                <div className="flex gap-4 cursor-pointer" onClick={() => navigate(`/profile/${studyDetail.leader.id}`)}>
+                <div className="flex gap-4 cursor-pointer" onClick={() => openModal('user-info', studyDetail.leader.id)}>
                   <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 shrink-0">
                     {leaderImgUrl ? <img src={leaderImgUrl} alt={leaderProfile.nickname} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gray-100" />}
                   </div>
@@ -306,7 +308,7 @@ export default function StudyDetail() {
           {/* 그룹장 소개 */}
           <section className="bg-background rounded-xl p-4">
             <h2 className="text-lg font-bold text-gray-900 mb-3">그룹장 소개</h2>
-            <div className="flex gap-3 cursor-pointer" onClick={() => navigate(`/profile/${studyDetail.leader.id}`)}>
+            <div className="flex gap-3 cursor-pointer" onClick={() => openModal('user-info', studyDetail.leader.id)}>
               <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 shrink-0">
                 {leaderImgUrl ? <img src={leaderImgUrl} alt={leaderProfile.nickname} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gray-100" />}
               </div>

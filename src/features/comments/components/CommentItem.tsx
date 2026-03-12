@@ -45,7 +45,7 @@ const CommentItem = ({
 }: CommentItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
-  const [editIsSecret, setEditIsSecret] = useState(comment.is_secret ?? false);
+  const [editIsSecret] = useState(comment.is_secret ?? false);
   const [showRecommentInput, setShowRecommentInput] = useState(false);
   const [taggedUser, setTaggedUser] = useState<
     { id: number; nickname: string } | undefined
@@ -62,7 +62,7 @@ const CommentItem = ({
   // 닉네임 추출
   const nickname = comment.user
     ? isWithdrawnUser(comment.user)
-      ? "탈퇴한 회원"
+      ? "미지의 사용자"
       : isNormalUser(comment.user)
         ? comment.user.profile.nickname
         : comment.user.profile.nickname
@@ -153,7 +153,7 @@ const CommentItem = ({
           <div className="hidden md:flex items-start justify-between gap-2">
             <div className="flex items-center gap-2 flex-wrap">
               <span
-                className={`text-base font-bold ${isDeleted ? "text-gray-500" : "text-surface"}`}
+                className={`text-sm font-bold ${isDeleted ? "text-gray-500" : "text-surface"}`}
               >
                 {nickname}
               </span>
@@ -208,21 +208,21 @@ const CommentItem = ({
           </div>
 
           {/* 웹 날짜 */}
-          <p className="hidden md:block text-sm text-gray-500 mt-1">
+          <p className="hidden md:block text-xs text-gray-400 mt-1">
             {comment.created ? formatDate(comment.created) : ""}
           </p>
 
           {/* 내용 or 수정 입력창 */}
           {isEditing ? (
-            <div className="mt-2 flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2">
+            <div className="mt-2 h-[50px] flex items-center border border-[#D9DBE0] rounded-[8px] overflow-hidden">
               <input
                 type="text"
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleUpdate()}
-                className="flex-1 text-base focus:outline-none"
+                className="flex-1 px-4 text-base focus:outline-none"
               />
-              <div className="flex gap-2 flex-shrink-0">
+              <div className="flex items-center gap-3 px-4 flex-shrink-0 border-l border-[#D9DBE0] h-full">
                 <button
                   onClick={() => setIsEditing(false)}
                   className="text-sm text-gray-500 underline"
@@ -240,9 +240,9 @@ const CommentItem = ({
           ) : (
             <div className="flex items-center gap-2 mt-[10px]">
               {comment.is_secret && isAuthor && (
-                <IconLock className="w-4 h-4 text-primary flex-shrink-0" />
+                <IconLock className="w-4 h-4 text-[#5C8EF2] flex-shrink-0" />
               )}
-              <p className="text-base break-all text-gray-700">
+              <p className={`text-base break-all ${isDeleted ? "text-gray-400" : "text-surface"}`}>
                 {isDeleted ? "삭제된 댓글입니다." : comment.content}
               </p>
             </div>

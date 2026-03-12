@@ -227,6 +227,7 @@ export default function Home() {
               isLoggedIn={isLoggedIn}
               userName={nickname}
               userImage={profileImg}
+              userId={storage.getUserId() ?? undefined}
               studies={myStudies.map((s) => ({
                 id: s.id,
                 title: s.title,
