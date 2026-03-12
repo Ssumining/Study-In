@@ -1,20 +1,17 @@
 import { useState, useEffect, useRef } from "react";
-import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getStudy, joinStudy } from '@/api/study';
 import { storage } from '@/utils/storage';
 import { StudyApiData, likeStudy, unlikeStudy } from '@/api/study';
 import { useAssociateGuard } from '@/hooks/useAssociateGuard';
 import { getFullUrl } from '@/api/upload';
-
+import { useModalStore } from '@/store/modalStore';
 import SpeakerIcon from "@/assets/base/icon-speaker.svg?react";
+import CrownIcon from "@/assets/base/icon-crown-fill.svg?react";
 import HeartIcon from "@/assets/base/icon-heart.svg?react";
 import HeartFillIcon from "@/assets/base/icon-heart-fill.svg?react";
 import ShareIcon from "@/assets/base/icon-Share.svg?react";
-import CrownIcon from "@/assets/base/icon-crown-fill.svg?react";
-
 import CommentSection from "@/features/comments/components/CommentSection";
-import { useModalStore } from "@/store/modalStore";
 
 function TagChip({ label }: { label: string }) {
   return (
@@ -40,7 +37,6 @@ export default function StudyDetail() {
   const thumbnailCardRef = useRef<HTMLDivElement>(null);
 
   const myPk = Number(storage.getUserId());
-  const myPk = useMemo(() => Number(storage.getUserId()), []);
   const isLeader = studyDetail?.leader?.id === myPk;
 
   useEffect(() => {
@@ -119,7 +115,6 @@ export default function StudyDetail() {
     const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
     return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, "0")}. ${String(d.getDate()).padStart(2, "0")}(${dayNames[d.getDay()]})`;
   };
-  const leaderImgUrl = leaderProfile.profile_img ? getFullUrl(leaderProfile.profile_img) : null;
 
   // 웹 오른쪽 사이드카드
   const SideCard = () => (
@@ -130,7 +125,7 @@ export default function StudyDetail() {
       </div>
       <div className="p-4 flex flex-col gap-4">
         <div className="flex justify-between">
-          {DAYS.map((d) => {
+          {DAYS_ORDER.map((d) => {
             const active = studyDetail.study_day.some((day) => day.name === d);
             return (
               <div key={d} className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium ${active ? "bg-primary text-background" : "bg-gray-100 text-gray-500"}`}>
@@ -157,7 +152,7 @@ export default function StudyDetail() {
           </div>
         </div>
         <button
-          onClick={() => withAssociateGuard(handleJoinOrChat)}
+          onClick={() => withAssociateGuard(handleJoinOrChat, 'associate-join')}
           className="w-full h-11 rounded-lg bg-primary text-background font-medium"
         >
           {primaryButtonText}
@@ -329,7 +324,7 @@ export default function StudyDetail() {
                 그룹장에게 질문하기
               </h2>
               <div className="flex flex-col gap-4">
-                <CommentSection studyPk={studyDetail.id} />
+                <CommentSection studyPk={studyDetail.id} leaderId={studyDetail.leader.id} currentUserId={myPk} />
               </div>
             </div>
           </div>
@@ -397,7 +392,7 @@ export default function StudyDetail() {
                   </span>
                 </div>
                 <button
-                  onClick={() => withAssociateGuard(handleJoinOrChat)}
+                  onClick={() => withAssociateGuard(handleJoinOrChat, 'associate-join')}
                   className="w-full h-11 rounded-lg bg-primary text-background font-semibold text-sm"
                 >
                   {primaryButtonText}
@@ -550,32 +545,18 @@ export default function StudyDetail() {
 
           <section className="py-4">
             <h2 className="text-lg font-bold text-gray-900 mb-3">그룹장 소개</h2>
-            <div
-              className="cursor-pointer flex gap-3"
-              onClick={() => openModal("user-info", studyDetail.leader.id)}
-            >
-              <div className="w-[100px] h-[100px] rounded-full overflow-hidden bg-gray-100 shrink-0">
-                {leaderImgUrl
-                  ? (
-                    <img
-                      src={leaderImgUrl}
-                      alt={leaderProfile.nickname}
-                      className="w-full h-full object-cover"
-                    />
-                  )
-                  : <div className="w-full h-full bg-gray-100" />
-                }
+            <div className="flex gap-3 cursor-pointer" onClick={() => openModal('user-info', studyDetail.leader.id)}>
+              <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 shrink-0">
+                {leaderImgUrl ? <img src={leaderImgUrl} alt={leaderProfile.nickname} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gray-100" />}
               </div>
-              <div className="flex-1 flex flex-col gap-2">
-                <div className="flex items-center gap-1">
-                  <span className="font-bold text-gray-900 text-sm">
-                    {leaderProfile.nickname}
+              <div className="flex flex-col justify-center gap-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="flex items-center gap-1">
+                    <span className="font-bold text-gray-900 text-sm">{leaderProfile.nickname}</span>
+                    <CrownIcon className="w-4 h-4 text-yellow-400 flex-shrink-0" />
                   </span>
-                  <CrownIcon className="w-4 h-4 text-primary" />
-                  {leaderProfile.preferred_region && (
-                    <span className="text-xs bg-gray-100 rounded-full px-[10px] py-[2px] text-gray-700 ml-1">
-                      {leaderProfile.preferred_region.location}
-                    </span>
+                  {studyDetail.study_location && (
+                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{studyDetail.study_location.location}</span>
                   )}
                 </div>
                 {leaderProfile.introduction && (
@@ -630,7 +611,7 @@ export default function StudyDetail() {
               }
             </button>
             <button
-              onClick={() => withAssociateGuard(handleJoinOrChat)}
+              onClick={() => withAssociateGuard(handleJoinOrChat, 'associate-join')}
               className="h-[50px] flex-1 rounded-lg bg-primary text-background font-medium"
             >
               {primaryButtonText}

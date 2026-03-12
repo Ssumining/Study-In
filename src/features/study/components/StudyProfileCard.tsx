@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import IconSpeaker from "@/assets/base/icon-speaker.svg?react";
 import { STATUS_COLOR } from "@/constants/study";
 import defaultProfile from "@/assets/base/icon-empty-profile.svg";
+import { useModalStore } from "@/store/modalStore";
 import type { StudyApiData } from "@/api/study";
 import defaultThumbnail from "@/assets/base/User-Profile-L.svg";
 
@@ -10,6 +11,7 @@ interface StudyProfileCardProps {
   isLoading?: boolean;
   userName?: string;
   userImage?: string;
+  userId?: number;
   studies?: StudyApiData[];
 }
 
@@ -18,9 +20,11 @@ export default function StudyProfileCard({
   isLoading = false,
   userName,
   userImage,
+  userId,
   studies = [],
 }: StudyProfileCardProps) {
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
   // 로그인 이전 (세 번째 사진 상황)
   if (!isLoggedIn) {
     return (
@@ -50,7 +54,8 @@ export default function StudyProfileCard({
           <img
             src={userImage || defaultProfile}
             alt="프로필"
-            className="w-[100px] h-[100px] rounded-full object-cover border-4 border-background shadow-sm"
+            onClick={() => userId && openModal('user-info', userId)}
+            className="w-[100px] h-[100px] rounded-full object-cover border-4 border-background shadow-sm cursor-pointer"
           />
         </div>
         <h3 className="font-bold text-lg mb-6">{userName ?? "닉네임 없음"}</h3>
