@@ -7,7 +7,7 @@ interface CommentSectionProps {
   studyPk: number;
 }
 
-const CommentSection = ({ studyPk,}: CommentSectionProps) => {
+const CommentSection = ({ studyPk }: CommentSectionProps) => {
   const navigate = useNavigate();
   const {
     comments,
