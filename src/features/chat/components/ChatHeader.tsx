@@ -39,7 +39,7 @@ export default function ChatHeader({
 }: ChatHeaderProps) {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const handleGoHome = () => navigate('/');
+    const handleGoHome = () => navigate('/chat');
 
     if (slot === 'left') {
         return (

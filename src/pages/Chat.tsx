@@ -18,6 +18,7 @@ export default function Chat() {
     const [hasStudy, setHasStudy] = useState<boolean | null>(null);
     const [participatingCount, setParticipatingCount] = useState(0);
     const [studyStatus, setStudyStatus] = useState<string>('');
+    const [studyTitle, setStudyTitle] = useState<string>('');
     const [leaderId, setLeaderId] = useState<number | undefined>();
     const [isRoomListOpen, setIsRoomListOpen] = useState(false);
     const [isMemberSidebarOpen, setIsMemberSidebarOpen] = useState(false);
@@ -33,6 +34,7 @@ export default function Chat() {
                     const current = studies.find((s: any) => String(s.id) === study_pk);
                     if (current) {
                         setStudyStatus(current.study_status?.name ?? '');
+                        setStudyTitle(current.title ?? '');
                         setLeaderId(current.leader?.id);
                     }
                 })
@@ -128,7 +130,7 @@ export default function Chat() {
                 <main className={`flex-1 min-w-0 flex flex-col overflow-x-hidden md:bg-gray-100 ${isNoData ? 'bg-background' : 'bg-gray-100'}`}>
                     <div className="relative shrink-0">
                         <ChatHeader
-                            title={!isNoData && !isNoRoomSelected ? "스터디 채팅방" : undefined}
+                            title={!isNoData && !isNoRoomSelected ? (studyTitle || "스터디 채팅방") : undefined}
                             statusName={studyStatus}
                             isRoomListOpen={isRoomListOpen}
                             onBack={() => setIsRoomListOpen(true)}

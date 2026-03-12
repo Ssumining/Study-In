@@ -75,12 +75,11 @@ const UserInfoModal = ({ userId, onClose }: UserInfoModalProps) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:overflow-y-auto sm:items-start sm:justify-center sm:py-10"
+      className="fixed inset-0 z-50 flex items-end sm:overflow-y-auto sm:items-start sm:justify-center sm:py-10 md:items-center md:py-0"
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/40 sm:hidden" />
       <div
-<<<<<<< HEAD
         className="relative z-10 w-full sm:w-[390px] rounded-t-[20px] sm:rounded-[10px] bg-background shadow-xl max-h-[90vh] overflow-y-auto sm:max-h-none sm:overflow-visible"
         onClick={(e) => e.stopPropagation()}
       >
