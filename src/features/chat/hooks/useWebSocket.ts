@@ -2,6 +2,25 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { storage } from '@/utils/storage';
 import { ChatMessage } from '@/types/chat';
 
+// WS/REST API 응답 모두 처리 (서버마다 flat/nested 구조 다름)
+export function normalizeChatMessage(data: any): ChatMessage {
+    return {
+        pk: data.pk ?? Date.now() * -1,
+        chat_type: data.chat_type ?? data.type,
+        message: data.message ?? null,
+        image_url: data.image_url ?? null,
+        file_url: data.file_url ?? null,
+        created: data.created ?? new Date().toISOString(),
+        user: {
+            pk: data.user?.pk ?? data.user?.id ?? null,
+            profile: data.user?.profile ?? {
+                nickname: data.user?.nickname ?? '',
+                profile_img: data.user?.profile_img ?? null,
+            },
+        },
+    };
+}
+
 const WS_BASE = import.meta.env.VITE_WS_BASE_URL || 'wss://api.wenivops.co.kr/services/studyin-chat/chat/study';
 const PING_INTERVAL = 30000; // 30초 핑 유지
 const MAX_RECONNECT_ATTEMPTS = 5; // 최대 재연동 시도 횟수
@@ -61,7 +80,7 @@ export const useWebSocket = ({ studyPk, onMessage }: UseWebSocketProps) => {
                 }
                 const SYSTEM_TYPES = ['pong', 'connection_success', 'connection_warning'];
                 if (!SYSTEM_TYPES.includes(data.type)) {
-                    onMessageRef.current(data);
+                    onMessageRef.current(normalizeChatMessage(data));
                 }
             } catch (e) {
                 console.error('[WS] 메시지 파싱 에러:', e);
