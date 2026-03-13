@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getStudy, joinStudy, leaveStudy } from '@/api/study';
+import { getStudy, joinStudy, leaveStudy, SCHEDULE_SEP } from '@/api/study';
 import { STATUS_BG_COLOR } from '@/constants/study';
 import { storage } from '@/utils/storage';
 import { StudyApiData, likeStudy, unlikeStudy } from '@/api/study';
@@ -39,6 +39,10 @@ export default function StudyDetail() {
 
   const myPk = useMemo(() => Number(storage.getUserId()), []);
   const isLeader = studyDetail?.leader?.id === myPk;
+
+  const studyParts = studyDetail?.study_info?.split(SCHEDULE_SEP) ?? [''];
+  const studyIntro = studyParts[0];
+  const studySchedule = studyParts[1] ?? '';
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -227,7 +231,7 @@ export default function StudyDetail() {
               <div className="flex flex-col gap-[20px]">
                 <h2 className="text-[30px] font-bold text-surface leading-[40px]">스터디 소개</h2>
                 <p className="whitespace-pre-line text-base text-surface leading-[24px]">
-                  {studyDetail.study_info}
+                  {studyIntro}
                 </p>
               </div>
 
@@ -236,10 +240,10 @@ export default function StudyDetail() {
               {/* 스터디 일정 */}
               <div className="flex flex-col gap-[20px]">
                 <h2 className="text-[30px] font-bold text-surface leading-[40px]">스터디 일정</h2>
-                {studyDetail.schedule_info
+                {studySchedule
                   ? (
                     <p className="whitespace-pre-line text-base text-surface leading-[24px]">
-                      {studyDetail.schedule_info}
+                      {studySchedule}
                     </p>
                   )
                   : <p className="text-base text-gray-300">일정 정보가 없습니다.</p>
@@ -532,7 +536,7 @@ export default function StudyDetail() {
           <section className="py-[20px]">
             <h2 className="text-2xl font-bold text-surface mb-[20px]">스터디 소개</h2>
             <p className="whitespace-pre-line text-lg text-surface leading-[24px]">
-              {studyDetail.study_info}
+              {studyIntro}
             </p>
           </section>
 
@@ -540,10 +544,10 @@ export default function StudyDetail() {
 
           <section className="py-[20px]">
             <h2 className="text-2xl font-bold text-surface mb-[20px]">스터디 일정</h2>
-            {studyDetail.schedule_info
+            {studySchedule
               ? (
                 <p className="whitespace-pre-line text-lg text-surface leading-[24px]">
-                  {studyDetail.schedule_info}
+                  {studySchedule}
                 </p>
               )
               : <p className="text-base text-gray-300">일정 정보가 없습니다.</p>

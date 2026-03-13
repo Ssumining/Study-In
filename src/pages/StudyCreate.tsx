@@ -137,7 +137,7 @@ export default function StudyCreate() {
       {/* ── 스터디 만들기 TopBar ── */}
       <StudyCreateTopBar
         isValid={isValid}
-        isSubmitting={isSubmitting || uploading}
+        isSubmitting={isSubmitting || uploading || aiIsLoading}
         onSubmitRequest={() =>
           openConfirm('study-create', () =>
             (document.getElementById('study-create-form') as HTMLFormElement)?.requestSubmit()

@@ -1,6 +1,5 @@
 import { axiosInstance } from './axios';
 import type { StudyFormState } from '@/types/study';
-import { uploadImage } from './upload';
 
 export interface StudyApiData {
   id: number;
@@ -68,19 +67,26 @@ const SUBJECT_MAP: Record<string, { id: number; name: string }> = {
   '기타':        { id: 8, name: '기타' },
 };
 
+// 백엔드가 schedule_info 필드를 지원하지 않으므로 study_info 안에 구분자로 합쳐서 저장
+export const SCHEDULE_SEP = '\n\n[studyin_schedule]\n';
+
 /** form + thumbnail → API payload 공통 빌더 */
 function buildStudyPayload(
   form: StudyFormState,
   thumbnailUrl: string,
   locationId?: number,
 ): Record<string, unknown> {
+  const schedule = form.schedule?.trim() ?? '';
+  const combinedStudyInfo = schedule
+    ? `${form.introduction}${SCHEDULE_SEP}${schedule}`
+    : form.introduction;
+
   const payload: Record<string, unknown> = {
     title: form.title,
     thumbnail: thumbnailUrl,
     is_offline: form.studyType === 'offline',
     recruitment: Number(form.maxMembers),
-    study_info: form.introduction,
-    schedule_info: form.schedule,
+    study_info: combinedStudyInfo,
     leader_intro: form.leaderIntro,
     study_day: form.days.map((day) => ({ id: DAY_MAP[day], name: day })),
     start_date: form.startDate,
@@ -130,8 +136,13 @@ export async function createStudy(
 
 /** 스터디 단건 조회 */
 export async function getStudy(studyId: number): Promise<StudyApiData> {
-  const res = await axiosInstance.get<StudyApiData>(`/study/${studyId}/`);
-  return res.data;
+  try {
+    const res = await axiosInstance.get<StudyApiData>(`/study/${studyId}/`);
+    return res.data;
+  } catch (error: any) {
+    console.error('[getStudy] 에러:', error.response?.status, error.response?.data);
+    throw error;
+  }
 }
 
 /** 스터디 삭제 */
