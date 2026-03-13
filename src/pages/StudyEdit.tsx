@@ -37,7 +37,7 @@ const SUBJECT_REVERSE: Record<string, string> = {
 function mapStudyApiToForm(data: StudyApiData): StudyFormState {
   return {
     thumbnail: null,
-    thumbnailPreview: data.thumbnail,
+    thumbnailPreview: getFullUrl(data.thumbnail),
     title: data.title,
     studyType: data.is_offline ? "offline" : "online",
     location: data.study_location?.location ?? "",
