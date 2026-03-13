@@ -45,7 +45,11 @@ export function useProfileForm() {
                 const data = await getProfile(userId);
                 setNickname(data.nickname ?? "");
                 setName(data.name ?? "");
-                setPhone(data.phone ?? "");
+                const rawPhone = (data.phone ?? "").replace(/\D/g, "").slice(0, 11);
+                let formattedPhone = rawPhone;
+                if (rawPhone.length > 7) formattedPhone = `${rawPhone.slice(0,3)}-${rawPhone.slice(3,7)}-${rawPhone.slice(7)}`;
+                else if (rawPhone.length > 3) formattedPhone = `${rawPhone.slice(0,3)}-${rawPhone.slice(3)}`;
+                setPhone(formattedPhone);
                 setBio(data.introduction ?? "");
                 setGithub(data.github_username ?? "");
                 setSelectedTags(data.tag ?? []);
@@ -115,7 +119,7 @@ export function useProfileForm() {
         setApiError(null);
         try {
             await updateProfile(userId, {
-                nickname, name, phone,
+                nickname, name, phone: phone.replace(/-/g, ""),
                 introduction: bio,
                 github_username: github,
                 profile_img: profileImgPath ?? undefined,
