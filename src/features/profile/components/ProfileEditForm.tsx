@@ -213,12 +213,27 @@ const ProfileEditForm = () => {
             <div className="flex gap-2">
               <input
                 type="text"
+                inputMode="numeric"
                 placeholder="010-0000-0000"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D/g, "").slice(0, 11);
+                  let formatted = digits;
+                  if (digits.length > 7) formatted = `${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7)}`;
+                  else if (digits.length > 3) formatted = `${digits.slice(0,3)}-${digits.slice(3)}`;
+                  setPhone(formatted);
+                }}
                 className="w-72 border border-gray-300 rounded-lg px-3 py-1.5 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary"
               />
-              <button className="w-20 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 shrink-0">
+              <button
+                type="button"
+                disabled={!phone}
+                className={`w-20 py-1.5 border rounded-lg text-sm font-medium text-background shrink-0 transition-colors ${
+                  phone
+                    ? "bg-primary border-primary cursor-pointer"
+                    : "bg-gray-300 border-gray-300 cursor-not-allowed"
+                }`}
+              >
                 인증
               </button>
             </div>
