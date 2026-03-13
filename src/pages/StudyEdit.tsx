@@ -9,7 +9,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import type { StudyFormState } from "@/types/study";
 import type { StudyDay } from "@/types/study";
-import { getStudy, updateStudy, deleteStudy } from "@/api/study";
+import { getStudy, updateStudy, deleteStudy, SCHEDULE_SEP } from "@/api/study";
 import { useAiStream } from "@/features/study/hooks/useAiStream";
 import type { StudyApiData } from "@/api/study";
 import useUpload from "@/hooks/useUpload";
@@ -42,8 +42,8 @@ function mapStudyApiToForm(data: StudyApiData): StudyFormState {
     studyType: data.is_offline ? "offline" : "online",
     location: data.study_location?.location ?? "",
     maxMembers: String(data.recruitment),
-    introduction: data.study_info,
-    schedule: data.schedule_info ?? "",
+    introduction: data.study_info?.split(SCHEDULE_SEP)[0] ?? "",
+    schedule: data.study_info?.split(SCHEDULE_SEP)[1] ?? "",
     leaderIntro: data.leader_intro ?? "",
     days: data.study_day.map((d) => d.name as StudyDay),
     startDate: data.start_date,
@@ -190,7 +190,7 @@ function StudyEditInner({
 
       <StudyCreateTopBar
         isValid={isValid}
-        isSubmitting={isSubmitting || uploading}
+        isSubmitting={isSubmitting || uploading || aiIsLoading}
         submitLabel="저장하기"
         submittingLabel="저장 중..."
         onViewStudy={() => navigate(`/study/${studyId}`)}

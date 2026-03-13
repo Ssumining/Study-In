@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { ChangeEvent, KeyboardEvent, FormEvent } from "react";
 import type { StudyFormState, StudyFormErrors, StudyDay } from "@/types/study";
 
@@ -85,7 +85,7 @@ export function useStudyForm(
   const fileInputRef = useRef<HTMLInputElement>(null);
   // 항상 최신 form 값을 참조하기 위한 ref (useCallback 클로저 문제 방지)
   const formRef = useRef(form);
-  useEffect(() => { formRef.current = form; }, [form]);
+  formRef.current = form; // 렌더마다 동기적으로 업데이트 (useEffect보다 항상 최신 보장)
 
   const updateField = useCallback(
     <K extends keyof StudyFormState>(key: K, value: StudyFormState[K]) => {
@@ -275,14 +275,15 @@ export function useStudyForm(
   const handleSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
-      const validationErrors = validateForm(form, minMembers);
+      const currentForm = formRef.current;
+      const validationErrors = validateForm(currentForm, minMembers);
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
         return;
       }
-      onSubmit?.(form);
+      onSubmit?.(currentForm);
     },
-    [form, onSubmit]
+    [onSubmit, minMembers],
   );
 
   const handleReset = useCallback(() => {
